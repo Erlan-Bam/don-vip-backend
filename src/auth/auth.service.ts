@@ -1,0 +1,115 @@
+import { HttpException, Injectable } from '@nestjs/common';
+import { UserService } from 'src/user/user.service';
+import { User } from '@prisma/client';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+import { PrismaService } from 'src/shared/services/prisma.service';
+
+@Injectable()
+export class AuthService {
+  constructor(
+    private prisma: PrismaService,
+    private userService: UserService,
+    private jwtService: JwtService,
+    private configService: ConfigService,
+  ) {}
+  async register(data: RegisterDto) {
+    let user = await this.userService.findByIdentifier(data.identifier);
+    if (user) {
+      throw new HttpException('User with such credentials already exists', 400);
+    }
+
+    user = await this.userService.createUser(data);
+
+    const [accessToken, refreshToken] = await Promise.all([
+      this.generateAccessToken(user),
+      this.generateRefreshToken(user),
+    ]);
+
+    return {
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    };
+  }
+  async login(data: LoginDto) {
+    const user = await this.userService.findByIdentifier(data.identifier);
+    if (!user) {
+      throw new HttpException('Invalid credentials', 400);
+    }
+
+    const isMatch = await this.userService.validatePassword(
+      user,
+      data.password,
+    );
+    if (!isMatch) {
+      throw new HttpException('Invalid password', 400);
+    }
+
+    const [accessToken, refreshToken] = await Promise.all([
+      this.generateAccessToken(user),
+      this.generateRefreshToken(user),
+    ]);
+
+    return {
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    };
+  }
+  async validateOAuth(profile: any) {
+    let user = await this.prisma.user.findUnique({
+      where: { identifier: profile.email },
+    });
+    if (!user) {
+      user = await this.prisma.user.create({
+        data: {
+          identifier: profile.email,
+          password: '',
+        },
+      });
+    }
+
+    const [accessToken, refreshToken] = await Promise.all([
+      this.generateAccessToken(user),
+      this.generateRefreshToken(user),
+    ]);
+
+    return {
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    };
+  }
+  async generateAccessToken(user: User): Promise<string> {
+    return await this.jwtService.signAsync(
+      { identifier: user.identifier, role: user.role },
+      {
+        secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+        expiresIn: '1d',
+      },
+    );
+  }
+  async generateRefreshToken(user: User): Promise<string> {
+    return await this.jwtService.signAsync(
+      { identifier: user.identifier, role: user.role },
+      {
+        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+        expiresIn: '7d',
+      },
+    );
+  }
+  async refreshAccessToken(refreshToken: string): Promise<string> {
+    try {
+      const payload = await this.jwtService.verifyAsync(refreshToken, {
+        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+      });
+      const user = await this.userService.findByIdentifier(payload.email);
+      if (!user) {
+        throw new HttpException('Invalid refresh token', 401);
+      }
+      return this.generateAccessToken(user);
+    } catch (error) {
+      throw new HttpException('Invalid refresh token', 401);
+    }
+  }
+}
