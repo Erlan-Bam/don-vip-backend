@@ -1,20 +1,43 @@
-import { Body, Controller, Post, UseGuards, Request } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  UseGuards,
+  Request,
+  Patch,
+  UseInterceptors,
+  UploadedFile,
+  HttpException,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { AuthGuard } from '@nestjs/passport';
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiConsumes,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { UpdateProfileDto } from './dto/update-profile.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { extname } from 'path';
+import { diskStorage } from 'multer';
+import { ConfigService } from '@nestjs/config';
 
-@ApiTags('Coupon')
+@ApiTags('User')
 @Controller('user')
 @ApiBearerAuth('JWT')
 export class UserController {
-  constructor(private userService: UserService) {}
+  private readonly baseUrl: string;
+  constructor(
+    private userService: UserService,
+    private configService: ConfigService,
+  ) {
+    const nodeEnv = this.configService.get<string>('NODE_ENV');
+    this.baseUrl = nodeEnv === 'development' ? 'http://localhost:3000' : '';
+  }
 
   @Post('reset-password')
   @UseGuards(AuthGuard('jwt'))
@@ -24,5 +47,55 @@ export class UserController {
   async resetPassword(@Body() data: ResetPasswordDto, @Request() request) {
     data.identifier = request.user.identifier;
     return this.userService.resetPassword(data);
+  }
+  @Patch('update-profile')
+  @UseInterceptors(
+    FileInterceptor('avatar', {
+      storage: diskStorage({
+        destination: './uploads/avatars',
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          callback(null, `avatar-${uniqueSuffix}${ext}`);
+        },
+      }),
+      fileFilter: (req, file, callback) => {
+        if (
+          ['image/png', 'image/jpeg', 'image/webp', 'image/svg'].includes(
+            file.mimetype,
+          )
+        ) {
+          callback(null, true);
+        } else {
+          callback(
+            new HttpException(
+              'Only .png, .jpeg, .svg and .webp formats are allowed!',
+              400,
+            ),
+            false,
+          );
+        }
+      },
+      limits: {
+        fileSize: 10 * 1024 * 1024,
+      },
+    }),
+  )
+  @ApiOperation({ summary: 'Update user profile' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Profile data to update',
+    type: UpdateProfileDto,
+  })
+  async updateProfile(
+    @Body() data: UpdateProfileDto,
+    @UploadedFile() file: Express.Multer.File,
+    @Request() request,
+  ) {
+    data.id = request.user.id;
+    data.avatar = `${this.baseUrl}/uploads/avatars/${file.filename}`;
+
+    return this.userService.updateProfile(data);
   }
 }

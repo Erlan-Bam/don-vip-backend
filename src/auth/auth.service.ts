@@ -43,8 +43,8 @@ export class AuthService {
     }
 
     const isMatch = await this.userService.validatePassword(
-      user,
       data.password,
+      user.password,
     );
     if (!isMatch) {
       throw new HttpException('Invalid password', 400);

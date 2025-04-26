@@ -22,6 +22,7 @@ model User {
   id            Int       @id @default(autoincrement())
   identifier    String    @unique
   password      String
+  balance       Int       @default(0)      
   first_name    String?
   last_name     String?
   avatar        String?
