@@ -13,6 +13,7 @@ import { RegisterDto } from './dto/register.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { ApiTags, ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -68,6 +69,14 @@ export class AuthController {
       body.token,
     );
     return { access_token: newAccessToken };
+  }
+
+  @ApiOperation({ summary: 'Send password reset email' })
+  @ApiBody({ type: ChangePasswordDto })
+  @ApiResponse({ status: 200, description: 'Email sent successfully' })
+  @Post('change-password')
+  async changePassword(@Body() data: ChangePasswordDto) {
+    return await this.authService.changePassword(data);
   }
 
   @Get('google/callback')

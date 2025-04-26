@@ -6,6 +6,8 @@ import { ConfigService } from '@nestjs/config';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { PrismaService } from 'src/shared/services/prisma.service';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { EmailService } from 'src/shared/services/email.service';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +15,7 @@ export class AuthService {
     private prisma: PrismaService,
     private userService: UserService,
     private jwtService: JwtService,
+    private emailService: EmailService,
     private configService: ConfigService,
   ) {}
   async register(data: RegisterDto) {
@@ -79,6 +82,20 @@ export class AuthService {
       access_token: accessToken,
       refresh_token: refreshToken,
     };
+  }
+  async changePassword(data: ChangePasswordDto) {
+    const user = await this.userService.findByIdentifier(data.email);
+
+    if (!user) {
+      throw new HttpException('User not found', 404);
+    }
+
+    const token = await this.generateAccessToken(user);
+    const resetLink = `https://don-vip.com/reset-password?token=${token}`;
+
+    await this.emailService.sendChangePasswordEmail(resetLink, data.lang);
+
+    return { message: 'Form sent successfully' };
   }
   async generateAccessToken(user: User): Promise<string> {
     return await this.jwtService.signAsync(
