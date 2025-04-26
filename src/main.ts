@@ -28,10 +28,32 @@ async function bootstrap() {
     .setTitle('Auth API')
     .setDescription('Authentication endpoints')
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        in: 'header',
+      },
+      'JWT',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document);
+  SwaggerModule.setup('docs', app, document, {
+    swaggerOptions: {
+      operationsSorter: (a: any, b: any) => {
+        const order = { post: 1, patch: 2, delete: 3, get: 4 };
+
+        const methodA = a.get('method').toLowerCase();
+        const methodB = b.get('method').toLowerCase();
+
+        if (order[methodA] < order[methodB]) return -1;
+        if (order[methodA] > order[methodB]) return 1;
+        return a.get('path').localeCompare(b.get('path'));
+      },
+    },
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({

@@ -7,15 +7,17 @@ import {
   ApiBody,
   ApiOperation,
   ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 
+@ApiTags('Coupon')
 @Controller('user')
+@ApiBearerAuth('JWT')
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Post('reset-password')
   @UseGuards(AuthGuard('jwt'))
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Reset password for authenticated user' })
   @ApiBody({ type: ResetPasswordDto })
   @ApiResponse({ status: 200, description: 'Password reset successful' })
