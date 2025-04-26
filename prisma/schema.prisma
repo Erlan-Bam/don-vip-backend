@@ -27,3 +27,10 @@ model User {
   avatar        String?
   role          Role      @default(User)
 }
+
+model Coupon {
+  id            Int     @id @default(autoincrement())
+  code          String  @unique
+  limit         Int?
+  discount      Int
+}
