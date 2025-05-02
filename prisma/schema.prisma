@@ -22,11 +22,13 @@ model User {
   id            Int       @id @default(autoincrement())
   identifier    String    @unique
   password      String
-  balance       Int       @default(0)      
+  balance       Decimal       @default(0)      
   first_name    String?
   last_name     String?
   avatar        String?
   role          Role      @default(User)
+
+  orders        Order[]
 }
 
 model Coupon {
@@ -34,4 +36,18 @@ model Coupon {
   code          String  @unique
   limit         Int?
   discount      Int
+}
+
+model Order {
+  id            String  @id @default(uuid())
+  price         Decimal
+  type          String
+  user_id       Int
+  payment       String
+  account_id    String?
+  server_id     String?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @default(now())
+  
+  user       User     @relation(fields: [user_id], references: [id])
 }

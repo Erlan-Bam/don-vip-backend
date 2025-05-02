@@ -1,0 +1,46 @@
+import { HttpException, Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/shared/services/prisma.service';
+import { CreateOrderDto } from './dto/create-order.dto';
+
+@Injectable()
+export class OrderService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async create(data: CreateOrderDto) {
+    return this.prisma.order.create({ data: data });
+  }
+
+  async findAll(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.order.findMany({
+        skip,
+        take: limit,
+        orderBy: { id: 'desc' },
+      }),
+      this.prisma.order.count(),
+    ]);
+
+    return {
+      total,
+      page,
+      limit,
+      data,
+    };
+  }
+
+  async findOne(id: string) {
+    return this.prisma.order.findUnique({ where: { id } });
+  }
+
+  async remove(id: string) {
+    const order = this.prisma.order.delete({ where: { id } });
+
+    if (!order) {
+      throw new HttpException('Order not found', 404);
+    }
+
+    return order;
+  }
+}

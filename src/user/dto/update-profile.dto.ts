@@ -20,8 +20,8 @@ export class UpdateProfileDto {
   last_name: string;
 
   @ApiProperty({
-    type: 'string', // 👈 обязательно указать type: 'string'
-    format: 'binary', // 👈 чтобы Swagger понял, что это файл
+    type: 'string',
+    format: 'binary',
     description: 'Avatar image file (PNG, JPG, WEBP)',
   })
   @IsOptional()
