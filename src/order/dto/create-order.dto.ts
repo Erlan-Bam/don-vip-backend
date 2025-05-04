@@ -12,8 +12,16 @@ export class CreateOrderDto {
   price: number;
 
   @ApiProperty({
+    description: 'Количество товара равное цене',
+    example: 10,
+  })
+  @Transform(({ value }) => parseInt(value))
+  @IsInt()
+  amount: number;
+
+  @ApiProperty({
     description: 'Тип заказа (например, "Rainbow Stone", "W-Gold", "Золото")',
-    example: 'subscription',
+    example: 'diamonds',
   })
   @IsString()
   type: string;

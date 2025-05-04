@@ -18,11 +18,16 @@ enum Role {
   Admin
 }
 
+enum PaymentStatus {
+  Paid
+  Pending
+  Cancelled
+}
+
 model User {
   id            Int       @id @default(autoincrement())
   identifier    String    @unique
-  password      String
-  balance       Decimal       @default(0)      
+  password      String 
   first_name    String?
   last_name     String?
   avatar        String?
@@ -41,9 +46,11 @@ model Coupon {
 model Order {
   id            String  @id @default(uuid())
   price         Decimal
+  amount        Int
   type          String
   user_id       Int
   payment       String
+  status        PaymentStatus @default(Pending)
   account_id    String?
   server_id     String?
   created_at    DateTime @default(now())

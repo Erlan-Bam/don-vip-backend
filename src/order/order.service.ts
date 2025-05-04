@@ -1,10 +1,14 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/shared/services/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { BigoService } from './bigo.service';
 
 @Injectable()
 export class OrderService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private bigoService: BigoService,
+  ) {}
 
   async create(data: CreateOrderDto) {
     return await this.prisma.order.create({ data: data });
@@ -28,6 +32,27 @@ export class OrderService {
       limit,
       data,
     };
+  }
+
+  async finishOrder(id: string) {
+    const order = await this.prisma.order.findUnique({ where: { id: id } });
+
+    if (!order) {
+      return order;
+    }
+
+    await this.bigoService.rechargeDiamond({
+      rechargeBigoId: order.account_id,
+      buOrderId: `${order.user_id}-${order.id}`,
+      currency: 'RUB',
+      value: order.amount,
+      totalCost: order.price.toNumber(),
+    });
+
+    return await this.prisma.order.update({
+      where: { id: id },
+      data: { status: 'Paid' },
+    });
   }
 
   async findOne(id: string) {

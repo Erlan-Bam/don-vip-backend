@@ -7,5 +7,6 @@ import { SharedModule } from 'src/shared/shared.module';
   imports: [SharedModule],
   providers: [OrderService],
   controllers: [OrderController],
+  exports: [OrderService],
 })
 export class OrderModule {}

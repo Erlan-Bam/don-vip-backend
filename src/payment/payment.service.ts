@@ -5,6 +5,7 @@ import { PrismaService } from 'src/shared/services/prisma.service';
 import * as base64 from 'base-64';
 import { PagsmileCreatePayinDto } from './dto/pagsmile-create-payin.dto';
 import { PagsmileNotificationDto } from './dto/pagsmile-notification.dto';
+import { OrderService } from 'src/order/order.service';
 
 @Injectable()
 export class PaymentService {
@@ -15,6 +16,7 @@ export class PaymentService {
   merchantId: string;
   constructor(
     private prisma: PrismaService,
+    private orderService: OrderService,
     private configService: ConfigService,
   ) {
     const backendURL =
@@ -78,18 +80,30 @@ export class PaymentService {
   async pagsmileNotification(
     data: PagsmileNotificationDto,
     signature: string,
-    rawBody: Buffer,
+    body: Buffer,
   ) {
     const isValid = await this.verifyPagsmileSignature(
-      rawBody.toString(),
+      body.toString(),
       signature,
     );
 
     if (!isValid) {
-      throw new HttpException('Invalid signature', 400);
+      console.log('INVALID NOTIFICATION');
+      return 'success';
     }
 
     const [userId, orderId, _] = data.out_trade_no.split('-');
+
+    if (data.trade_status !== 'SUCCESS') {
+      return 'success';
+    }
+
+    const order = await this.orderService.finishOrder(orderId);
+
+    if (!order) {
+      console.log('INVALID! ORDER ID NOT FOUND');
+      return 'success';
+    }
 
     return 'success';
   }
