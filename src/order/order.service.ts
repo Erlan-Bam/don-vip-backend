@@ -7,7 +7,7 @@ export class OrderService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(data: CreateOrderDto) {
-    return this.prisma.order.create({ data: data });
+    return await this.prisma.order.create({ data: data });
   }
 
   async findAll(page: number, limit: number) {
@@ -31,11 +31,11 @@ export class OrderService {
   }
 
   async findOne(id: string) {
-    return this.prisma.order.findUnique({ where: { id } });
+    return await this.prisma.order.findUnique({ where: { id } });
   }
 
   async remove(id: string) {
-    const order = this.prisma.order.delete({ where: { id } });
+    const order = await this.prisma.order.delete({ where: { id } });
 
     if (!order) {
       throw new HttpException('Order not found', 404);
