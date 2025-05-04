@@ -1,7 +1,7 @@
 import { IsDecimal, IsOptional, IsUUID } from 'class-validator';
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 
-export class CreatePayinDto {
+export class PagsmileCreatePayinDto {
   @ApiProperty({ example: '100.00', description: 'Payment amount in RUB' })
   @IsDecimal()
   amount: string;

@@ -1,6 +1,14 @@
-import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Request,
+  Headers,
+  RawBody,
+} from '@nestjs/common';
 import { PaymentService } from './payment.service';
-import { CreatePayinDto } from './dto/create-payin.dto';
+import { PagsmileCreatePayinDto } from './dto/pagsmile-create-payin.dto';
 import {
   ApiTags,
   ApiOperation,
@@ -8,6 +16,7 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { PagsmileNotificationDto } from './dto/pagsmile-notification.dto';
 
 @ApiTags('Payment')
 @Controller('payment')
@@ -20,8 +29,24 @@ export class PaymentController {
   @ApiOperation({ summary: 'Create a Payin transaction via Pagsmile' })
   @ApiResponse({ status: 201, description: 'Payin created successfully' })
   @ApiResponse({ status: 400, description: 'Validation failed' })
-  async createPayin(@Body() data: CreatePayinDto, @Request() request) {
+  async createPagsmilePayin(
+    @Body() data: PagsmileCreatePayinDto,
+    @Request() request,
+  ) {
     data.user_id = request.user.id;
-    return this.paymentService.createPayin(data);
+    return this.paymentService.createPagsmilePayin(data);
+  }
+
+  @Post('pagsmile/notification')
+  async handleNotification(
+    @Body() data: PagsmileNotificationDto,
+    @Headers('Pagsmile-Signature') signature: string,
+    @RawBody() rawBody: Buffer,
+  ) {
+    return await this.paymentService.pagsmileNotification(
+      data,
+      signature,
+      rawBody,
+    );
   }
 }

@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { Axios } from 'axios';
 import { PrismaService } from 'src/shared/services/prisma.service';
 import * as base64 from 'base-64';
-import { CreatePayinDto } from './dto/create-payin.dto';
+import { PagsmileCreatePayinDto } from './dto/pagsmile-create-payin.dto';
+import { PagsmileNotificationDto } from './dto/pagsmile-notification.dto';
 
 @Injectable()
 export class PaymentService {
@@ -44,7 +45,7 @@ export class PaymentService {
     }
     this.merchantId = merchantId;
   }
-  async createPayin(data: CreatePayinDto) {
+  async createPagsmilePayin(data: PagsmileCreatePayinDto) {
     const base64 = await import('base-64');
     const { format } = await import('date-fns');
     const credentials = base64.encode(`${this.appId}:${this.secretKey}`);
@@ -53,7 +54,7 @@ export class PaymentService {
       {
         app_id: this.appId,
         method: 'SBP',
-        out_trade_no: `${data.user_id}-${Date.now()}`,
+        out_trade_no: `${data.user_id}-${data.order_id}-${Date.now()}`,
         notify_url: `${this.backendURL}/api/payment/pagsmile/success`,
         timestamp: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
         subject: 'Don Vip донат',
@@ -73,5 +74,46 @@ export class PaymentService {
       },
     );
     return payment.data;
+  }
+  async pagsmileNotification(
+    data: PagsmileNotificationDto,
+    signature: string,
+    rawBody: Buffer,
+  ) {
+    const isValid = await this.verifyPagsmileSignature(
+      rawBody.toString(),
+      signature,
+    );
+
+    if (!isValid) {
+      throw new HttpException('Invalid signature', 400);
+    }
+
+    const [userId, orderId, _] = data.out_trade_no.split('-');
+
+    return 'success';
+  }
+  async verifyPagsmileSignature(
+    raw: string,
+    signature: string,
+  ): Promise<boolean> {
+    const { createHmac } = await import('crypto');
+    const elements = signature.split(',');
+    const map: Record<string, string> = {};
+
+    elements.forEach((element) => {
+      const [key, value] = element.split('=');
+      map[key] = value;
+    });
+
+    const receivedSignature = map['v2'];
+
+    const expectedSignature = createHmac('sha256', this.secretKey)
+      .update(raw)
+      .digest('hex');
+
+    console.log('Expected Signature:', expectedSignature);
+    console.log('Received Signature:', receivedSignature);
+    return expectedSignature === receivedSignature;
   }
 }
