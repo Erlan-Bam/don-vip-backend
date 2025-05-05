@@ -9,6 +9,7 @@ import {
   UploadedFile,
   HttpException,
   Get,
+  Param,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ResetPasswordDto } from './dto/reset-password.dto';
@@ -113,7 +114,7 @@ export class UserController {
   @ApiOperation({ summary: 'Get user by ID' })
   @ApiResponse({ status: 200, description: 'User data returned successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async getUserById(@Request() req, @Body('id') id: number) {
-    return this.userService.findById(id);
+  async getUserById(@Param('id') id: string) {
+    return this.userService.findById(Number(id));
   }
 }
