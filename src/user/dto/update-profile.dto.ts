@@ -9,6 +9,7 @@ export class UpdateProfileDto {
     description: 'First name of the user',
     example: 'John',
   })
+  @IsOptional()
   @IsString()
   first_name: string;
 
@@ -16,6 +17,7 @@ export class UpdateProfileDto {
     description: 'Last name of the user',
     example: 'Doe',
   })
+  @IsOptional()
   @IsString()
   last_name: string;
 

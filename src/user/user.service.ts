@@ -52,7 +52,7 @@ export class UserService {
       },
     });
   }
-  async updateProfile(data: UpdateProfileDto) {
+  async updateProfile(data: Partial<UpdateProfileDto>) {
     const user = await this.prisma.user.findUnique({ where: { id: data.id } });
 
     if (!user) {
