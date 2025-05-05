@@ -6,7 +6,12 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EmailService } from './services/email.service';
 
 @Module({
-  imports: [ConfigModule, JwtModule],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    JwtModule,
+  ],
   providers: [
     JwtStrategy,
     PrismaService,

@@ -36,6 +36,7 @@ export class AuthController {
   async login(@Body() data: LoginDto) {
     const tokens = await this.authService.login(data);
     return {
+      id: tokens.userId,
       access_token: tokens.access_token,
       refresh_token: tokens.refresh_token,
     };

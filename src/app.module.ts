@@ -7,6 +7,13 @@ import { OrderModule } from './order/order.module';
 import { PaymentModule } from './payment/payment.module';
 
 @Module({
-  imports: [AuthModule, SharedModule, UserModule, CouponModule, OrderModule, PaymentModule],
+  imports: [
+    AuthModule,
+    SharedModule,
+    UserModule,
+    CouponModule,
+    OrderModule,
+    PaymentModule,
+  ],
 })
 export class AppModule {}
