@@ -18,6 +18,15 @@ export class UserService {
       },
     });
   }
+
+  async findById(id: number): Promise<User> {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) {
+      throw new HttpException('User not found', 404);
+    }
+    return user;
+  }
+
   async resetPassword(data: ResetPasswordDto) {
     const user = await this.prisma.user.findUnique({
       where: { identifier: data.identifier },

@@ -8,6 +8,7 @@ import {
   UseInterceptors,
   UploadedFile,
   HttpException,
+  Get,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ResetPasswordDto } from './dto/reset-password.dto';
@@ -37,6 +38,14 @@ export class UserController {
   ) {
     const nodeEnv = this.configService.get<string>('NODE_ENV');
     this.baseUrl = nodeEnv === 'development' ? 'http://localhost:3000' : '';
+  }
+
+  @Get('me')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Get current user' })
+  @ApiResponse({ status: 200, description: 'Current user profile' })
+  async getMe(@Request() request) {
+    return this.userService.findById(request.user.id);
   }
 
   @Post('reset-password')
