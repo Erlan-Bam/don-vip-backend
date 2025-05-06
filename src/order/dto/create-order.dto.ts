@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsOptional, IsString, IsDecimal } from 'class-validator';
+import {
+  IsInt,
+  IsOptional,
+  IsString,
+  IsDecimal,
+  IsNumber,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class CreateOrderDto {
@@ -8,7 +14,7 @@ export class CreateOrderDto {
     example: 49.99,
   })
   @Transform(({ value }) => parseFloat(value))
-  @IsDecimal()
+  @IsNumber()
   price: number;
 
   @ApiProperty({

@@ -1,3 +1,4 @@
+import { UserService } from 'src/user/user.service';
 import {
   Body,
   Controller,
@@ -11,7 +12,6 @@ import {
   Get,
   Param,
 } from '@nestjs/common';
-import { UserService } from './user.service';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { AuthGuard } from '@nestjs/passport';
 import {
