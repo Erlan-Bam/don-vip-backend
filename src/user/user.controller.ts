@@ -162,7 +162,7 @@ export class UserController {
     @UploadedFile() file: Express.Multer.File,
     @Request() req,
   ) {
-    const avatarUrl = `${this.baseUrl}/uploads/avatars/${file.filename}`;
+    const avatarUrl = `https://don-vip-backend-production.up.railway.app/uploads/avatars/${file.filename}`;
     return this.userService.updateProfile({
       id: req.user.id,
       avatar: avatarUrl,
