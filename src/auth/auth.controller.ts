@@ -24,9 +24,10 @@ export class AuthController {
     private authService: AuthService,
     private configService: ConfigService,
   ) {
-    const nodeEnv = this.configService.get<string>('NODE_ENV');
     this.baseFrontendUrl =
-      nodeEnv === 'development' ? 'http://localhost:3000' : '';
+      this.configService.get<string>('NODE_ENV') === 'development'
+        ? 'http://localhost:3000'
+        : '';
   }
 
   @Post('login')
@@ -80,16 +81,23 @@ export class AuthController {
     return await this.authService.changePassword(data);
   }
 
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  @ApiOperation({ summary: 'Initiate Google OAuth login' })
+  async googleAuth() {}
+
   @Get('google/callback')
   @UseGuards(AuthGuard('google'))
   @ApiOperation({ summary: 'Google OAuth callback' })
   async googleAuthRedirect(@Request() request, @Response() response) {
     try {
       const tokens = await this.authService.validateOAuth(request.user);
+      console.log(tokens);
       return response.redirect(
-        `${this.baseFrontendUrl}/google?access=${tokens.access_token}?refresh=${tokens.refresh_token}`,
+        `${this.baseFrontendUrl}/google?access=${tokens.access_token}&refresh=${tokens.refresh_token}`,
       );
     } catch (error) {
+      console.log(error);
       return response.redirect(`${this.baseFrontendUrl}/register`);
     }
   }
