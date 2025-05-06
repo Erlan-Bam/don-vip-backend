@@ -26,10 +26,13 @@ enum PaymentStatus {
 
 model User {
   id            Int       @id @default(autoincrement())
-  identifier    String    @unique
-  password      String 
+  identifier    String    @unique // used as email
+  password      String
   first_name    String?
   last_name     String?
+  gender        String?   // e.g., "Мужской", "Женский"
+  birth_date    DateTime? // parsed from 02.11.1992 format
+  phone         String?   @unique
   avatar        String?
   role          Role      @default(User)
 
