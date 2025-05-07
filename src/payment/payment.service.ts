@@ -56,7 +56,7 @@ export class PaymentService {
       {
         app_id: this.appId,
         method: 'SBP',
-        out_trade_no: `${data.user_id}-${data.order_id}-${Date.now()}`,
+        out_trade_no: `${data.user_id}:${data.order_id}:${Date.now()}`,
         notify_url: `${this.backendURL}/api/payment/pagsmile/success`,
         timestamp: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
         subject: 'Don Vip донат',
@@ -92,7 +92,7 @@ export class PaymentService {
       return 'success';
     }
 
-    const [userId, orderId, _] = data.out_trade_no.split('-');
+    const [userId, orderId, _] = data.out_trade_no.split(':');
     console.log(userId, orderId, _);
 
     if (data.trade_status !== 'SUCCESS') {
