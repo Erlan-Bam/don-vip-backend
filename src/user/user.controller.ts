@@ -38,7 +38,10 @@ export class UserController {
     private configService: ConfigService,
   ) {
     const nodeEnv = this.configService.get<string>('NODE_ENV');
-    this.baseUrl = nodeEnv === 'development' ? 'http://localhost:3000' : '';
+    this.baseUrl =
+      nodeEnv === 'development'
+        ? 'http://localhost:3000'
+        : 'https://don-vip-backend-production.up.railway.app';
   }
 
   @Get('me')

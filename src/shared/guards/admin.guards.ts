@@ -5,6 +5,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class AdminGuard implements CanActivate {
@@ -12,13 +13,13 @@ export class AdminGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
-    const user = request.user;
+    const user = request.user as User;
 
     if (!user) {
       throw new ForbiddenException('User not authenticated');
     }
 
-    if (user.role !== 'admin') {
+    if (user.role !== 'Admin') {
       throw new ForbiddenException('Access denied: Admins only');
     }
 

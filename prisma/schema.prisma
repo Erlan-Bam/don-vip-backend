@@ -37,6 +37,27 @@ model User {
   role          Role      @default(User)
 
   orders        Order[]
+  feedbacks     Feedback[]
+}
+
+model Product {
+  id            Int      @id @default(autoincrement())
+  name          String
+  description   String
+  image         String
+  replenishment Json
+  feedbacks     Feedback[]
+}
+
+model Feedback {
+  id            Int        @id @default(autoincrement())
+  reaction      Boolean
+  text          String
+  product_id    Int
+  user_id       Int
+
+  product       Product     @relation(fields: [product_id], references: [id])
+  user          User        @relation(fields: [user_id], references: [id])
 }
 
 model Coupon {
