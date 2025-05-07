@@ -110,16 +110,14 @@ export class PaymentService {
     raw: string,
     signature: string,
   ): Promise<boolean> {
-    console.log(signature);
     const { createHmac } = await import('crypto');
     const elements = signature.split(',');
     const map: Record<string, string> = {};
 
     elements.forEach((element) => {
       const [key, value] = element.split('=');
-      map[key] = value;
+      map[key.trim()] = value.trim();
     });
-    console.log(elements, map);
 
     const receivedSignature = map['v2'];
 
