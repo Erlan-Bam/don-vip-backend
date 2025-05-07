@@ -80,12 +80,9 @@ export class PaymentService {
   async pagsmileNotification(
     data: PagsmileNotificationDto,
     signature: string,
-    body: Buffer,
+    body: string,
   ) {
-    const isValid = await this.verifyPagsmileSignature(
-      body.toString(),
-      signature,
-    );
+    const isValid = await this.verifyPagsmileSignature(body, signature);
 
     if (!isValid) {
       console.log('INVALID NOTIFICATION');

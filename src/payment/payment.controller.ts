@@ -41,10 +41,10 @@ export class PaymentController {
   async handleNotification(
     @Body() data: PagsmileNotificationDto,
     @Headers('pagsmile-signature') signature: string,
-    @RawBody() rawBody: Buffer,
+    @RawBody() rawBody: string,
     @Request() req,
   ) {
-    console.log(data);
+    console.log(rawBody);
     return await this.paymentService.pagsmileNotification(
       data,
       signature,
