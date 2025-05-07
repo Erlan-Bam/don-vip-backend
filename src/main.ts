@@ -7,8 +7,20 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.use(bodyParser.json({ limit: '50mb' }));
-  app.use(bodyParser.urlencoded({ extended: true }));
+  const rawBodySaver = (req, res, buf, encoding) => {
+    if (buf && buf.length) {
+      req.rawBody = buf.toString(encoding || 'utf-8');
+    }
+  };
+
+  app.use(bodyParser.json({ limit: '50mb', verify: rawBodySaver }));
+  app.use(
+    bodyParser.urlencoded({
+      extended: true,
+      limit: '50mb',
+      verify: rawBodySaver,
+    }),
+  );
 
   app.setGlobalPrefix('api');
   app.enableCors({
