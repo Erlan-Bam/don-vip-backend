@@ -21,8 +21,9 @@ export class PaymentService {
   ) {
     const backendURL =
       this.configService.get<string>('NODE_ENV') === 'production'
-        ? 'https://don-vip.com'
+        ? 'https://don-vip-backend-production.up.railway.app'
         : 'http://localhost:6001';
+    console.log(backendURL);
     this.backendURL = backendURL;
     const baseURL =
       this.configService.get<string>('NODE_ENV') === 'production'
@@ -57,7 +58,7 @@ export class PaymentService {
         app_id: this.appId,
         method: 'SBP',
         out_trade_no: `${data.user_id}:${data.order_id}:${Date.now()}`,
-        notify_url: `${this.backendURL}/api/payment/pagsmile/success`,
+        notify_url: `${this.backendURL}/api/payment/pagsmile/notification`,
         timestamp: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
         subject: 'Don Vip донат',
         order_amount: data.amount,
