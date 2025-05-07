@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsInt,
   IsOptional,
@@ -42,7 +42,7 @@ export class CreateOrderDto {
   @IsOptional()
   user_id: number;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'ID аккаунта, связанного с заказом',
     example: 'acc_456',
     required: false,
@@ -51,7 +51,7 @@ export class CreateOrderDto {
   @IsString()
   account_id: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'ID сервера, если есть',
     example: 'srv_789',
     required: false,
