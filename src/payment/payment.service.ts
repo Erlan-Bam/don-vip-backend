@@ -23,12 +23,11 @@ export class PaymentService {
       this.configService.get<string>('NODE_ENV') === 'production'
         ? 'https://don-vip-backend-production.up.railway.app'
         : 'http://localhost:6001';
-    console.log(backendURL);
     this.backendURL = backendURL;
     const baseURL =
       this.configService.get<string>('NODE_ENV') === 'production'
         ? 'https://gateway.pagsmile.com'
-        : 'https://don-vip-backend-production.up.railway.app';
+        : 'https://gateway-test.pagsmile.com';
     this.pagsmile = axios.create({
       baseURL: baseURL,
     });
