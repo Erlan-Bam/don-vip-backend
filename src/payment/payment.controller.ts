@@ -43,6 +43,7 @@ export class PaymentController {
     @Headers('Pagsmile-Signature') signature: string,
     @RawBody() rawBody: Buffer,
   ) {
+    console.log('worked');
     return await this.paymentService.pagsmileNotification(
       data,
       signature,
