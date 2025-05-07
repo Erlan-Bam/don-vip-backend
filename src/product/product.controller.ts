@@ -45,7 +45,7 @@ export class ProductController {
     const nodeEnv = this.configService.get<string>('NODE_ENV');
     this.baseUrl =
       nodeEnv === 'development'
-        ? 'http://localhost:3000'
+        ? 'http://localhost:6001'
         : 'https://don-vip-backend-production.up.railway.app';
   }
   @Post('')
