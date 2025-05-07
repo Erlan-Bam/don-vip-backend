@@ -40,7 +40,7 @@ export class PaymentController {
   @Post('pagsmile/notification')
   async handleNotification(
     @Body() data: PagsmileNotificationDto,
-    @Headers('Pagsmile-Signature') signature: string,
+    @Headers('pagsmile-signature') signature: string,
     @RawBody() rawBody: Buffer,
     @Request() req,
   ) {

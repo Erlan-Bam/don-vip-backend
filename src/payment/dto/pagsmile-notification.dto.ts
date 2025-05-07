@@ -11,6 +11,7 @@ export class PagsmileNotificationDto {
   out_trade_no: string;
 
   @ApiProperty()
+  @IsOptional()
   @IsString()
   out_request_no: string;
 
@@ -42,4 +43,7 @@ export class PagsmileNotificationDto {
   @IsOptional()
   @IsString()
   channel: string;
+
+  @IsOptional()
+  user: any;
 }
