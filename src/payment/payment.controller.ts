@@ -20,12 +20,12 @@ import { PagsmileNotificationDto } from './dto/pagsmile-notification.dto';
 
 @ApiTags('Payment')
 @Controller('payment')
-@UseGuards(AuthGuard('jwt'))
 @ApiBearerAuth('JWT')
 export class PaymentController {
   constructor(private paymentService: PaymentService) {}
 
   @Post('pagsmile/payin')
+  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Create a Payin transaction via Pagsmile' })
   @ApiResponse({ status: 201, description: 'Payin created successfully' })
   @ApiResponse({ status: 400, description: 'Validation failed' })
