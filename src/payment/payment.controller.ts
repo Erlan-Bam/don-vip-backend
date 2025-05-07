@@ -44,8 +44,7 @@ export class PaymentController {
     @RawBody() rawBody: Buffer,
     @Request() req,
   ) {
-    console.log(data, req);
-    console.log('worked');
+    console.log(data);
     return await this.paymentService.pagsmileNotification(
       data,
       signature,

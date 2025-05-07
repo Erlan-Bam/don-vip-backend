@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as bodyParser from 'body-parser';
-import { ValidationPipe } from '@nestjs/common';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
@@ -60,6 +60,10 @@ async function bootstrap() {
       whitelist: true,
       // forbidNonWhitelisted: true,
       transform: true,
+      exceptionFactory: (errors) => {
+        console.error(errors);
+        return new BadRequestException(errors);
+      },
     }),
   );
 
