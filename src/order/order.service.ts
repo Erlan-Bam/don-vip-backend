@@ -1,8 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/shared/services/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { BigoService } from './bigo.service';
-// import { BigoService } from './bigo.service';
+import { BigoService } from '../shared/services/bigo.service';
 
 @Injectable()
 export class OrderService {

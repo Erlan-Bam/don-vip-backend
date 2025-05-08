@@ -4,6 +4,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { PrismaService } from './services/prisma.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EmailService } from './services/email.service';
+import { BigoService } from './services/bigo.service';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { EmailService } from './services/email.service';
     JwtService,
     ConfigService,
     EmailService,
+    BigoService,
   ],
   exports: [
     JwtStrategy,
@@ -26,6 +28,7 @@ import { EmailService } from './services/email.service';
     ConfigModule,
     ConfigService,
     EmailService,
+    BigoService,
   ],
 })
 export class SharedModule {}

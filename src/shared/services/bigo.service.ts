@@ -9,7 +9,7 @@ import {
   GetUserInfoDto,
   PreCheckDto,
   RechargeDiamondDto,
-} from './dto/bigo.dto';
+} from '../dto/bigo.dto';
 
 @Injectable()
 export class BigoService {
@@ -96,6 +96,7 @@ export class BigoService {
         'bigo-timestamp': timestamp.toString(),
       },
     });
+    console.log('bigo data', response.data);
     return response.data;
   }
 
@@ -141,5 +142,3 @@ export class BigoService {
     return response.data;
   }
 }
-
-//

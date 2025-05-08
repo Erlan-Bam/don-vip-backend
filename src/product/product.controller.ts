@@ -32,6 +32,7 @@ import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '@nestjs/passport';
 import { AdminGuard } from 'src/shared/guards/admin.guards';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { SmileService } from 'src/shared/services/smile.service';
 
 @ApiTags('Product')
 @Controller('product')
@@ -40,6 +41,7 @@ export class ProductController {
   baseUrl: string;
   constructor(
     private productService: ProductService,
+    private smileService: SmileService,
     private configService: ConfigService,
   ) {
     const nodeEnv = this.configService.get<string>('NODE_ENV');
@@ -108,6 +110,13 @@ export class ProductController {
     @Query('limit', ParseIntPipe) limit = 10,
   ) {
     return this.productService.findAll(page, limit);
+  }
+
+  @Get('smile')
+  @ApiOperation({ summary: 'Get all products from smile' })
+  @UseGuards(AuthGuard('jwt'))
+  async getSmileProducts() {
+    return this.smileService.getProducts();
   }
 
   @Get(':id')
