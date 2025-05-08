@@ -43,7 +43,7 @@ export class OrderService {
 
     await this.bigoService.rechargeDiamond({
       rechargeBigoId: order.account_id,
-      buOrderId: `${order.user_id}${order.id}${Math.floor(Math.random() * 100)}`,
+      buOrderId: `${order.user_id}${Date.now()}${Math.floor(Math.random() * 100000)}`,
       currency: 'RUB',
       value: order.amount,
       totalCost: order.price.toNumber(),

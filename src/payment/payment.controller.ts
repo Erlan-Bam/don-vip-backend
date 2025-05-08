@@ -5,7 +5,8 @@ import {
   UseGuards,
   Request,
   Headers,
-  RawBody,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { PagsmileCreatePayinDto } from './dto/pagsmile-create-payin.dto';
@@ -38,6 +39,13 @@ export class PaymentController {
   }
 
   @Post('pagsmile/notification')
+  @UsePipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: false,
+      transform: true,
+    }),
+  )
   async handleNotification(
     @Body() data: PagsmileNotificationDto,
     @Headers('pagsmile-signature') signature: string,
