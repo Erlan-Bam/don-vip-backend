@@ -92,7 +92,6 @@ export class AuthController {
   async googleAuthRedirect(@Request() request, @Response() response) {
     try {
       const tokens = await this.authService.validateOAuth(request.user);
-      console.log(tokens);
       return response.redirect(
         `${this.baseFrontendUrl}/google?access=${tokens.access_token}&refresh=${tokens.refresh_token}`,
       );
