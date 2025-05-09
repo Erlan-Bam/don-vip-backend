@@ -11,6 +11,7 @@ import {
   HttpException,
   Get,
   Param,
+  Query,
 } from '@nestjs/common';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -50,6 +51,38 @@ export class UserController {
   @ApiResponse({ status: 200, description: 'Current user profile' })
   async getMe(@Request() request) {
     return this.userService.findById(request.user.id);
+  }
+
+  @Get()
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Find all users (pagination + search)' })
+  @ApiResponse({ status: 200, description: 'List of users with pagination' })
+  async findAllUsers(
+    @Query('search') search?: string,
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '10',
+  ) {
+    return this.userService.findAllUsers({
+      search,
+      page: parseInt(page),
+      limit: parseInt(limit),
+    });
+  }
+
+  @Patch(':id/ban')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Ban a user by ID' })
+  @ApiResponse({ status: 200, description: 'User banned successfully' })
+  async banUser(@Param('id') id: string) {
+    return this.userService.banUser(Number(id));
+  }
+
+  @Patch(':id/unban')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Unban a user by ID' })
+  @ApiResponse({ status: 200, description: 'User unbanned successfully' })
+  async unbanUser(@Param('id') id: string) {
+    return this.userService.unbanUser(Number(id));
   }
 
   @Post('reset-password')

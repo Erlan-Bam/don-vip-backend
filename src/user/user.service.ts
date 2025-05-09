@@ -1,5 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { PrismaService } from 'src/shared/services/prisma.service';
 import { RegisterDto } from 'src/auth/dto/register.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
@@ -85,9 +85,55 @@ export class UserService {
       where: { identifier: identifier },
     });
   }
-  async findAllUsers(): Promise<User[]> {
-    return this.prisma.user.findMany();
+
+  async findAllUsers(query: {
+    search?: string;
+    page?: number;
+    limit?: number;
+  }) {
+    const { search = '', page = 1, limit = 10 } = query;
+
+    const where: Prisma.UserWhereInput = search
+      ? {
+          OR: [
+            { first_name: { contains: search, mode: 'insensitive' } },
+            { last_name: { contains: search, mode: 'insensitive' } },
+            { identifier: { contains: search, mode: 'insensitive' } },
+          ],
+        }
+      : {};
+
+    const users = await this.prisma.user.findMany({
+      where,
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: { id: 'desc' },
+    });
+
+    const total = await this.prisma.user.count({ where });
+
+    return {
+      data: users,
+      total,
+      page,
+      limit,
+    };
   }
+
+  async banUser(userId: number) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { is_banned: true },
+    });
+  }
+
+  async unbanUser(userId: number) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { is_banned: false },
+    });
+  }
+
   async validatePassword(
     password: string,
     hashedPassword: string,
