@@ -90,7 +90,6 @@ export class PaymentService {
     }
 
     const [userId, orderId, _] = data.out_trade_no.split(':');
-    console.log(userId, orderId, _);
 
     if (data.trade_status !== 'SUCCESS') {
       console.log('not success', data.trade_status);
