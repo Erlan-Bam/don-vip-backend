@@ -7,7 +7,7 @@ import {
   IsOptional,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 class ReplenishmentItem {
   @ApiProperty({ example: 9.99 })
@@ -50,4 +50,9 @@ export class CreateProductDto {
   @IsOptional()
   @Type(() => ReplenishmentItem)
   replenishment: ReplenishmentItem[];
+
+  @ApiPropertyOptional({ example: 'mobilelegendsru' })
+  @IsOptional()
+  @IsString()
+  smile_api_game?: string;
 }

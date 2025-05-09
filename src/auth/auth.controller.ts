@@ -94,7 +94,7 @@ export class AuthController {
     try {
       const tokens = await this.authService.validateOAuth(request.user);
       return response.redirect(
-        `${this.baseFrontendUrl}/ru/google?access=${tokens.access_token}&refresh=${tokens.refresh_token}`,
+        `${this.baseFrontendUrl}/google?access=${tokens.access_token}&refresh=${tokens.refresh_token}`,
       );
     } catch (error) {
       console.log(error);

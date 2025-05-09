@@ -68,6 +68,40 @@ export class SmileService {
         Authorization: `Bearer ${token}`,
       },
     });
-    return response.data;
+    if (response.data.result) {
+      return {
+        status: 'success',
+        data: response.data.result.productList,
+      };
+    } else {
+      return { status: 'error', error: response.data.error };
+    }
+  }
+  async skuList(apiGame: string) {
+    const id = `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
+    const payload = {
+      jsonrpc: this.apiVersion,
+      id: id,
+      method: 'skuList',
+      params: {
+        iat: Math.floor(Date.now() / 1000),
+        apiGame: apiGame,
+      },
+    };
+    const token = await this.generateToken(payload);
+    const response = await this.smile.post('', null, {
+      params: payload,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (response.data.result) {
+      return {
+        status: 'success',
+        data: response.data.result.skuList,
+      };
+    } else {
+      return { status: 'error', error: response.data.error };
+    }
   }
 }

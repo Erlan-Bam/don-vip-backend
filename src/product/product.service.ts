@@ -1,17 +1,35 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/shared/services/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
+import { SmileService } from 'src/shared/services/smile.service';
 
 @Injectable()
 export class ProductService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private smileService: SmileService,
+  ) {}
   async create(data: CreateProductDto) {
+    if (data.smile_api_game) {
+      const { status, data: smileProducts } =
+        await this.smileService.getProducts();
+      if (status !== 'error') {
+        const hasMatchingGame = smileProducts.some(
+          (product) => product.apiGame === data.smile_api_game,
+        );
+
+        if (!hasMatchingGame) {
+          throw new HttpException('Invalid api game', 400);
+        }
+      }
+    }
     return await this.prisma.product.create({
       data: {
         name: data.name,
         description: data.description,
         image: data.image,
         replenishment: JSON.parse(JSON.stringify(data.replenishment)),
+        smile_api_game: data.smile_api_game,
       },
     });
   }

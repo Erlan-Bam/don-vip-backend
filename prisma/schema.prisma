@@ -41,12 +41,13 @@ model User {
 }
 
 model Product {
-  id            Int      @id @default(autoincrement())
-  name          String
-  description   String
-  image         String
-  replenishment Json
-  feedbacks     Feedback[]
+  id             Int      @id @default(autoincrement())
+  name           String
+  description    String
+  image          String
+  replenishment  Json
+  smile_api_game String?  @unique
+  feedbacks      Feedback[]
 }
 
 model Feedback {

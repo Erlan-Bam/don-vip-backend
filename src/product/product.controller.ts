@@ -119,6 +119,14 @@ export class ProductController {
     return this.smileService.getProducts();
   }
 
+  @Get('smile/:apiGame')
+  @ApiOperation({ summary: 'Get sku list from smile product via api game' })
+  @ApiParam({ name: 'apiGame', type: String })
+  @UseGuards(AuthGuard('jwt'))
+  async getSmileSKU(@Param('apiGame') apiGame: string) {
+    return this.smileService.skuList(apiGame);
+  }
+
   @Get(':id')
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Get product by ID' })
