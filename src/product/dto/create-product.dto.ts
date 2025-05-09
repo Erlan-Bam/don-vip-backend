@@ -35,7 +35,7 @@ export class CreateProductDto {
   @ApiProperty({
     type: 'string',
     format: 'binary',
-    required: false,
+    required: true,
   })
   @IsOptional()
   image: any;
