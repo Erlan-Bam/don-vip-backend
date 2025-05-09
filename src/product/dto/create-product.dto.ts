@@ -43,8 +43,8 @@ export class CreateProductDto {
   @ApiProperty({
     type: [ReplenishmentItem],
     example: [
-      { price: 9.99, amount: 100, type: 'diamonds' },
-      { price: 5.49, amount: 50, type: 'diamonds' },
+      { price: 9.99, amount: 100, type: 'diamonds', sku: '1' },
+      { price: 5.49, amount: 50, type: 'diamonds', sku: '2' },
     ],
   })
   @IsOptional()
