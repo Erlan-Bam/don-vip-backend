@@ -2,6 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/shared/services/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { SmileService } from 'src/shared/services/smile.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ProductService {
@@ -35,16 +36,25 @@ export class ProductService {
     });
   }
 
-  async findAll(page = 1, limit = 10) {
+  async findAll(page = 1, limit = 10, search = '') {
     const skip = (page - 1) * limit;
 
+    const where: Prisma.ProductWhereInput = search
+      ? {
+          OR: [
+            { name: { contains: search, mode: 'insensitive' } },
+            { description: { contains: search, mode: 'insensitive' } },
+          ],
+        }
+      : {};
     const [products, total] = await this.prisma.$transaction([
       this.prisma.product.findMany({
+        where,
         skip,
         take: limit,
         orderBy: { id: 'desc' },
       }),
-      this.prisma.product.count(),
+      this.prisma.product.count({ where }),
     ]);
 
     return {

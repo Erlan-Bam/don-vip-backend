@@ -102,14 +102,18 @@ export class ProductController {
 
   @Get()
   @UseGuards(AuthGuard('jwt'))
-  @ApiOperation({ summary: 'Get all products with pagination' })
+  @ApiOperation({
+    summary: 'Get all products with pagination and optional search',
+  })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  @ApiQuery({ name: 'search', required: false, type: String, example: 'Smile' })
   async findAll(
     @Query('page', ParseIntPipe) page = 1,
     @Query('limit', ParseIntPipe) limit = 10,
+    @Query('search') search = '',
   ) {
-    return this.productService.findAll(page, limit);
+    return this.productService.findAll(page, limit, search);
   }
 
   @Get('smile')
