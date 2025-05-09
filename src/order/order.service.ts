@@ -2,6 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/shared/services/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { BigoService } from '../shared/services/bigo.service';
+import { ReplenishmentItem } from 'src/product/dto/create-product.dto';
 
 @Injectable()
 export class OrderService {
@@ -11,7 +12,34 @@ export class OrderService {
   ) {}
 
   async create(data: CreateOrderDto) {
-    return await this.prisma.order.create({ data: data });
+    const product = await this.prisma.product.findUnique({
+      where: { id: data.product_id },
+      select: {
+        id: true,
+        replenishment: true,
+      },
+    });
+    if (!product) {
+      throw new HttpException('Invalid product id', 400);
+    }
+    const replenishment =
+      product.replenishment as unknown as ReplenishmentItem[];
+    if (data.item_id >= replenishment.length) {
+      throw new HttpException(
+        'ID пакета больше чем количество пакетов в этом продукте',
+        400,
+      );
+    }
+    return await this.prisma.order.create({
+      data: {
+        product_id: data.product_id,
+        user_id: data.user_id,
+        item_id: data.item_id,
+        payment: data.payment,
+        account_id: data.account_id,
+        server_id: data.server_id,
+      },
+    });
   }
 
   async findAll(page: number, limit: number) {
@@ -41,12 +69,20 @@ export class OrderService {
       return order;
     }
 
+    const product = await this.prisma.product.findUnique({
+      where: { id: order.product_id },
+      select: {
+        replenishment: true,
+      },
+    });
+    const item: ReplenishmentItem = product.replenishment[order.item_id];
+
     await this.bigoService.rechargeDiamond({
       rechargeBigoId: order.account_id,
       buOrderId: `${order.user_id}${Date.now()}${Math.floor(Math.random() * 100000)}`,
       currency: 'RUB',
-      value: order.amount,
-      totalCost: order.price.toNumber(),
+      value: item.amount,
+      totalCost: item.price,
     });
 
     return await this.prisma.order.update({

@@ -24,6 +24,11 @@ enum PaymentStatus {
   Cancelled
 }
 
+enum ProductType {
+  Bigo
+  Smile
+}
+
 model User {
   id            Int       @id @default(autoincrement())
   identifier    String    @unique // used as email
@@ -47,7 +52,9 @@ model Product {
   image          String
   replenishment  Json
   smile_api_game String?  @unique
+  type           ProductType
   feedbacks      Feedback[]
+  orders         Order[]
 }
 
 model Feedback {
@@ -69,17 +76,17 @@ model Coupon {
 }
 
 model Order {
-  id            String  @id @default(uuid())
-  price         Decimal
-  amount        Int
-  type          String
+  id            String         @id @default(uuid())
   user_id       Int
+  product_id    Int
+  item_id       Int
   payment       String
-  status        PaymentStatus @default(Pending)
+  status        PaymentStatus  @default(Pending)
   account_id    String?
   server_id     String?
-  created_at    DateTime @default(now())
-  updated_at    DateTime @default(now())
-  
+  created_at    DateTime       @default(now())
+  updated_at    DateTime       @default(now())
+
   user       User     @relation(fields: [user_id], references: [id])
+  product    Product  @relation(fields: [product_id], references: [id])
 }

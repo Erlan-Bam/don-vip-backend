@@ -1,46 +1,31 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import {
-  IsInt,
-  IsOptional,
-  IsString,
-  IsDecimal,
-  IsNumber,
-} from 'class-validator';
-import { Transform } from 'class-transformer';
+import { IsInt, IsOptional, IsString, Min } from 'class-validator';
 
 export class CreateOrderDto {
   @ApiProperty({
-    description: 'Цена заказа в виде десятичного числа',
-    example: 49.99,
+    description: 'ID продукта, который покупается',
+    example: 1,
   })
-  @Transform(({ value }) => parseFloat(value))
-  @IsNumber()
-  price: number;
-
-  @ApiProperty({
-    description: 'Количество товара равное цене',
-    example: 10,
-  })
-  @Transform(({ value }) => parseInt(value))
   @IsInt()
-  amount: number;
+  product_id: number;
 
   @ApiProperty({
-    description: 'Тип заказа (например, "Rainbow Stone", "W-Gold", "Золото")',
-    example: 'diamonds',
+    description: 'ID позиции пополнения из массива replenishment (Пакетов)',
+    example: 0,
   })
-  @IsString()
-  type: string;
+  @IsInt()
+  @Min(0)
+  item_id: number;
 
   @ApiProperty({
     description: 'Метод оплаты (например, "Tinkoff", "Smile")',
-    example: 'card',
+    example: 'Tinkoff',
   })
   @IsString()
   payment: string;
 
   @IsOptional()
-  user_id: number;
+  user_id?: number;
 
   @ApiPropertyOptional({
     description: 'ID аккаунта, связанного с заказом',
@@ -49,14 +34,14 @@ export class CreateOrderDto {
   })
   @IsOptional()
   @IsString()
-  account_id: string;
+  account_id?: string;
 
   @ApiPropertyOptional({
-    description: 'ID сервера, если есть',
+    description: 'ID сервера, если применимо (например, сервер игры)',
     example: 'srv_789',
     required: false,
   })
   @IsOptional()
   @IsString()
-  server_id: string;
+  server_id?: string;
 }

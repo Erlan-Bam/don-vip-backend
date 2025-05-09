@@ -29,6 +29,7 @@ export class ProductService {
         description: data.description,
         image: data.image,
         replenishment: JSON.parse(JSON.stringify(data.replenishment)),
+        type: data.type,
         smile_api_game: data.smile_api_game,
       },
     });
