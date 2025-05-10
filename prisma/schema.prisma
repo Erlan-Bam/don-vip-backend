@@ -95,7 +95,7 @@ model Coupon {
   code      String        @unique
   limit     Int?
   discount  Int
-  status    CouponStatus  @default(Active) // ✅ добавлено поле статуса
+  status    CouponStatus  @default(Active)
 }
 
 

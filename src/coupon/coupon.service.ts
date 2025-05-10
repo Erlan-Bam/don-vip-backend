@@ -29,9 +29,7 @@ export class CouponService {
       throw new HttpException('Invalid code', 404);
     }
 
-    // Проверка на окончание лимита
     if (coupon.limit !== null && coupon.limit <= 0) {
-      // Обновим статус на "Expired", если не установлен
       if (coupon.status !== 'Expired') {
         await this.prisma.coupon.update({
           where: { code: data.code },
