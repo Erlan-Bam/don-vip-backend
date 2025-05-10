@@ -12,6 +12,7 @@ import {
   Get,
   Param,
   Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -28,6 +29,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { extname } from 'path';
 import { diskStorage } from 'multer';
 import { ConfigService } from '@nestjs/config';
+import { AdminGuard } from 'src/shared/guards/admin.guards';
 
 @ApiTags('User')
 @Controller('user')
@@ -70,19 +72,19 @@ export class UserController {
   }
 
   @Patch(':id/ban')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @ApiOperation({ summary: 'Ban a user by ID' })
   @ApiResponse({ status: 200, description: 'User banned successfully' })
-  async banUser(@Param('id') id: string) {
-    return this.userService.banUser(Number(id));
+  async banUser(@Param('id', ParseIntPipe) id: number) {
+    return this.userService.banUser(id);
   }
 
   @Patch(':id/unban')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @ApiOperation({ summary: 'Unban a user by ID' })
   @ApiResponse({ status: 200, description: 'User unbanned successfully' })
-  async unbanUser(@Param('id') id: string) {
-    return this.userService.unbanUser(Number(id));
+  async unbanUser(@Param('id', ParseIntPipe) id: number) {
+    return this.userService.unbanUser(id);
   }
 
   @Post('reset-password')
@@ -94,6 +96,7 @@ export class UserController {
     data.identifier = request.user.identifier;
     return this.userService.resetPassword(data);
   }
+
   @Patch('update-profile')
   @UseInterceptors(
     FileInterceptor('avatar', {

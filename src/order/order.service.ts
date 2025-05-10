@@ -3,12 +3,14 @@ import { PrismaService } from 'src/shared/services/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { BigoService } from '../shared/services/bigo.service';
 import { ReplenishmentItem } from 'src/product/dto/create-product.dto';
+import { SmileService } from 'src/shared/services/smile.service';
 
 @Injectable()
 export class OrderService {
   constructor(
     private readonly prisma: PrismaService,
     private bigoService: BigoService,
+    private smileService: SmileService,
   ) {}
 
   async create(data: CreateOrderDto) {
@@ -73,22 +75,58 @@ export class OrderService {
       where: { id: order.product_id },
       select: {
         replenishment: true,
+        type: true,
       },
     });
     const item: ReplenishmentItem = product.replenishment[order.item_id];
 
-    await this.bigoService.rechargeDiamond({
-      rechargeBigoId: order.account_id,
-      buOrderId: `${order.user_id}${Date.now()}${Math.floor(Math.random() * 100000)}`,
-      currency: 'RUB',
-      value: item.amount,
-      totalCost: item.price,
-    });
+    if (product.type === 'Bigo') {
+      await this.bigoService.rechargeDiamond({
+        rechargeBigoId: order.account_id,
+        buOrderId: `${order.user_id}${Date.now()}${Math.floor(Math.random() * 100000)}`,
+        currency: 'RUB',
+        value: item.amount,
+        totalCost: item.price,
+      });
+    } else {
+      // await this.smileService;
+    }
 
     return await this.prisma.order.update({
       where: { id: id },
       data: { status: 'Paid' },
     });
+  }
+
+  async getHistory(userId: number, page: number, limit: number) {
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.order.findMany({
+        where: { user_id: userId, status: 'Paid' },
+        skip,
+        take: limit,
+        select: {
+          item_id: true,
+          payment: true,
+          product: {
+            select: {
+              replenishment: true,
+            },
+          },
+        },
+      }),
+      this.prisma.order.count({
+        where: { user_id: userId, status: 'Paid' },
+      }),
+    ]);
+
+    return {
+      total,
+      page,
+      limit,
+      data,
+    };
   }
 
   async findOne(id: string) {

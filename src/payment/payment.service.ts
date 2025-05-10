@@ -91,6 +91,26 @@ export class PaymentService {
 
     const [userId, orderId, _] = data.out_trade_no.split(':');
 
+    const allowedStatus = [
+      'SUCCESS',
+      'CANCEL',
+      'EXPIRED',
+      'REFUSED',
+      'REFUSE_FAILED',
+    ];
+
+    if (data.trade_status && allowedStatus.includes(data.trade_status)) {
+      await this.prisma.payment.create({
+        data: {
+          price: data.amount,
+          method: data.method,
+          order_id: orderId,
+          user_id: Number(userId),
+          status: data.trade_status !== 'SUCCESS' ? 'Cancelled' : 'Paid',
+        },
+      });
+    }
+
     if (data.trade_status !== 'SUCCESS') {
       console.log('not success', data.trade_status);
       return 'success';
@@ -105,6 +125,29 @@ export class PaymentService {
 
     return 'success';
   }
+
+  async getHistory(userId: number, page: number, limit: number) {
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.payment.findMany({
+        where: { user_id: userId, status: 'Paid' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.payment.count({
+        where: { user_id: userId, status: 'Paid' },
+      }),
+    ]);
+
+    return {
+      total,
+      page,
+      limit,
+      data,
+    };
+  }
+
   async verifyPagsmileSignature(
     raw: string,
     signature: string,
@@ -124,8 +167,6 @@ export class PaymentService {
       .update(raw)
       .digest('hex');
 
-    console.log('Expected Signature:', expectedSignature);
-    console.log('Received Signature:', receivedSignature);
     return expectedSignature === receivedSignature;
   }
 }

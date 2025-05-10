@@ -35,6 +35,18 @@ export class OrderController {
     return this.orderService.create(data);
   }
 
+  @Get('history')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  async getHistory(
+    @Request() request,
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('limit', ParseIntPipe) limit = 10,
+  ) {
+    return this.orderService.getHistory(request.user.id, page, limit);
+  }
+
   @Get()
   @ApiOperation({ summary: 'Get all orders' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })

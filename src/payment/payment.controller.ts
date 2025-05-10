@@ -7,6 +7,9 @@ import {
   Headers,
   UsePipes,
   ValidationPipe,
+  Get,
+  Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { PagsmileCreatePayinDto } from './dto/pagsmile-create-payin.dto';
@@ -15,6 +18,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiQuery,
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { PagsmileNotificationDto } from './dto/pagsmile-notification.dto';
@@ -57,5 +61,17 @@ export class PaymentController {
       signature,
       rawBody,
     );
+  }
+
+  @Get('history')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  async getHistory(
+    @Request() request,
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('limit', ParseIntPipe) limit = 10,
+  ) {
+    return this.paymentService.getHistory(request.user.id, page, limit);
   }
 }

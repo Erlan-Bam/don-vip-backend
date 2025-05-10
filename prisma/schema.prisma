@@ -44,10 +44,22 @@ model User {
 
   orders        Order[]
   feedbacks     Feedback[]
+  payments      Payment[]
 }
 
+model Payment {
+  id            Int            @id @default(autoincrement())
+  price         Decimal
+  method        String
+  order_id      String
+  user_id       Int
+  status        PaymentStatus  
+  created_at    DateTime       @default(now())
+  updated_at    DateTime       @updatedAt @default(now())
 
-
+  order      Order    @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
 
 model Product {
   id             Int      @id @default(autoincrement())
@@ -89,8 +101,9 @@ model Order {
   account_id    String?
   server_id     String?
   created_at    DateTime       @default(now())
-  updated_at    DateTime       @default(now())
+  updated_at    DateTime       @updatedAt @default(now())
 
   user       User     @relation(fields: [user_id], references: [id])
-  product    Product  @relation(fields: [product_id], references: [id])
+  product    Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  payments   Payment[]
 }

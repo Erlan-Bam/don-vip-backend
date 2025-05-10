@@ -100,7 +100,12 @@ export class AuthService {
   }
   async generateAccessToken(user: User): Promise<string> {
     return await this.jwtService.signAsync(
-      { id: user.id, identifier: user.identifier, role: user.role },
+      {
+        id: user.id,
+        identifier: user.identifier,
+        role: user.role,
+        is_banned: user.is_banned,
+      },
       {
         secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
         expiresIn: '1d',
@@ -109,7 +114,12 @@ export class AuthService {
   }
   async generateRefreshToken(user: User): Promise<string> {
     return await this.jwtService.signAsync(
-      { id: user.id, identifier: user.identifier, role: user.role },
+      {
+        id: user.id,
+        identifier: user.identifier,
+        role: user.role,
+        is_banned: user.is_banned,
+      },
       {
         secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
         expiresIn: '7d',

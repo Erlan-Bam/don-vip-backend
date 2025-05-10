@@ -121,6 +121,13 @@ export class UserService {
   }
 
   async banUser(userId: number) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw new HttpException('User not found', 404);
+    }
+    if (user.role === 'Admin') {
+      throw new HttpException('Admin cannot be banned', 400);
+    }
     return this.prisma.user.update({
       where: { id: userId },
       data: { is_banned: true },
@@ -128,9 +135,13 @@ export class UserService {
   }
 
   async unbanUser(userId: number) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      throw new HttpException('User not found', 404);
+    }
     return this.prisma.user.update({
       where: { id: userId },
-      data: { is_banned: false },
+      data: { is_banned: true },
     });
   }
 
