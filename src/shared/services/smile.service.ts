@@ -105,11 +105,11 @@ export class SmileService {
     }
   }
 
-  async sendOrder(apiGame: string, sku: string){
+  async sendOrder(apiGame: string, sku: string) {
     const list = await this.skuList(apiGame);
 
-    if(list.status === 'success'){
-      const item = 
-    }
+    // if(list.status === 'success'){
+    //   const item =
+    // }
   }
 }
