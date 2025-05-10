@@ -104,4 +104,12 @@ export class SmileService {
       return { status: 'error', error: response.data.error };
     }
   }
+
+  async sendOrder(apiGame: string, sku: string){
+    const list = await this.skuList(apiGame);
+
+    if(list.status === 'success'){
+      const item = 
+    }
+  }
 }
