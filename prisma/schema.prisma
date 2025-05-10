@@ -59,7 +59,9 @@ model Payment {
 
   order      Order    @relation(fields: [order_id], references: [id], onDelete: Cascade)
   user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-}enum CouponStatus {
+}
+
+enum CouponStatus {
   Active
   Used
   Expired

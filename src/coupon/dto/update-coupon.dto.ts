@@ -1,5 +1,6 @@
-import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { CouponStatus } from '@prisma/client';
 
 export class UpdateCouponDto {
   @ApiProperty({
@@ -40,4 +41,13 @@ export class UpdateCouponDto {
   @Min(0)
   @Max(100)
   discount: number;
+
+  @ApiProperty({
+    enum: CouponStatus,
+    description: 'Set coupon status',
+    required: false,
+    default: CouponStatus.Active,
+  })
+  @IsEnum(CouponStatus)
+  status: CouponStatus;
 }
