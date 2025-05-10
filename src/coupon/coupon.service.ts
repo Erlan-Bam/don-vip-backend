@@ -23,23 +23,32 @@ export class CouponService {
   async check(data: CheckCouponDto) {
     const coupon = await this.prisma.coupon.findUnique({
       where: { code: data.code },
-      select: {
-        code: true,
-        limit: true,
-        discount: true,
-      },
     });
 
     if (!coupon) {
       throw new HttpException('Invalid code', 404);
     }
 
-    if (coupon.limit && !coupon.limit) {
+    // Проверка на окончание лимита
+    if (coupon.limit !== null && coupon.limit <= 0) {
+      // Обновим статус на "Expired", если не установлен
+      if (coupon.status !== 'Expired') {
+        await this.prisma.coupon.update({
+          where: { code: data.code },
+          data: { status: 'Expired' },
+        });
+      }
       throw new HttpException('Expired code', 400);
     }
 
-    return coupon;
+    return {
+      code: coupon.code,
+      limit: coupon.limit,
+      discount: coupon.discount,
+      status: coupon.status,
+    };
   }
+
   async getCoupons() {
     return await this.prisma.coupon.findMany();
   }

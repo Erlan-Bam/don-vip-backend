@@ -59,7 +59,13 @@ model Payment {
 
   order      Order    @relation(fields: [order_id], references: [id], onDelete: Cascade)
   user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}enum CouponStatus {
+  Active
+  Used
+  Expired
+  Disabled
 }
+
 
 model Product {
   id             Int      @id @default(autoincrement())
@@ -85,11 +91,13 @@ model Feedback {
 }
 
 model Coupon {
-  id            Int     @id @default(autoincrement())
-  code          String  @unique
-  limit         Int?
-  discount      Int
+  id        Int           @id @default(autoincrement())
+  code      String        @unique
+  limit     Int?
+  discount  Int
+  status    CouponStatus  @default(Active) // ✅ добавлено поле статуса
 }
+
 
 model Order {
   id            String         @id @default(uuid())
