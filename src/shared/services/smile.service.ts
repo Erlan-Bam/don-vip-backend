@@ -105,6 +105,38 @@ export class SmileService {
     }
   }
 
+  async validate(apiGame: string, user_id: string, server_id: string) {
+    const id = `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
+    const payload = {
+      jsonrpc: this.apiVersion,
+      id: id,
+      method: 'validate',
+      params: {
+        iat: Math.floor(Date.now() / 1000),
+        apiGame: apiGame,
+        userAccount: {
+          user_id: user_id,
+          server_id: server_id,
+        },
+      },
+    };
+    const token = await this.generateToken(payload);
+    const response = await this.smile.post('', null, {
+      params: payload,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (response.data.result) {
+      return {
+        status: 'success',
+        data: response.data.result,
+      };
+    } else {
+      return { status: 'error', error: response.data.error };
+    }
+  }
+
   async sendOrder(apiGame: string, sku: string) {
     const list = await this.skuList(apiGame);
 

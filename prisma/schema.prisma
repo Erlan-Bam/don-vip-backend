@@ -68,7 +68,6 @@ enum CouponStatus {
   Disabled
 }
 
-
 model Product {
   id             Int      @id @default(autoincrement())
   name           String
@@ -99,7 +98,6 @@ model Coupon {
   discount  Int
   status    CouponStatus  @default(Active)
 }
-
 
 model Order {
   id            String         @id @default(uuid())

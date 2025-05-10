@@ -33,6 +33,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { AdminGuard } from 'src/shared/guards/admin.guards';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { SmileService } from 'src/shared/services/smile.service';
+import { SmileValidateDto } from './dto/smile-validate.dto';
 
 @ApiTags('Product')
 @Controller('product')
@@ -129,6 +130,25 @@ export class ProductController {
   @UseGuards(AuthGuard('jwt'))
   async getSmileSKU(@Param('apiGame') apiGame: string) {
     return this.smileService.skuList(apiGame);
+  }
+
+  @Post('validate')
+  @ApiOperation({ summary: 'Validate Smile donation to user account' })
+  @ApiBody({
+    description: 'Smile validate method body',
+    type: SmileValidateDto,
+  })
+  async smileValidate(@Body() data: SmileValidateDto) {
+    const { apiGame, user_id, server_id } = data;
+    return this.smileService.validate(apiGame, user_id, server_id);
+  }
+
+  @Post('/smile/buy')
+  @ApiBody({
+    description: 'Smile',
+  })
+  async smileBuy(@Body() data: { sku: string; apiGame: string }) {
+    return this.smileService.sendOrder(data.apiGame, data.sku);
   }
 
   @Get(':id')
