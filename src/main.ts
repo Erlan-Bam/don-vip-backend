@@ -3,7 +3,6 @@ import { AppModule } from './app.module';
 import * as bodyParser from 'body-parser';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import axios from 'axios';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
@@ -35,12 +34,6 @@ async function bootstrap() {
     ],
     exposedHeaders: ['Authorization'],
   });
-
-  const getPublicIp = async () => {
-    const res = await axios.get('https://api.ipify.org?format=json');
-    console.log('Public IP:', res.data.ip);
-  };
-  await getPublicIp();
 
   const config = new DocumentBuilder()
     .setTitle('Auth API')
