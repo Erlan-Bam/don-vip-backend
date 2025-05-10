@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { Axios } from 'axios';
 
@@ -108,8 +108,37 @@ export class SmileService {
   async sendOrder(apiGame: string, sku: string) {
     const list = await this.skuList(apiGame);
 
-    // if(list.status === 'success'){
-    //   const item =
-    // }
+    if (list.status === 'success') {
+      const item = list.data.find((product) => product.sku === sku);
+
+      const id = `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
+      const payload = {
+        jsonrpc: this.apiVersion,
+        id: id,
+        method: 'skuList',
+        params: {
+          iat: Math.floor(Date.now() / 1000),
+          apiGame: apiGame,
+          items: [{ qty: 1, ...item }],
+        },
+      };
+      const token = await this.generateToken(payload);
+      const response = await this.smile.post('', null, {
+        params: payload,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.data.result) {
+        return {
+          status: 'success',
+          data: response.data.result.orderId,
+        };
+      } else {
+        return { status: 'error', error: response.data.error };
+      }
+    } else {
+      throw new HttpException('Try coming later', 400);
+    }
   }
 }

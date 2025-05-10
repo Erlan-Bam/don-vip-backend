@@ -28,7 +28,6 @@ export class AuthController {
       this.configService.get<string>('NODE_ENV') === 'development'
         ? 'http://localhost:3000'
         : 'https://don-vip.online';
-    console.log(this.baseFrontendUrl);
   }
 
   @Post('login')

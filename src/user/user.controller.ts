@@ -56,18 +56,18 @@ export class UserController {
   }
 
   @Get()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @ApiOperation({ summary: 'Find all users (pagination + search)' })
   @ApiResponse({ status: 200, description: 'List of users with pagination' })
   async findAllUsers(
     @Query('search') search?: string,
-    @Query('page') page: string = '1',
-    @Query('limit') limit: string = '10',
+    @Query('page', ParseIntPipe) page: number = 1,
+    @Query('limit', ParseIntPipe) limit: number = 10,
   ) {
     return this.userService.findAllUsers({
       search,
-      page: parseInt(page),
-      limit: parseInt(limit),
+      page: page,
+      limit: limit,
     });
   }
 
