@@ -102,7 +102,6 @@ export class ProductController {
   }
 
   @Get()
-  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({
     summary: 'Get all products with pagination and optional search',
   })
@@ -152,7 +151,6 @@ export class ProductController {
   }
 
   @Get(':id')
-  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Get product by ID' })
   @ApiParam({ name: 'id', type: Number })
   async findOne(@Param('id', ParseIntPipe) id: number) {
