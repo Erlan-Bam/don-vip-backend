@@ -96,6 +96,13 @@ export class ProductController {
     @Body() data: CreateProductDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
+    if (!file) {
+      throw new HttpException(
+        'Image is required and must be a valid format',
+        400,
+      );
+    }
+
     data.image = `${this.baseUrl}/uploads/products/${file.filename}`;
 
     return this.productService.create(data);
