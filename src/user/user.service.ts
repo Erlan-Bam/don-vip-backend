@@ -141,7 +141,7 @@ export class UserService {
     }
     return this.prisma.user.update({
       where: { id: userId },
-      data: { is_banned: true },
+      data: { is_banned: false },
     });
   }
 

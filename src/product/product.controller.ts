@@ -96,9 +96,78 @@ export class ProductController {
     @Body() data: CreateProductDto,
     @UploadedFile() file: Express.Multer.File,
   ) {
+    if (!file) {
+      throw new HttpException(
+        'Image is required and must be a valid format',
+        400,
+      );
+    }
+
     data.image = `${this.baseUrl}/uploads/products/${file.filename}`;
 
     return this.productService.create(data);
+  }
+
+  @Patch(':id/image')
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage: diskStorage({
+        destination: './uploads/products',
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          callback(null, `product-${uniqueSuffix}${ext}`);
+        },
+      }),
+      fileFilter: (req, file, callback) => {
+        if (
+          ['image/png', 'image/jpeg', 'image/webp', 'image/svg'].includes(
+            file.mimetype,
+          )
+        ) {
+          callback(null, true);
+        } else {
+          callback(
+            new HttpException(
+              'Only .png, .jpeg, .svg and .webp formats are allowed!',
+              400,
+            ),
+            false,
+          );
+        }
+      },
+      limits: {
+        fileSize: 10 * 1024 * 1024,
+      },
+    }),
+  )
+  @ApiOperation({ summary: 'Upload or update product image' })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        image: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  async uploadImage(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new HttpException('Image file is required', 400);
+    }
+
+    const imagePath = `${this.baseUrl}/uploads/products/${file.filename}`;
+
+    return this.productService.update(id, { image: imagePath });
   }
 
   @Get()
