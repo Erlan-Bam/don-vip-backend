@@ -6,6 +6,7 @@ import * as base64 from 'base-64';
 import { PagsmileCreatePayinDto } from './dto/pagsmile-create-payin.dto';
 import { PagsmileNotificationDto } from './dto/pagsmile-notification.dto';
 import { OrderService } from 'src/order/order.service';
+import { TBankWebhookDto } from './dto/tbank-webhook.dto';
 
 @Injectable()
 export class PaymentService {
@@ -113,6 +114,44 @@ export class PaymentService {
 
     if (data.trade_status !== 'SUCCESS') {
       console.log('not success', data.trade_status);
+      return 'success';
+    }
+
+    const order = await this.orderService.finishOrder(orderId);
+
+    if (!order) {
+      console.log('INVALID! ORDER ID NOT FOUND');
+      return 'success';
+    }
+
+    return 'success';
+  }
+  async tbankWebhook(data: TBankWebhookDto, ip: string) {
+    const allowed = ['212.233.80.7', '91.218.132.2'];
+
+    if (!allowed.includes(ip)) {
+      console.log('Invalid ip:', ip);
+      return 'success';
+    }
+
+    const allowedStatus = ['IN_PROGRESS', 'EXECUTED', 'FAILED', 'CANCELLED'];
+    const [userId, orderId, _] = data.orderId.split(':');
+    console.log('Credentials', userId, orderId);
+
+    if (data.status && allowedStatus.includes(data.status)) {
+      await this.prisma.payment.create({
+        data: {
+          price: data.amount,
+          method: 'T-Bank',
+          order_id: orderId,
+          user_id: Number(userId),
+          status: data.status === 'EXECUTED' ? 'Cancelled' : 'Paid',
+        },
+      });
+    }
+
+    if (data.status !== 'EXECUTED') {
+      console.log('not success', data.status);
       return 'success';
     }
 

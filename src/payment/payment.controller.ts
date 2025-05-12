@@ -22,6 +22,7 @@ import {
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { PagsmileNotificationDto } from './dto/pagsmile-notification.dto';
+import { TBankWebhookDto } from './dto/tbank-webhook.dto';
 
 @ApiTags('Payment')
 @Controller('payment')
@@ -61,6 +62,14 @@ export class PaymentController {
       signature,
       rawBody,
     );
+  }
+
+  @Post('webhook')
+  async tbankWebhook(@Body() data: TBankWebhookDto, @Request() req: Request) {
+    const ip =
+      req.headers['x-forwarded-for']?.toString().split(',')[0].trim() ||
+      (req as any).socket.remoteAddress;
+    return this.paymentService.tbankWebhook(data, ip);
   }
 
   @Get('history')
