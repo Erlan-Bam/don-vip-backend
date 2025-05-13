@@ -18,6 +18,19 @@ export class UserService {
       },
     });
   }
+  async updateToUser(id: number, identifier: string, password: string) {
+    const bcrypt = await import('bcryptjs');
+    const hashedPassword = await bcrypt.hash(password, 10);
+    return await this.prisma.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        identifier: identifier,
+        password: hashedPassword,
+      },
+    });
+  }
 
   async findById(id: number): Promise<User> {
     const user = await this.prisma.user.findUnique({ where: { id: id } });

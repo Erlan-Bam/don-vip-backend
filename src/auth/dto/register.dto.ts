@@ -4,6 +4,7 @@ import {
   registerDecorator,
   ValidationOptions,
   ValidationArguments,
+  IsInt,
 } from 'class-validator';
 
 export function IsEmailOrPhone(validationOptions?: ValidationOptions) {
@@ -31,6 +32,9 @@ export function IsEmailOrPhone(validationOptions?: ValidationOptions) {
 }
 
 export class RegisterDto {
+  @IsInt()
+  id: number;
+
   @ApiProperty({
     description: 'Email or phone number in E.164 format',
     example: 'user@example.com or +77001112233',

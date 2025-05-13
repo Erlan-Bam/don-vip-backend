@@ -19,12 +19,16 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
   async register(data: RegisterDto) {
-    let user = await this.userService.findByIdentifier(data.identifier);
-    if (user) {
-      throw new HttpException('User with such credentials already exists', 400);
+    let user = await this.userService.findById(data.id);
+    if (!user) {
+      user = await this.userService.createUser(data);
+    } else {
+      user = await this.userService.updateToUser(
+        data.id,
+        data.identifier,
+        data.password,
+      );
     }
-
-    user = await this.userService.createUser(data);
 
     const [accessToken, refreshToken] = await Promise.all([
       this.generateAccessToken(user),
@@ -35,6 +39,10 @@ export class AuthService {
       access_token: accessToken,
       refresh_token: refreshToken,
     };
+  }
+  async createGuest() {
+    const user = await this.prisma.user.create({ data: {} });
+    return user;
   }
   async login(data: LoginDto) {
     const user = await this.userService.findByIdentifier(data.identifier);
