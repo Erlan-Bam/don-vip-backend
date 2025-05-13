@@ -1,5 +1,6 @@
-import { IsDecimal, IsOptional, IsUUID } from 'class-validator';
+import { IsDecimal, IsInt, IsOptional, IsUUID } from 'class-validator';
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 
 export class PagsmileCreatePayinDto {
   @ApiProperty({ example: '100.00', description: 'Payment amount in RUB' })
@@ -13,7 +14,11 @@ export class PagsmileCreatePayinDto {
   @IsUUID()
   order_id: string;
 
-  @ApiHideProperty()
-  @IsOptional()
+  @ApiProperty({
+    example: '1',
+    description: 'ID пользователя который будет оплачивать',
+  })
+  @Type(() => Number)
+  @IsInt()
   user_id: number;
 }

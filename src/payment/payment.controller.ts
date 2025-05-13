@@ -31,15 +31,10 @@ export class PaymentController {
   constructor(private paymentService: PaymentService) {}
 
   @Post('pagsmile/payin')
-  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Create a Payin transaction via Pagsmile' })
   @ApiResponse({ status: 201, description: 'Payin created successfully' })
   @ApiResponse({ status: 400, description: 'Validation failed' })
-  async createPagsmilePayin(
-    @Body() data: PagsmileCreatePayinDto,
-    @Request() request,
-  ) {
-    data.user_id = request.user.id;
+  async createPagsmilePayin(@Body() data: PagsmileCreatePayinDto) {
     return this.paymentService.createPagsmilePayin(data);
   }
 
