@@ -64,7 +64,7 @@ export class PaymentController {
     );
   }
 
-  @Post('webhook')
+  @Post('tbank/webhook')
   async tbankWebhook(@Body() data: TBankWebhookDto, @Request() req: Request) {
     const ip =
       req.headers['x-forwarded-for']?.toString().split(',')[0].trim() ||
