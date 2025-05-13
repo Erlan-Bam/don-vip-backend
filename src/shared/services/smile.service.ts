@@ -137,7 +137,12 @@ export class SmileService {
     }
   }
 
-  async sendOrder(apiGame: string, sku: string) {
+  async sendOrder(
+    apiGame: string,
+    sku: string,
+    user_id: string,
+    server_id: string,
+  ) {
     const list = await this.skuList(apiGame);
 
     if (list.status === 'success') {
@@ -147,11 +152,15 @@ export class SmileService {
       const payload = {
         jsonrpc: this.apiVersion,
         id: id,
-        method: 'skuList',
+        method: 'sendOrder',
         params: {
           iat: Math.floor(Date.now() / 1000),
           apiGame: apiGame,
           items: [{ qty: 1, ...item }],
+          userAccount: {
+            user_id: user_id,
+            server_id: server_id,
+          },
         },
       };
       const token = await this.generateToken(payload);

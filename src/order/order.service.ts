@@ -65,22 +65,30 @@ export class OrderService {
   }
 
   async finishOrder(id: string) {
-    const order = await this.prisma.order.findUnique({ where: { id: id } });
+    const order = await this.prisma.order.findUnique({
+      where: { id: id },
+      select: {
+        user_id: true,
+        account_id: true,
+        server_id: true,
+        item_id: true,
+        product: {
+          select: {
+            replenishment: true,
+            type: true,
+            smile_api_game: true,
+          },
+        },
+      },
+    });
 
     if (!order) {
       return order;
     }
 
-    const product = await this.prisma.product.findUnique({
-      where: { id: order.product_id },
-      select: {
-        replenishment: true,
-        type: true,
-      },
-    });
-    const item: ReplenishmentItem = product.replenishment[order.item_id];
+    const item: ReplenishmentItem = order.product.replenishment[order.item_id];
 
-    if (product.type === 'Bigo') {
+    if (order.product.type === 'Bigo') {
       await this.bigoService.rechargeDiamond({
         rechargeBigoId: order.account_id,
         buOrderId: `${order.user_id}${Date.now()}${Math.floor(Math.random() * 100000)}`,
@@ -89,7 +97,12 @@ export class OrderService {
         totalCost: item.price,
       });
     } else {
-      // await this.smileService;
+      await this.smileService.sendOrder(
+        order.product.smile_api_game,
+        item.sku,
+        order.account_id,
+        order.server_id,
+      );
     }
 
     return await this.prisma.order.update({

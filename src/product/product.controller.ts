@@ -211,14 +211,6 @@ export class ProductController {
     return this.smileService.validate(apiGame, user_id, server_id);
   }
 
-  @Post('/smile/buy')
-  @ApiBody({
-    description: 'Smile',
-  })
-  async smileBuy(@Body() data: { sku: string; apiGame: string }) {
-    return this.smileService.sendOrder(data.apiGame, data.sku);
-  }
-
   @Get(':id')
   @ApiOperation({ summary: 'Get product by ID' })
   @ApiParam({ name: 'id', type: Number })
