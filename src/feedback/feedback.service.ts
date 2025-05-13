@@ -8,7 +8,20 @@ export class FeedbackService {
   constructor(private prisma: PrismaService) {}
 
   async create(data: CreateFeedbackDto) {
-    return await this.prisma.feedback.create({ data });
+    return this.prisma.feedback.create({
+      data: {
+        text: data.text,
+        reaction: data.reaction,
+        product: {
+          connect: { id: data.product_id },
+        },
+        ...(data.user_id && {
+          user: {
+            connect: { id: data.user_id },
+          },
+        }),
+      },
+    });
   }
 
   async findAll(page = 1, limit = 10) {
