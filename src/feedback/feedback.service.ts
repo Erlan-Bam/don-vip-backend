@@ -15,11 +15,9 @@ export class FeedbackService {
         product: {
           connect: { id: data.product_id },
         },
-        ...(data.user_id && {
-          user: {
-            connect: { id: data.user_id },
-          },
-        }),
+        user: {
+          connect: { id: data.user_id },
+        },
       },
     });
   }
