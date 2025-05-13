@@ -23,19 +23,17 @@ import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Orders')
 @Controller('order')
-@ApiBearerAuth('JWT')
-@UseGuards(AuthGuard('jwt'))
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Post()
   @ApiOperation({ summary: 'Create order' })
-  async create(@Body() data: CreateOrderDto, @Request() request) {
-    data.user_id = request.user.id;
+  async create(@Body() data: CreateOrderDto) {
     return this.orderService.create(data);
   }
 
   @Get('history')
+  @ApiBearerAuth('JWT')
   @UseGuards(AuthGuard('jwt'))
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
@@ -66,6 +64,8 @@ export class OrderController {
   }
 
   @Delete(':id')
+  @ApiBearerAuth('JWT')
+  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Delete order' })
   @ApiParam({ name: 'id', type: Number, example: 1 })
   async remove(@Param('id') id: string) {

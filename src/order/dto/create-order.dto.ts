@@ -24,8 +24,13 @@ export class CreateOrderDto {
   @IsString()
   payment: string;
 
-  @IsOptional()
-  user_id?: number;
+  @ApiProperty({
+    description: 'ID пользователя, совершающего заказ',
+    example: 1,
+    required: true,
+  })
+  @IsInt()
+  user_id: number;
 
   @ApiPropertyOptional({
     description: 'ID аккаунта, связанного с заказом',
