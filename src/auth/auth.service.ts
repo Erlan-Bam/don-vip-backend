@@ -41,7 +41,7 @@ export class AuthService {
     };
   }
   async createGuest() {
-    const user = await this.prisma.user.create({ data: {} });
+    const user = await this.prisma.user.create({ data: {} as any });
     return user;
   }
   async login(data: LoginDto) {
