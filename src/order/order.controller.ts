@@ -45,6 +45,11 @@ export class OrderController {
     return this.orderService.getHistory(request.user.id, page, limit);
   }
 
+  @Get('check')
+  async check() {
+    await this.orderService.finishOrder('f80702c1-6ff3-4850-b8b5-f097299d1cfd');
+  }
+
   @Get()
   @ApiOperation({ summary: 'Get all orders' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })

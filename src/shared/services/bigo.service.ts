@@ -80,9 +80,9 @@ export class BigoService {
       reseller_bigoid: this.resellerBigoId,
       seqid: buOrderId,
       bu_orderid: buOrderId,
-      value,
+      value: value,
       total_cost: totalCost,
-      currency,
+      currency: currency,
     };
     const signature = this.generateSignature(
       JSON.stringify(body),

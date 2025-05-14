@@ -86,7 +86,17 @@ export class OrderService {
       return order;
     }
 
-    const item: ReplenishmentItem = order.product.replenishment[order.item_id];
+    let replenishment: ReplenishmentItem[] = [];
+
+    if (typeof order.product.replenishment === 'string') {
+      replenishment = JSON.parse(order.product.replenishment);
+    } else if (Array.isArray(order.product.replenishment)) {
+      replenishment = order.product
+        .replenishment as unknown as ReplenishmentItem[];
+    } else {
+      throw new HttpException('Invalid replenishments', 500);
+    }
+    const item: ReplenishmentItem = replenishment[order.item_id];
 
     if (order.product.type === 'Bigo') {
       await this.bigoService.rechargeDiamond({
