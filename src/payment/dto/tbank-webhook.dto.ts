@@ -18,24 +18,24 @@ export class TBankWebhookDto {
 
   @IsOptional()
   @IsString()
-  customerKey?: string;
+  CustomerKey?: string;
 
   @IsString()
-  status: string;
-
-  @IsOptional()
-  @IsString()
-  paymentId?: string;
+  Status: string;
 
   @IsOptional()
   @IsString()
-  rebillId?: string;
+  PaymentId?: string;
 
   @IsOptional()
   @IsString()
-  terminalKey?: string;
+  RebillId?: string;
+
+  @IsOptional()
+  @IsString()
+  TerminalKey?: string;
 
   @IsOptional()
   @IsObject()
-  raw?: object;
+  Raw?: object;
 }

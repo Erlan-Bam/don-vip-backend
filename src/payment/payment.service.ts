@@ -134,23 +134,33 @@ export class PaymentService {
       return 'success';
     }
 
-    const allowedStatus = ['IN_PROGRESS', 'EXECUTED', 'FAILED', 'CANCELLED'];
+    const allowedStatus = [
+      'IN_PROGRESS',
+      'EXECUTED',
+      'FAILED',
+      'CANCELLED',
+      'AUTHORIZED',
+      'CONFIRMED',
+    ];
     const [userId, orderId] = [data.DATA.UserId, data.DATA.OrderId];
 
-    if (data.status && allowedStatus.includes(data.status)) {
+    if (data.Status && allowedStatus.includes(data.Status)) {
       await this.prisma.payment.create({
         data: {
           price: data.Amount,
           method: 'T-Bank',
           order_id: orderId,
           user_id: Number(userId),
-          status: data.status === 'EXECUTED' ? 'Cancelled' : 'Paid',
+          status:
+            data.Status === 'CONFIRMED' || data.Status === 'AUTHORIZED'
+              ? 'Paid'
+              : 'Cancelled',
         },
       });
     }
 
-    if (data.status !== 'EXECUTED') {
-      console.log('not success', data.status);
+    if (data.Status !== 'CONFIRMED' && data.Status !== 'AUTHORIZED') {
+      console.log('not success', data.Status);
       return 'success';
     }
 
