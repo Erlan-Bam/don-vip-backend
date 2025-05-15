@@ -140,7 +140,7 @@ export class PaymentService {
     if (data.status && allowedStatus.includes(data.status)) {
       await this.prisma.payment.create({
         data: {
-          price: data.amount,
+          price: data.Amount,
           method: 'T-Bank',
           order_id: orderId,
           user_id: Number(userId),

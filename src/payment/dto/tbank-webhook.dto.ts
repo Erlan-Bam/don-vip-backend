@@ -7,10 +7,10 @@ export class TBankWebhookDto {
 
   @Type(() => Number)
   @IsInt()
-  amount: number;
+  Amount: number;
 
   @IsString()
-  orderId: string;
+  OrderId: string;
 
   @IsOptional()
   @IsObject()
