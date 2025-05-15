@@ -1,5 +1,5 @@
 import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateFeedbackDto {
   @ApiPropertyOptional({ example: true })
@@ -14,4 +14,8 @@ export class UpdateFeedbackDto {
   @ApiPropertyOptional({ example: 1 })
   @IsInt()
   product_id: number;
+
+  @ApiProperty({ example: 1 })
+  @IsInt()
+  user_id: number;
 }

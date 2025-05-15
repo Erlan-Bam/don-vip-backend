@@ -25,8 +25,6 @@ import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Feedback')
 @Controller('feedback')
-@ApiBearerAuth('JWT')
-@UseGuards(AuthGuard('jwt'))
 export class FeedbackController {
   constructor(private readonly feedbackService: FeedbackService) {}
 

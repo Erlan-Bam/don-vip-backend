@@ -57,7 +57,10 @@ export class FeedbackService {
   }
 
   async update(id: number, data: UpdateFeedbackDto) {
-    return await this.prisma.feedback.update({ where: { id: id }, data: data });
+    return await this.prisma.feedback.update({
+      where: { id: id, user_id: data.user_id },
+      data: data,
+    });
   }
 
   async remove(id: number) {

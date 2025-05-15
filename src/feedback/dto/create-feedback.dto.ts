@@ -14,6 +14,7 @@ export class CreateFeedbackDto {
   @IsInt()
   product_id: number;
 
-  @IsOptional()
+  @ApiProperty({ example: 1 })
+  @IsInt()
   user_id: number;
 }
