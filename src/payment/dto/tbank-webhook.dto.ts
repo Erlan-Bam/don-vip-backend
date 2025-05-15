@@ -13,6 +13,10 @@ export class TBankWebhookDto {
   orderId: string;
 
   @IsOptional()
+  @IsObject()
+  DATA: any;
+
+  @IsOptional()
   @IsString()
   customerKey?: string;
 
