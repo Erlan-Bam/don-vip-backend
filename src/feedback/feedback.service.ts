@@ -8,7 +8,7 @@ export class FeedbackService {
   constructor(private prisma: PrismaService) {}
 
   async create(data: CreateFeedbackDto) {
-    return this.prisma.feedback.create({
+    return await this.prisma.feedback.create({
       data: {
         text: data.text,
         reaction: data.reaction,
