@@ -48,7 +48,7 @@ export class UpdateProfileDto {
     example: '+7 903 000 00 00',
   })
   @IsOptional()
-  @IsPhoneNumber('RU') // Adjust for your region
+  @IsPhoneNumber(null)
   phone: string;
 
   @ApiPropertyOptional({
