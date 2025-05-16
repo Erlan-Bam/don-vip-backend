@@ -99,51 +99,13 @@ export class UserController {
 
   @Patch('update-profile')
   @UseGuards(AuthGuard('jwt'))
-  @UseInterceptors(
-    FileInterceptor('avatar', {
-      storage: diskStorage({
-        destination: './uploads/avatars',
-        filename: (req, file, callback) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname);
-          callback(null, `avatar-${uniqueSuffix}${ext}`);
-        },
-      }),
-      fileFilter: (req, file, callback) => {
-        if (
-          ['image/png', 'image/jpeg', 'image/webp', 'image/svg'].includes(
-            file.mimetype,
-          )
-        ) {
-          callback(null, true);
-        } else {
-          callback(
-            new HttpException(
-              'Only .png, .jpeg, .svg and .webp formats are allowed!',
-              400,
-            ),
-            false,
-          );
-        }
-      },
-      limits: {
-        fileSize: 10 * 1024 * 1024,
-      },
-    }),
-  )
   @ApiOperation({ summary: 'Update user profile' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     description: 'Profile data to update',
     type: UpdateProfileDto,
   })
-  async updateProfile(
-    @Body() data: UpdateProfileDto,
-    @UploadedFile() file: Express.Multer.File,
-  ) {
-    data.avatar = `${this.baseUrl}/uploads/avatars/${file.filename}`;
-
+  async updateProfile(@Body() data: UpdateProfileDto) {
     return this.userService.updateProfile(data);
   }
 
