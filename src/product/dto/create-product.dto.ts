@@ -28,7 +28,7 @@ export class ReplenishmentItem {
   @ApiProperty({
     example: 'sku_number_1',
     description:
-      'Если этот пакет связан с smile, надо обязательно указать его, sku можно получить в запросе GET /api/product/smile/:apiGame',
+      'Если этот пакет связан с Smile, указывается SKU из GET /api/product/smile/:apiGame',
   })
   @IsString()
   sku: string;
@@ -53,7 +53,7 @@ export class CreateProductDto {
     type: 'string',
     format: 'binary',
     required: true,
-    description: 'Изображение продукта в формате файла (multipart/form-data)',
+    description: 'Изображение продукта (multipart/form-data)',
   })
   @IsOptional()
   image: any;
@@ -73,8 +73,7 @@ export class CreateProductDto {
 
   @ApiPropertyOptional({
     example: 'mobilelegendsru',
-    description:
-      'Идентификатор игры в Smile API (если используется), получается из GET /api/product/smile',
+    description: 'Идентификатор игры в Smile API (если используется)',
   })
   @IsOptional()
   @IsString()
@@ -83,8 +82,22 @@ export class CreateProductDto {
   @ApiProperty({
     example: 'Bigo',
     enum: ProductType,
-    description: 'Тип продукта, соответствующий значению enum ProductType',
+    description: 'Тип продукта (enum ProductType)',
   })
   @IsEnum(ProductType)
   type: ProductType;
+
+  @ApiProperty({
+    example: 'https://cdn.example.com/icons/usd.png',
+    description: 'URL изображения валюты (иконка)',
+  })
+  @IsString()
+  currency_image: string;
+
+  @ApiProperty({
+    example: 'USD',
+    description: 'Название валюты (например, USD, EUR, RUB)',
+  })
+  @IsString()
+  currency_name: string;
 }

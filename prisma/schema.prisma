@@ -76,6 +76,8 @@ model Product {
   description    String
   image          String
   replenishment  Json
+  currency_image String?
+  currency_name  String?
   smile_api_game String?  @unique
   type           ProductType
   feedbacks      Feedback[]
