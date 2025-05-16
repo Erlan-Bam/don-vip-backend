@@ -37,6 +37,12 @@ export class FeedbackService {
               image: true,
             },
           },
+          user: {
+            select: {
+              first_name: true,
+              avatar: true,
+            },
+          },
         },
       }),
       this.prisma.feedback.count(),
