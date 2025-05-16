@@ -13,9 +13,13 @@ import {
   ParseIntPipe,
   Param,
   Delete,
+  UploadedFiles,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  FileFieldsInterceptor,
+  FileInterceptor,
+} from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 import {
@@ -27,13 +31,14 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
-import { CreateProductDto } from './dto/create-product.dto';
+import { CreateProductDto, ReplenishmentItem } from './dto/create-product.dto';
 import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '@nestjs/passport';
 import { AdminGuard } from 'src/shared/guards/admin.guards';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { SmileService } from 'src/shared/services/smile.service';
 import { SmileValidateDto } from './dto/smile-validate.dto';
+import { plainToInstance } from 'class-transformer';
 
 @ApiTags('Product')
 @Controller('product')
@@ -51,41 +56,72 @@ export class ProductController {
         ? 'http://localhost:6001'
         : 'https://don-vip.online';
   }
+
   @Post('')
   @UseGuards(AuthGuard('jwt'), AdminGuard)
   @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({
-        destination: './uploads/products',
-        filename: (req, file, callback) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname);
-          callback(null, `product-${uniqueSuffix}${ext}`);
+    FileFieldsInterceptor(
+      [
+        { name: 'image', maxCount: 1 },
+        { name: 'currency_image', maxCount: 1 },
+      ],
+      {
+        storage: diskStorage({
+          destination: './uploads/products',
+          filename: (req, file, callback) => {
+            const uniqueSuffix =
+              Date.now() + '-' + Math.round(Math.random() * 1e9);
+            const ext = extname(file.originalname);
+            callback(null, `product-${uniqueSuffix}${ext}`);
+          },
+        }),
+        limits: { fileSize: 10 * 1024 * 1024 },
+        fileFilter: (req, file, callback) => {
+          if (
+            ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'].includes(
+              file.mimetype,
+            )
+          ) {
+            callback(null, true);
+          } else {
+            callback(new HttpException('Invalid file type', 400), false);
+          }
         },
-      }),
-      fileFilter: (req, file, callback) => {
-        if (
-          ['image/png', 'image/jpeg', 'image/webp', 'image/svg'].includes(
-            file.mimetype,
-          )
-        ) {
-          callback(null, true);
-        } else {
-          callback(
-            new HttpException(
-              'Only .png, .jpeg, .svg and .webp formats are allowed!',
-              400,
-            ),
-            false,
-          );
-        }
       },
-      limits: {
-        fileSize: 10 * 1024 * 1024,
-      },
-    }),
+    ),
   )
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: CreateProductDto })
+  async createProduct(
+    @UploadedFiles()
+    files: {
+      image?: Express.Multer.File[];
+      currency_image?: Express.Multer.File[];
+    },
+    @Body() body: any,
+  ) {
+    if (!files.image?.[0]) {
+      throw new HttpException('Image is required', 400);
+    }
+
+    if (!files.currency_image?.[0]) {
+      throw new HttpException('Currency image is required', 400);
+    }
+
+    const replenishment = body.replenishment
+      ? plainToInstance(ReplenishmentItem, JSON.parse(body.replenishment))
+      : [];
+
+    const data: CreateProductDto = {
+      ...body,
+      image: `${this.baseUrl}/uploads/products/${files.image[0].filename}`,
+      currency_image: `${this.baseUrl}/uploads/products/${files.currency_image[0].filename}`,
+      replenishment,
+    };
+
+    return this.productService.create(data);
+  }
+
   @ApiOperation({ summary: 'Create product' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
