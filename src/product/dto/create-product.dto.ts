@@ -99,5 +99,6 @@ export class CreateProductDto {
     description: 'Название валюты (например, USD, EUR, RUB)',
   })
   @IsString()
+  @IsOptional()
   currency_name: string;
 }
