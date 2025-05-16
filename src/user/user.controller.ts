@@ -141,9 +141,7 @@ export class UserController {
   async updateProfile(
     @Body() data: UpdateProfileDto,
     @UploadedFile() file: Express.Multer.File,
-    @Request() request,
   ) {
-    data.id = request.user.id;
     data.avatar = `${this.baseUrl}/uploads/avatars/${file.filename}`;
 
     return this.userService.updateProfile(data);

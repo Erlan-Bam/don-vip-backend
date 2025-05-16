@@ -4,11 +4,12 @@ import {
   IsDateString,
   IsPhoneNumber,
   IsEmail,
+  IsInt,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateProfileDto {
-  @IsOptional()
+  @IsInt()
   id: number;
 
   @ApiPropertyOptional({
