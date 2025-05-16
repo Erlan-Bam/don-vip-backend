@@ -24,6 +24,7 @@ import {
   ApiParam,
   ApiBearerAuth,
 } from '@nestjs/swagger';
+import { ApplyCouponDto } from './dto/apply-coupon.dto';
 
 @ApiTags('Coupon')
 @Controller('coupon')
@@ -38,6 +39,15 @@ export class CouponController {
   @ApiResponse({ status: 201, description: 'Coupon created successfully' })
   async create(@Body() data: CreateCouponDto) {
     return await this.couponService.create(data);
+  }
+
+  @Post('apply')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Apply a coupon to user by user_id' })
+  @ApiBody({ type: ApplyCouponDto })
+  @ApiResponse({ status: 200, description: 'Coupon applied' })
+  async applyCoupon(@Body() dto: ApplyCouponDto) {
+    return await this.couponService.applyCoupon(dto);
   }
 
   @Patch(':id')

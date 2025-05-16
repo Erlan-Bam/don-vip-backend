@@ -40,11 +40,13 @@ model User {
   phone         String?   @unique
   avatar        String?
   role          Role      @default(User)
-  is_banned     Boolean   @default(false) // ✅ Новое поле
+  is_banned     Boolean   @default(false) 
 
   orders        Order[]
   feedbacks     Feedback[]
   payments      Payment[]
+    coupon_id     Int?       
+  coupon        Coupon?    @relation(fields: [coupon_id], references: [id]) 
 }
 
 model Payment {
@@ -97,6 +99,8 @@ model Coupon {
   limit     Int?
   discount  Int
   status    CouponStatus  @default(Active)
+    users     User[]      
+
 }
 
 model Order {
