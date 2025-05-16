@@ -24,7 +24,7 @@ export class TBankWebhookDto {
   Status: string;
 
   @IsOptional()
-  @IsString()
+  @IsInt()
   PaymentId?: string;
 
   @IsOptional()

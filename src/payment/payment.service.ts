@@ -127,7 +127,17 @@ export class PaymentService {
     return 'success';
   }
   async tbankWebhook(data: TBankWebhookDto, ip: string) {
-    const allowed = ['212.233.80.7', '91.218.132.2'];
+    const allowed = [
+      '91.194.226.0/23',
+      '91.218.132.0/24',
+      '91.218.133.1/24',
+      '91.218.134.0/24',
+      '91.218.135.0/24',
+      '212.233.80.0/24',
+      '212.233.81.0/24',
+      '212.233.82.0/24',
+      '91.194.226.181',
+    ];
 
     if (!allowed.includes(ip)) {
       console.log('Invalid ip:', ip);
