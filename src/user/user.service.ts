@@ -106,7 +106,7 @@ export class UserService {
   }) {
     const { search = '', page = 1, limit = 10 } = query;
 
-    const where: Prisma.UserWhereInput = search
+    const searchFilter: Prisma.UserWhereInput = search
       ? {
           OR: [
             { first_name: { contains: search, mode: 'insensitive' } },
@@ -115,6 +115,13 @@ export class UserService {
           ],
         }
       : {};
+
+    const where: Prisma.UserWhereInput = {
+      ...searchFilter,
+      NOT: {
+        identifier: null,
+      },
+    };
 
     const users = await this.prisma.user.findMany({
       where,
