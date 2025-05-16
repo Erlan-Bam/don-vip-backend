@@ -3,6 +3,7 @@ import { PrismaService } from 'src/shared/services/prisma.service';
 import { CreateCouponDto } from './dto/create-coupon.dto';
 import { UpdateCouponDto } from './dto/update-coupon.dto';
 import { CheckCouponDto } from './dto/check-coupon.dto';
+import { ApplyCouponDto } from './dto/apply-coupon.dto';
 
 @Injectable()
 export class CouponService {
@@ -44,6 +45,43 @@ export class CouponService {
       limit: coupon.limit,
       discount: coupon.discount,
       status: coupon.status,
+    };
+  }
+
+  async applyCoupon(dto: ApplyCouponDto) {
+    const coupon = await this.prisma.coupon.findUnique({
+      where: { code: dto.code },
+    });
+
+    if (!coupon) {
+      throw new HttpException('Invalid code', 404);
+    }
+
+    if (coupon.status !== 'Active') {
+      throw new HttpException('Coupon is not active', 400);
+    }
+
+    if (coupon.limit !== null && coupon.limit <= 0) {
+      await this.prisma.coupon.update({
+        where: { code: dto.code },
+        data: { status: 'Expired' },
+      });
+      throw new HttpException('Coupon expired', 400);
+    }
+
+    await this.prisma.user.update({
+      where: { id: dto.user_id },
+      data: {
+        coupon: {
+          connect: { id: coupon.id },
+        },
+      },
+    });
+
+    return {
+      message: 'Coupon applied successfully',
+      code: coupon.code,
+      discount: coupon.discount,
     };
   }
 
