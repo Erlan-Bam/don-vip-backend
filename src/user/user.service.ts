@@ -66,7 +66,9 @@ export class UserService {
     });
   }
   async updateProfile(data: Partial<UpdateProfileDto>) {
-    const user = await this.prisma.user.findUnique({ where: { id: data.id } });
+    const user = await this.prisma.user.findUnique({
+      where: { id: data.id },
+    });
 
     if (!user) {
       throw new HttpException('User not found', 404);
@@ -90,6 +92,8 @@ export class UserService {
         first_name: data.first_name,
         last_name: data.last_name,
         avatar: data.avatar,
+        gender: data.gender,
+        phone: data.phone,
       },
     });
   }
