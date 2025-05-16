@@ -98,6 +98,7 @@ export class UserController {
   }
 
   @Patch('update-profile')
+  @UseGuards(AuthGuard('jwt'))
   @UseInterceptors(
     FileInterceptor('avatar', {
       storage: diskStorage({
