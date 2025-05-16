@@ -45,7 +45,7 @@ model User {
   orders        Order[]
   feedbacks     Feedback[]
   payments      Payment[]
-    coupon_id     Int?       
+  coupon_id     Int?       
   coupon        Coupon?    @relation(fields: [coupon_id], references: [id]) 
 }
 
