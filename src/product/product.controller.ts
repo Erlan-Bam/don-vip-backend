@@ -49,7 +49,7 @@ export class ProductController {
     this.baseUrl =
       nodeEnv === 'development'
         ? 'http://localhost:6001'
-        : 'https://don-vip-backend-production.up.railway.app';
+        : 'https://don-vip.online';
   }
   @Post('')
   @UseGuards(AuthGuard('jwt'), AdminGuard)
