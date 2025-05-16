@@ -92,7 +92,7 @@ export class CreateProductDto {
     description: 'URL изображения валюты (иконка)',
   })
   @IsString()
-  currency_image: string;
+  currency_image: any;
 
   @ApiProperty({
     example: 'USD',
