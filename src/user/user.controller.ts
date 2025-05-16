@@ -106,6 +106,7 @@ export class UserController {
     type: UpdateProfileDto,
   })
   async updateProfile(@Body() data: UpdateProfileDto) {
+    console.log(data);
     return this.userService.updateProfile(data);
   }
 
