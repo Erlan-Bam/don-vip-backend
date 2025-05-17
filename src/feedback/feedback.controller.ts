@@ -87,10 +87,10 @@ export class FeedbackController {
   @ApiOperation({ summary: 'Get accepted feedbacks only' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
-  async findAccepted(
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
-  ) {
-    return this.feedbackService.findAccepted(page, limit);
+  async findAccepted(@Query('page') page: any, @Query('limit') limit: any) {
+    const safePage = Number(page) || 1;
+    const safeLimit = Number(limit) || 10;
+
+    return this.feedbackService.findAccepted(safePage, safeLimit);
   }
 }
