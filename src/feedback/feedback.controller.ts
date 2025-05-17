@@ -67,4 +67,26 @@ export class FeedbackController {
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.feedbackService.remove(id);
   }
+
+  @Patch(':id/accept')
+  @ApiOperation({ summary: 'Accept feedback' })
+  @ApiParam({ name: 'id', type: Number })
+  async accept(@Param('id', ParseIntPipe) id: number) {
+    return this.feedbackService.accept(id);
+  }
+
+  @Patch(':id/decline')
+  @ApiOperation({ summary: 'Decline feedback' })
+  @ApiParam({ name: 'id', type: Number })
+  async decline(@Param('id', ParseIntPipe) id: number) {
+    return this.feedbackService.decline(id);
+  }
+
+  @Get('accepted')
+  @ApiOperation({ summary: 'Get accepted feedbacks only' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  async findAccepted(@Query('page') page = 1, @Query('limit') limit = 10) {
+    return this.feedbackService.findAccepted(Number(page), Number(limit));
+  }
 }
