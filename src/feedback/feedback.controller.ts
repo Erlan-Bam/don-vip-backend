@@ -85,8 +85,8 @@ export class FeedbackController {
 
   @Get('accepted')
   @ApiOperation({ summary: 'Get accepted feedbacks only' })
-  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
-  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  @ApiQuery({ name: 'page', required: false, type: String, example: '1' })
+  @ApiQuery({ name: 'limit', required: false, type: String, example: '10' })
   async findAccepted(@Query('page') page: any, @Query('limit') limit: any) {
     const safePage = Number(page) || 1;
     const safeLimit = Number(limit) || 10;
