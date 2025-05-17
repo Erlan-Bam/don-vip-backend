@@ -137,37 +137,6 @@ export class SmileService {
     }
   }
 
-  async test(apiGame = 'pubgmobile', user_id = '5512001988') {
-    const id = `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
-    const payload = {
-      jsonrpc: this.apiVersion,
-      id: id,
-      method: 'validate',
-      params: {
-        iat: Math.floor(Date.now() / 1000),
-        apiGame: apiGame,
-        userAccount: {
-          user_id: user_id,
-        },
-      },
-    };
-    const token = await this.generateToken(payload);
-    const response = await this.smile.post('', null, {
-      params: payload,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (response.data.result) {
-      return {
-        status: 'success',
-        data: response.data.result,
-      };
-    } else {
-      return { status: 'error', error: response.data.error };
-    }
-  }
-
   async sendOrder(
     apiGame: string,
     sku: string,
