@@ -9,6 +9,7 @@ import {
   Patch,
   UseGuards,
   Query,
+  DefaultValuePipe,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -86,7 +87,10 @@ export class FeedbackController {
   @ApiOperation({ summary: 'Get accepted feedbacks only' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
-  async findAccepted(@Query('page') page = 1, @Query('limit') limit = 10) {
-    return this.feedbackService.findAccepted(Number(page), Number(limit));
+  async findAccepted(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+  ) {
+    return this.feedbackService.findAccepted(page, limit);
   }
 }
