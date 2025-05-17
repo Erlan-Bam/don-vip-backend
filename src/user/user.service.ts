@@ -4,6 +4,8 @@ import { PrismaService } from 'src/shared/services/prisma.service';
 import { RegisterDto } from 'src/auth/dto/register.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { join } from 'path';
+import { unlink } from 'fs/promises';
 
 @Injectable()
 export class UserService {
@@ -79,16 +81,30 @@ export class UserService {
       throw new HttpException('User not found', 404);
     }
 
-    if (user.avatar) {
-      try {
-        const { unlink } = await import('fs/promises');
-        const { join } = await import('path');
+    // ✅ Преобразуем birth_date в ISO 8601, если формат DD.MM.YYYY
+    let formattedBirthDate: string | undefined = undefined;
 
+    if (data.birth_date) {
+      if (data.birth_date.includes('.')) {
+        // формат DD.MM.YYYY
+        const [day, month, year] = data.birth_date.split('.');
+        formattedBirthDate = `${year}-${month}-${day}`;
+      } else {
+        // предполагаем, что уже ISO
+        formattedBirthDate = data.birth_date;
+      }
+    }
+
+    const isNewAvatar = data.avatar && data.avatar !== user.avatar;
+
+    if (isNewAvatar && user.avatar) {
+      try {
         const filename = user.avatar.split('/').pop();
         const filePath = join(process.cwd(), 'uploads', 'avatars', filename);
-
         await unlink(filePath);
-      } catch (err) {}
+      } catch (err) {
+        console.warn('Failed to delete old avatar:', err.message);
+      }
     }
 
     return await this.prisma.user.update({
@@ -99,9 +115,12 @@ export class UserService {
         avatar: data.avatar,
         gender: data.gender,
         phone: data.phone,
+        birth_date: formattedBirthDate,
+        identifier: data.identifier,
       },
     });
   }
+
   async findByIdentifier(identifier: string): Promise<User> {
     return await this.prisma.user.findUnique({
       where: { identifier: identifier },
