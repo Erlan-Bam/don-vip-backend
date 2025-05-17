@@ -83,7 +83,7 @@ export class FeedbackController {
     return this.feedbackService.decline(id);
   }
 
-  @Get('accepted')
+  @Get('/list/accepted')
   @ApiOperation({ summary: 'Get accepted feedbacks only' })
   @ApiQuery({ name: 'page', required: false, type: String, example: '1' })
   @ApiQuery({ name: 'limit', required: false, type: String, example: '10' })
