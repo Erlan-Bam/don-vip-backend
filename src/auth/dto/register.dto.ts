@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
 import {
   IsString,
   registerDecorator,
@@ -33,6 +34,7 @@ export function IsEmailOrPhone(validationOptions?: ValidationOptions) {
 
 export class RegisterDto {
   @IsInt()
+  @Type(() => Number)
   id: number;
 
   @ApiProperty({

@@ -37,9 +37,6 @@ export class UserService {
   async findById(id: number): Promise<any> {
     const user = await this.prisma.user.findUnique({
       where: { id: id },
-      select: {
-        coupon: true,
-      },
     });
     if (!user) {
       throw new HttpException('User not found', 404);
