@@ -8,6 +8,7 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) {}
+
   async createUser(data: RegisterDto) {
     const bcrypt = await import('bcryptjs');
     const hashedPassword = await bcrypt.hash(data.password, 10);
@@ -18,6 +19,7 @@ export class UserService {
       },
     });
   }
+
   async updateToUser(id: number, identifier: string, password: string) {
     const bcrypt = await import('bcryptjs');
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -32,8 +34,13 @@ export class UserService {
     });
   }
 
-  async findById(id: number): Promise<User> {
-    const user = await this.prisma.user.findUnique({ where: { id: id } });
+  async findById(id: number): Promise<any> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: id },
+      select: {
+        coupon: true,
+      },
+    });
     if (!user) {
       throw new HttpException('User not found', 404);
     }
@@ -65,6 +72,7 @@ export class UserService {
       },
     });
   }
+
   async updateProfile(data: Partial<UpdateProfileDto>) {
     const user = await this.prisma.user.findUnique({
       where: { id: data.id },
