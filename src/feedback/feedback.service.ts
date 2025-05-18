@@ -72,4 +72,55 @@ export class FeedbackService {
   async remove(id: number) {
     return await this.prisma.feedback.delete({ where: { id } });
   }
+
+  async accept(id: number) {
+    const feedback = await this.prisma.feedback.update({
+      where: { id },
+      data: { isVerified: true },
+    });
+    return feedback;
+  }
+
+  async decline(id: number) {
+    const feedback = await this.prisma.feedback.update({
+      where: { id },
+      data: { isVerified: false },
+    });
+    return feedback;
+  }
+
+  async findAccepted(page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.feedback.findMany({
+        where: { isVerified: true },
+        skip,
+        take: limit,
+        orderBy: { id: 'desc' },
+        include: {
+          product: {
+            select: {
+              name: true,
+              image: true,
+            },
+          },
+          user: {
+            select: {
+              first_name: true,
+              avatar: true,
+            },
+          },
+        },
+      }),
+      this.prisma.feedback.count({ where: { isVerified: true } }),
+    ]);
+
+    return {
+      data,
+      total,
+      page,
+      lastPage: Math.ceil(total / limit),
+    };
+  }
 }

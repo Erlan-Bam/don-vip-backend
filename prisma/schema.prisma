@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -29,40 +23,6 @@ enum ProductType {
   Smile
 }
 
-model User {
-  id            Int       @id @default(autoincrement())
-  identifier    String?    @unique
-  password      String?
-  first_name    String?
-  last_name     String?
-  gender        String?
-  birth_date    String?
-  phone         String?   @unique
-  avatar        String?
-  role          Role      @default(User)
-  is_banned     Boolean   @default(false) 
-
-  orders        Order[]
-  feedbacks     Feedback[]
-  payments      Payment[]
-  coupon_id     Int?       
-  coupon        Coupon?    @relation(fields: [coupon_id], references: [id]) 
-}
-
-model Payment {
-  id            Int            @id @default(autoincrement())
-  price         Decimal
-  method        String
-  order_id      String
-  user_id       Int
-  status        PaymentStatus  
-  created_at    DateTime       @default(now())
-  updated_at    DateTime       @updatedAt @default(now())
-
-  order      Order    @relation(fields: [order_id], references: [id], onDelete: Cascade)
-  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
-}
-
 enum CouponStatus {
   Active
   Used
@@ -70,54 +30,105 @@ enum CouponStatus {
   Disabled
 }
 
-model Product {
-  id             Int      @id @default(autoincrement())
-  name           String
-  description    String
-  image          String
-  replenishment  Json
-  currency_image String?
-  currency_name  String?
-  smile_api_game String?  @unique
-  type           ProductType
-  feedbacks      Feedback[]
-  orders         Order[]
-}
+model User {
+  id                Int           @id @default(autoincrement())
+  identifier        String?       @unique
+  password          String?
+  first_name        String?
+  last_name         String?
+  gender            String?
+  birth_date        String?
+  phone             String?       @unique
+  avatar            String?
+  role              Role          @default(User)
+  is_banned         Boolean       @default(false)
 
-model Feedback {
-  id            Int        @id @default(autoincrement())
-  reaction      Boolean
-  text          String
-  product_id    Int
-  user_id       Int
+  active_discount   Int?          // 💰 текущая скидка
+  active_coupon_id  Int?          // 🔗 связь с активным купоном
+  activeCoupon      Coupon?       @relation("ActiveCoupon", fields: [active_coupon_id], references: [id])
 
-  product       Product     @relation(fields: [product_id], references: [id])
-  user          User        @relation(fields: [user_id], references: [id])
+  orders            Order[]
+  feedbacks         Feedback[]
+  payments          Payment[]
+  usedCoupons       UsedCoupon[]
 }
 
 model Coupon {
-  id        Int           @id @default(autoincrement())
-  code      String        @unique
-  limit     Int?
-  discount  Int
-  status    CouponStatus  @default(Active)
-    users     User[]      
+  id           Int           @id @default(autoincrement())
+  code         String        @unique
+  limit        Int?
+  discount     Int
+  status       CouponStatus  @default(Active)
 
+  usedBy       UsedCoupon[]
+  activeUsers  User[]        @relation("ActiveCoupon")
+}
+
+model UsedCoupon {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  coupon_id  Int
+  used_at    DateTime  @default(now())
+
+  user       User      @relation(fields: [user_id], references: [id])
+  coupon     Coupon    @relation(fields: [coupon_id], references: [id])
+
+  @@unique([user_id, coupon_id]) // один пользователь = один раз на купон
+}
+
+model Payment {
+  id         Int            @id @default(autoincrement())
+  price      Decimal
+  method     String
+  order_id   String
+  user_id    Int
+  status     PaymentStatus
+  created_at DateTime       @default(now())
+  updated_at DateTime       @updatedAt @default(now())
+
+  order      Order          @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  user       User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model Product {
+  id              Int        @id @default(autoincrement())
+  name            String
+  description     String
+  image           String
+  replenishment   Json
+  currency_image  String?
+  currency_name   String?
+  smile_api_game  String?    @unique
+  type            ProductType
+
+  feedbacks       Feedback[]
+  orders          Order[]
+}
+
+model Feedback {
+  id          Int      @id @default(autoincrement())
+  reaction    Boolean
+  text        String
+  product_id  Int
+  isVerified    Boolean @default(false)
+  user_id     Int
+  product     Product  @relation(fields: [product_id], references: [id])
+  user        User     @relation(fields: [user_id], references: [id])
 }
 
 model Order {
-  id            String         @id @default(uuid())
-  user_id       Int
-  product_id    Int
-  item_id       Int
-  payment       String
-  status        PaymentStatus  @default(Pending)
-  account_id    String?
-  server_id     String?
-  created_at    DateTime       @default(now())
-  updated_at    DateTime       @updatedAt @default(now())
+  id           String         @id @default(uuid())
+  user_id      Int
+  product_id   Int
+  item_id      Int
+  payment      String
+  status       PaymentStatus  @default(Pending)
+  account_id   String?
+  server_id    String?
+  created_at   DateTime       @default(now())
+  updated_at   DateTime       @updatedAt @default(now())
 
-  user       User     @relation(fields: [user_id], references: [id])
-  product    Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
-  payments   Payment[]
+  user         User     @relation(fields: [user_id], references: [id])
+  product      Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  payments     Payment[]
 }

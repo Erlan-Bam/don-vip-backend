@@ -8,9 +8,11 @@ import { ApplyCouponDto } from './dto/apply-coupon.dto';
 @Injectable()
 export class CouponService {
   constructor(private prisma: PrismaService) {}
+
   async create(data: CreateCouponDto) {
-    return await this.prisma.coupon.create({ data: data });
+    return await this.prisma.coupon.create({ data });
   }
+
   async update(data: UpdateCouponDto) {
     return await this.prisma.coupon.update({
       where: { id: data.id },
@@ -21,6 +23,7 @@ export class CouponService {
       },
     });
   }
+
   async check(data: CheckCouponDto) {
     const coupon = await this.prisma.coupon.findUnique({
       where: { code: data.code },
@@ -63,18 +66,58 @@ export class CouponService {
 
     if (coupon.limit !== null && coupon.limit <= 0) {
       await this.prisma.coupon.update({
-        where: { code: dto.code },
+        where: { id: coupon.id },
         data: { status: 'Expired' },
       });
       throw new HttpException('Coupon expired', 400);
     }
 
+    // Проверка: использовал ли уже пользователь этот купон
+    const alreadyUsed = await this.prisma.usedCoupon.findFirst({
+      where: {
+        user_id: dto.user_id,
+        coupon_id: coupon.id,
+      },
+    });
+
+    if (alreadyUsed) {
+      throw new HttpException('You already used this coupon', 400);
+    }
+
+    // Проверка: есть ли активный купон у пользователя
+    const user = await this.prisma.user.findUnique({
+      where: { id: dto.user_id },
+      select: { active_coupon_id: true },
+    });
+
+    if (user?.active_coupon_id) {
+      throw new HttpException('User already has an active coupon', 400);
+    }
+
+    // Сохраняем факт использования
+    await this.prisma.usedCoupon.create({
+      data: {
+        user_id: dto.user_id,
+        coupon_id: coupon.id,
+      },
+    });
+
+    // Уменьшаем лимит (если есть)
+    if (coupon.limit !== null) {
+      await this.prisma.coupon.update({
+        where: { id: coupon.id },
+        data: {
+          limit: { decrement: 1 },
+        },
+      });
+    }
+
+    // Применяем скидку и устанавливаем активный купон
     await this.prisma.user.update({
       where: { id: dto.user_id },
       data: {
-        coupon: {
-          connect: { id: coupon.id },
-        },
+        active_discount: coupon.discount,
+        active_coupon_id: coupon.id,
       },
     });
 
@@ -88,11 +131,12 @@ export class CouponService {
   async getCoupons() {
     return await this.prisma.coupon.findMany();
   }
+
   async delete(id: number) {
-    const coupon = await this.prisma.coupon.delete({ where: { id: id } });
+    const coupon = await this.prisma.coupon.delete({ where: { id } });
 
     if (!coupon) {
-      throw new HttpException('Coupond not found', 404);
+      throw new HttpException('Coupon not found', 404);
     }
 
     return coupon;

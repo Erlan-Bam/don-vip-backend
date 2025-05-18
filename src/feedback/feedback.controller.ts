@@ -9,6 +9,7 @@ import {
   Patch,
   UseGuards,
   Query,
+  DefaultValuePipe,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -66,5 +67,30 @@ export class FeedbackController {
   @ApiParam({ name: 'id', type: Number })
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.feedbackService.remove(id);
+  }
+
+  @Patch(':id/accept')
+  @ApiOperation({ summary: 'Accept feedback' })
+  @ApiParam({ name: 'id', type: Number })
+  async accept(@Param('id', ParseIntPipe) id: number) {
+    return this.feedbackService.accept(id);
+  }
+
+  @Patch(':id/decline')
+  @ApiOperation({ summary: 'Decline feedback' })
+  @ApiParam({ name: 'id', type: Number })
+  async decline(@Param('id', ParseIntPipe) id: number) {
+    return this.feedbackService.decline(id);
+  }
+
+  @Get('/list/accepted')
+  @ApiOperation({ summary: 'Get accepted feedbacks only' })
+  @ApiQuery({ name: 'page', required: false, type: String, example: '1' })
+  @ApiQuery({ name: 'limit', required: false, type: String, example: '10' })
+  async findAccepted(@Query('page') page: any, @Query('limit') limit: any) {
+    const safePage = Number(page) || 1;
+    const safeLimit = Number(limit) || 10;
+
+    return this.feedbackService.findAccepted(safePage, safeLimit);
   }
 }
