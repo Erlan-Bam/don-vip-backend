@@ -15,7 +15,7 @@ export class EmailService {
     this.email = EMAIL_USER;
     this.password = EMAIL_PASS;
   }
-  async sendChangePasswordEmail(link: string, lang: string) {
+  async sendChangePasswordEmail(toEmail: string, link: string, lang: string) {
     const emailTemplate =
       lang === 'ru'
         ? `
@@ -138,8 +138,8 @@ export class EmailService {
       port: 465,
       secure: true,
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: this.email,
+        pass: this.password,
       },
       tls: {
         rejectUnauthorized: false,
@@ -147,8 +147,8 @@ export class EmailService {
     });
 
     const mailOptions: nodemailer.SendMailOptions = {
-      from: process.env.EMAIL_USER,
-      to: this.email,
+      from: this.email,
+      to: toEmail,
       subject:
         lang === 'ru'
           ? 'Сброс пароля DON-VIP.COM'

@@ -172,6 +172,7 @@ export class SmileService {
           Authorization: `Bearer ${token}`,
         },
       });
+      console.log(response.data);
       if (response.data.result) {
         return {
           status: 'success',

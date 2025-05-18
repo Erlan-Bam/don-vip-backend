@@ -102,7 +102,11 @@ export class AuthService {
     const token = await this.generateAccessToken(user);
     const resetLink = `https://don-vip.com/reset-password?token=${token}`;
 
-    await this.emailService.sendChangePasswordEmail(resetLink, data.lang);
+    await this.emailService.sendChangePasswordEmail(
+      data.email,
+      resetLink,
+      data.lang,
+    );
 
     return { message: 'Form sent successfully' };
   }
