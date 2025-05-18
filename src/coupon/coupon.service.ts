@@ -145,6 +145,7 @@ export class CouponService {
         id: product.id,
         name: product.name,
         originalPrice,
+        image: product.image,
         discountedPrice:
           typeof originalPrice === 'number'
             ? originalPrice * (1 - coupon.discount / 100)
