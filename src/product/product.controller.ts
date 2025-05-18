@@ -206,7 +206,7 @@ export class ProductController {
     return this.productService.update(id, { image: imagePath });
   }
 
-  @Get()
+  @Get('/all')
   @ApiOperation({
     summary: 'Get all products with pagination and optional search',
   })
