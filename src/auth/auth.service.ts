@@ -19,7 +19,7 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
   async register(data: RegisterDto) {
-    let user = await this.userService.findById(data.id);
+    let user = await this.prisma.user.findUnique({ where: { id: data.id } });
     if (!user) {
       user = await this.userService.createUser(data);
     } else {
