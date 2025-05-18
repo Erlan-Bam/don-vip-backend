@@ -12,6 +12,7 @@ export class EmailService {
     if (!EMAIL_USER || !EMAIL_PASS) {
       throw new Error('EMAIL OR PASSWORD IS NOT SET IN EMAIL SERVICE');
     }
+    console.log(EMAIL_PASS, EMAIL_USER);
     this.email = EMAIL_USER;
     this.password = EMAIL_PASS;
   }
@@ -132,9 +133,10 @@ export class EmailService {
       </body>
       </html>
     `;
+    console.log(this.email, this.password);
     const transporter = nodemailer.createTransport({
       pool: true,
-      host: 'pkz66.hoster.kz',
+      host: 'mail.don-vip.com',
       port: 465,
       secure: true,
       auth: {
@@ -144,6 +146,7 @@ export class EmailService {
       tls: {
         rejectUnauthorized: false,
       },
+      debug: true,
     });
 
     const mailOptions: nodemailer.SendMailOptions = {
@@ -156,7 +159,8 @@ export class EmailService {
       html: emailTemplate,
     };
 
-    await transporter.sendMail(mailOptions);
+    const result = await transporter.sendMail(mailOptions);
+    console.log('worked', result);
   }
   async sendVerificationEmail(
     email: string,
@@ -164,8 +168,7 @@ export class EmailService {
     code: string,
   ) {
     const transporter = nodemailer.createTransport({
-      pool: true,
-      host: 'pkz66.hoster.kz',
+      host: 'mail.don-vip.com',
       port: 465,
       secure: true,
       auth: {
