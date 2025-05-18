@@ -86,6 +86,21 @@ export class UserService {
     });
   }
 
+  async setVerified(identifier: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { identifier },
+    });
+
+    if (!user) {
+      throw new HttpException('User not found', 404);
+    }
+
+    return this.prisma.user.update({
+      where: { identifier },
+      data: { is_verified: true },
+    });
+  }
+
   async updateProfile(data: Partial<UpdateProfileDto>) {
     const user = await this.prisma.user.findUnique({
       where: { id: data.id },

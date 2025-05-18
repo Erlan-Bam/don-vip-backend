@@ -30,6 +30,7 @@ import { extname } from 'path';
 import { diskStorage } from 'multer';
 import { ConfigService } from '@nestjs/config';
 import { AdminGuard } from 'src/shared/guards/admin.guards';
+import { SetVerifiedDto } from './dto/set-verified.dto';
 
 @ApiTags('User')
 @Controller('user')
@@ -176,5 +177,12 @@ export class UserController {
   @ApiResponse({ status: 404, description: 'User not found' })
   async getUserById(@Param('id') id: string) {
     return this.userService.findById(Number(id));
+  }
+
+  @Post('verify')
+  @ApiOperation({ summary: 'Mark user as verified by identifier' })
+  @ApiBody({ type: SetVerifiedDto })
+  async setVerified(@Body() data: SetVerifiedDto) {
+    return await this.userService.setVerified(data.identifier);
   }
 }
