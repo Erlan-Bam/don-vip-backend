@@ -206,7 +206,7 @@ export class ProductController {
     return this.productService.update(id, { image: imagePath });
   }
 
-  @Get()
+  @Get('/all')
   @ApiOperation({
     summary: 'Get all products with pagination and optional search',
   })
@@ -214,11 +214,14 @@ export class ProductController {
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
   @ApiQuery({ name: 'search', required: false, type: String, example: 'Smile' })
   async findAll(
-    @Query('page', ParseIntPipe) page = 1,
-    @Query('limit', ParseIntPipe) limit = 10,
+    @Query('page') page: any,
+    @Query('limit') limit: any,
     @Query('search') search = '',
   ) {
-    return this.productService.findAll(page, limit, search);
+    const parsedPage = parseInt(page) || 1;
+    const parsedLimit = parseInt(limit) || 10;
+
+    return this.productService.findAll(parsedPage, parsedLimit, search);
   }
 
   @Get('smile')

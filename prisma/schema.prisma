@@ -45,14 +45,11 @@ model User {
   is_verified       Boolean       @default(false)
   verification_code String?
 
-  active_discount   Int?
-  active_coupon_id  Int?
-  activeCoupon      Coupon?       @relation("ActiveCoupon", fields: [active_coupon_id], references: [id])
-
   orders            Order[]
   feedbacks         Feedback[]
   payments          Payment[]
   usedCoupons       UsedCoupon[]
+  activeCoupons     ActiveCoupon[] // ✅ multiple active coupons
 }
 
 model Coupon {
@@ -63,9 +60,9 @@ model Coupon {
   status       CouponStatus  @default(Active)
 
   usedBy       UsedCoupon[]
-  activeUsers  User[]        @relation("ActiveCoupon")
-  orders       Order[]       // Orders that used this coupon
-  products     Product[]     @relation("CouponProducts") // ✅ Related products/games
+  activeUsers  ActiveCoupon[] // ✅ multiple users can activate
+  orders       Order[]
+  products     Product[]     @relation("CouponProducts")
 }
 
 model Product {
@@ -81,7 +78,7 @@ model Product {
 
   feedbacks       Feedback[]
   orders          Order[]
-  coupons         Coupon[]   @relation("CouponProducts") // ✅ Back-reference
+  coupons         Coupon[]   @relation("CouponProducts")
 }
 
 model UsedCoupon {
@@ -93,7 +90,19 @@ model UsedCoupon {
   user       User      @relation(fields: [user_id], references: [id])
   coupon     Coupon    @relation(fields: [coupon_id], references: [id])
 
-  @@unique([user_id, coupon_id])
+  @@unique([user_id, coupon_id]) // prevent duplicate usage
+}
+
+model ActiveCoupon {
+  id          Int       @id @default(autoincrement())
+  user_id     Int
+  coupon_id   Int
+  activated_at DateTime @default(now())
+
+  user        User      @relation(fields: [user_id], references: [id])
+  coupon      Coupon    @relation(fields: [coupon_id], references: [id])
+
+  @@unique([user_id, coupon_id]) // prevent duplicate activation
 }
 
 model Payment {
@@ -135,7 +144,7 @@ model Order {
   updated_at   DateTime       @updatedAt @default(now())
 
   coupon_id    Int?
-  coupon       Coupon?        @relation(fields: [coupon_id], references: [id]) // ✅ Coupon relation
+  coupon       Coupon?        @relation(fields: [coupon_id], references: [id])
 
   user         User           @relation(fields: [user_id], references: [id])
   product      Product        @relation(fields: [product_id], references: [id], onDelete: Cascade)
