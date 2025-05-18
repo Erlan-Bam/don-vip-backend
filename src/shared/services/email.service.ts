@@ -12,7 +12,6 @@ export class EmailService {
     if (!EMAIL_USER || !EMAIL_PASS) {
       throw new Error('EMAIL OR PASSWORD IS NOT SET IN EMAIL SERVICE');
     }
-    console.log(EMAIL_PASS, EMAIL_USER);
     this.email = EMAIL_USER;
     this.password = EMAIL_PASS;
   }
@@ -146,7 +145,6 @@ export class EmailService {
       tls: {
         rejectUnauthorized: false,
       },
-      debug: true,
     });
 
     const mailOptions: nodemailer.SendMailOptions = {
