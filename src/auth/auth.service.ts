@@ -23,10 +23,14 @@ export class AuthService {
     if (!user) {
       user = await this.userService.createUser(data);
     } else {
+      const code = await this.emailService.sendVerificationEmail(
+        data.identifier,
+      );
       user = await this.userService.updateToUser(
         data.id,
         data.identifier,
         data.password,
+        code,
       );
     }
 

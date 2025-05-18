@@ -22,7 +22,20 @@ export class UserService {
     });
   }
 
-  async updateToUser(id: number, identifier: string, password: string) {
+  async updateToUser(
+    id: number,
+    identifier: string,
+    password: string,
+    code: string,
+  ) {
+    const exist = await this.findByIdentifier(identifier);
+    if (exist) {
+      throw new HttpException('User with this email already exists', 409);
+    }
+    const user = await this.findById(id);
+    if (user.identifier) {
+      throw new HttpException('User with this email already exists', 409);
+    }
     const bcrypt = await import('bcryptjs');
     const hashedPassword = await bcrypt.hash(password, 10);
     return await this.prisma.user.update({
@@ -32,11 +45,12 @@ export class UserService {
       data: {
         identifier: identifier,
         password: hashedPassword,
+        verification_code: code,
       },
     });
   }
 
-  async findById(id: number): Promise<any> {
+  async findById(id: number): Promise<User> {
     const user = await this.prisma.user.findUnique({
       where: { id: id },
     });
