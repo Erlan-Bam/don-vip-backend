@@ -99,13 +99,15 @@ export class OrderService {
     const item: ReplenishmentItem = replenishment[order.item_id];
 
     if (order.product.type === 'Bigo') {
-      await this.bigoService.rechargeDiamond({
+      const result = await this.bigoService.rechargeDiamond({
         rechargeBigoId: order.account_id,
         buOrderId: `${order.user_id}${Date.now()}${Math.floor(Math.random() * 100000)}`,
         currency: 'RUB',
         value: item.amount,
         totalCost: item.price,
       });
+      // if (result.message !== 'ok') {
+      // }
     } else {
       await this.smileService.sendOrder(
         order.product.smile_api_game,
