@@ -66,7 +66,7 @@ export class CouponService {
     const coupon = await this.prisma.coupon.findUnique({
       where: { code: dto.code },
       include: {
-        products: true, // 🧩 Fetch linked games
+        products: true,
       },
     });
 
@@ -97,17 +97,27 @@ export class CouponService {
       throw new HttpException('You already used this coupon', 400);
     }
 
-    const user = await this.prisma.user.findUnique({
-      where: { id: dto.user_id },
-      select: { active_coupon_id: true },
+    const alreadyActive = await this.prisma.activeCoupon.findFirst({
+      where: {
+        user_id: dto.user_id,
+        coupon_id: coupon.id,
+      },
     });
 
-    if (user?.active_coupon_id) {
-      throw new HttpException('User already has an active coupon', 400);
+    if (alreadyActive) {
+      throw new HttpException('Coupon is already active for this user', 400);
     }
 
     // Save usage
     await this.prisma.usedCoupon.create({
+      data: {
+        user_id: dto.user_id,
+        coupon_id: coupon.id,
+      },
+    });
+
+    // Add to active coupons
+    await this.prisma.activeCoupon.create({
       data: {
         user_id: dto.user_id,
         coupon_id: coupon.id,
@@ -124,19 +134,11 @@ export class CouponService {
       });
     }
 
-    await this.prisma.user.update({
-      where: { id: dto.user_id },
-      data: {
-        active_discount: coupon.discount,
-        active_coupon_id: coupon.id,
-      },
-    });
-
+    // Build discounted product info
     const discountedProducts = coupon.products.map((product) => {
       type ReplenishmentItem = { price: number };
 
       const replenishmentData = product.replenishment as ReplenishmentItem[];
-
       const originalPrice = replenishmentData?.[0]?.price;
 
       return {
