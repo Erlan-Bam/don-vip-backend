@@ -43,8 +43,8 @@ model User {
   role              Role          @default(User)
   is_banned         Boolean       @default(false)
 
-  active_discount   Int?          // 💰 текущая скидка
-  active_coupon_id  Int?          // 🔗 связь с активным купоном
+  active_discount   Int?
+  active_coupon_id  Int?
   activeCoupon      Coupon?       @relation("ActiveCoupon", fields: [active_coupon_id], references: [id])
 
   orders            Order[]
@@ -62,6 +62,24 @@ model Coupon {
 
   usedBy       UsedCoupon[]
   activeUsers  User[]        @relation("ActiveCoupon")
+  orders       Order[]       // Orders that used this coupon
+  products     Product[]     @relation("CouponProducts") // ✅ Related products/games
+}
+
+model Product {
+  id              Int        @id @default(autoincrement())
+  name            String
+  description     String
+  image           String
+  replenishment   Json
+  currency_image  String?
+  currency_name   String?
+  smile_api_game  String?    @unique
+  type            ProductType
+
+  feedbacks       Feedback[]
+  orders          Order[]
+  coupons         Coupon[]   @relation("CouponProducts") // ✅ Back-reference
 }
 
 model UsedCoupon {
@@ -73,7 +91,7 @@ model UsedCoupon {
   user       User      @relation(fields: [user_id], references: [id])
   coupon     Coupon    @relation(fields: [coupon_id], references: [id])
 
-  @@unique([user_id, coupon_id]) // один пользователь = один раз на купон
+  @@unique([user_id, coupon_id])
 }
 
 model Payment {
@@ -90,28 +108,14 @@ model Payment {
   user       User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
-model Product {
-  id              Int        @id @default(autoincrement())
-  name            String
-  description     String
-  image           String
-  replenishment   Json
-  currency_image  String?
-  currency_name   String?
-  smile_api_game  String?    @unique
-  type            ProductType
-
-  feedbacks       Feedback[]
-  orders          Order[]
-}
-
 model Feedback {
   id          Int      @id @default(autoincrement())
   reaction    Boolean
   text        String
   product_id  Int
-  isVerified    Boolean @default(false)
+  isVerified  Boolean  @default(false)
   user_id     Int
+
   product     Product  @relation(fields: [product_id], references: [id])
   user        User     @relation(fields: [user_id], references: [id])
 }
@@ -128,7 +132,10 @@ model Order {
   created_at   DateTime       @default(now())
   updated_at   DateTime       @updatedAt @default(now())
 
-  user         User     @relation(fields: [user_id], references: [id])
-  product      Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  coupon_id    Int?
+  coupon       Coupon?        @relation(fields: [coupon_id], references: [id]) // ✅ Coupon relation
+
+  user         User           @relation(fields: [user_id], references: [id])
+  product      Product        @relation(fields: [product_id], references: [id], onDelete: Cascade)
   payments     Payment[]
 }
