@@ -158,8 +158,11 @@ export class EmailService {
 
     await transporter.sendMail(mailOptions);
   }
-  async sendVerificationEmail(email: string, lang: string = 'en') {
-    const code = await this.generateCode();
+  async sendVerificationEmail(
+    email: string,
+    lang: string = 'en',
+    code: string,
+  ) {
     const transporter = nodemailer.createTransport({
       pool: true,
       host: 'pkz66.hoster.kz',
@@ -309,17 +312,6 @@ export class EmailService {
 
     await transporter.sendMail(mailOptions);
 
-    return code;
-  }
-
-  async generateCode() {
-    const chars =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let code = '';
-    for (let i = 0; i < 5; i++) {
-      const randomIndex = Math.floor(Math.random() * chars.length);
-      code += chars[randomIndex];
-    }
     return code;
   }
 }

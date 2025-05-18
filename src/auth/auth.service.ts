@@ -23,13 +23,16 @@ export class AuthService {
     if (!user) {
       user = await this.userService.createUser(data);
     } else {
-      const code = await this.emailService.sendVerificationEmail(
-        data.identifier,
-      );
+      const code = await this.generateCode();
       user = await this.userService.updateToUser(
         data.id,
         data.identifier,
         data.password,
+        code,
+      );
+      await this.emailService.sendVerificationEmail(
+        data.identifier,
+        data.lang,
         code,
       );
     }
@@ -141,6 +144,16 @@ export class AuthService {
         expiresIn: '7d',
       },
     );
+  }
+  async generateCode() {
+    const chars =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let code = '';
+    for (let i = 0; i < 5; i++) {
+      const randomIndex = Math.floor(Math.random() * chars.length);
+      code += chars[randomIndex];
+    }
+    return code;
   }
   async refreshAccessToken(refreshToken: string): Promise<string> {
     try {

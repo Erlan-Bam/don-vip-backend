@@ -42,6 +42,7 @@ model User {
   avatar            String?
   role              Role          @default(User)
   is_banned         Boolean       @default(false)
+  is_verified       Boolean       @default(false)
   verification_code String?
 
   active_discount   Int?
