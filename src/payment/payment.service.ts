@@ -127,7 +127,6 @@ export class PaymentService {
     return 'success';
   }
   async tbankWebhook(data: TBankWebhookDto, ip: string) {
-    console.log('my data', data, 'my ip', ip);
     const allowed = [
       '91.194.226.0/23',
       '91.218.132.0/24',

@@ -64,6 +64,7 @@ export class PaymentController {
     const ip =
       req.headers['x-forwarded-for']?.toString().split(',')[0].trim() ||
       (req as any).socket.remoteAddress;
+    console.log('ip', ip, 'data', data);
     return this.paymentService.tbankWebhook(data, ip);
   }
 
