@@ -4,8 +4,10 @@ import * as bodyParser from 'body-parser';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { GlobalPipe } from './shared/pipes/global.pipe';
+import { LoggerMiddleware } from './shared/logger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.use(new LoggerMiddleware().use);
 
   const rawBodySaver = (req, res, buf, encoding) => {
     if (buf && buf.length) {
