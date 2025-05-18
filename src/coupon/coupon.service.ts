@@ -155,6 +155,7 @@ export class CouponService {
       code: coupon.code,
       discount: coupon.discount,
       discountedGames: discountedProducts,
+      products: coupon.products,
     };
   }
 
