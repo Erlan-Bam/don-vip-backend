@@ -1,5 +1,12 @@
-import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import {
+  IsArray,
+  IsInt,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateCouponDto {
   @ApiProperty({
@@ -28,4 +35,13 @@ export class CreateCouponDto {
   @Min(0)
   @Max(100)
   discount: number;
+
+  @ApiPropertyOptional({
+    description: 'List of game (product) IDs the coupon applies to',
+    example: [1, 2, 3],
+    type: [Number],
+  })
+  @IsOptional()
+  @IsArray()
+  gameIds?: number[];
 }
