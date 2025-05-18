@@ -10,7 +10,18 @@ export class CouponService {
   constructor(private prisma: PrismaService) {}
 
   async create(data: CreateCouponDto) {
-    return await this.prisma.coupon.create({ data });
+    const { gameIds, ...couponData } = data;
+
+    return this.prisma.coupon.create({
+      data: {
+        ...couponData,
+        products: gameIds
+          ? {
+              connect: gameIds.map((id) => ({ id })),
+            }
+          : undefined,
+      },
+    });
   }
 
   async update(data: UpdateCouponDto) {
