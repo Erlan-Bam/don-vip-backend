@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
 import { SharedModule } from './shared/shared.module';
 import { UserModule } from './user/user.module';
@@ -9,6 +9,7 @@ import { ProductModule } from './product/product.module';
 import { FeedbackModule } from './feedback/feedback.module';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { LoggerMiddleware } from './shared/logger';
 
 @Module({
   imports: [
@@ -26,4 +27,8 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     FeedbackModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*'); // or specific routes
+  }
+}
