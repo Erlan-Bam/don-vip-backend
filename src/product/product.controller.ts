@@ -39,6 +39,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { SmileService } from 'src/shared/services/smile.service';
 import { SmileValidateDto } from './dto/smile-validate.dto';
 import { plainToInstance } from 'class-transformer';
+import { BigoValidateDto } from './dto/bigo-validate.dto';
 
 @ApiTags('Product')
 @Controller('product')
@@ -248,6 +249,17 @@ export class ProductController {
   async smileValidate(@Body() data: SmileValidateDto) {
     const { apiGame, user_id, server_id } = data;
     return this.smileService.validate(apiGame, user_id, server_id);
+  }
+
+  @Post('bigo/validate')
+  @ApiOperation({ summary: 'Validate Bigo donation to user account' })
+  @ApiBody({
+    description: 'Bigo validate method body',
+    type: BigoValidateDto,
+  })
+  async bigoValidate(@Body() data: BigoValidateDto) {
+    const { user_id } = data;
+    return this.smileService.bigoValidate(user_id);
   }
 
   @Get(':id')

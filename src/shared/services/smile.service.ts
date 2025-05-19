@@ -185,4 +185,35 @@ export class SmileService {
       throw new HttpException('Try coming later', 400);
     }
   }
+
+  async bigoValidate(user_id: string) {
+    const id = `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
+    const payload = {
+      jsonrpc: this.apiVersion,
+      id: id,
+      method: 'validate',
+      params: {
+        iat: Math.floor(Date.now() / 1000),
+        apiGame: 'bigo',
+        userAccount: {
+          user_id: user_id,
+        },
+      },
+    };
+    const token = await this.generateToken(payload);
+    const response = await this.smile.post('', null, {
+      params: payload,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (response.data.result) {
+      return {
+        status: 'success',
+        data: response.data.result,
+      };
+    } else {
+      return { status: 'error', error: response.data.error };
+    }
+  }
 }
