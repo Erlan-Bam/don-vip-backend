@@ -126,7 +126,7 @@ export class PaymentService {
 
     return 'success';
   }
-  async tbankWebhook(data: TBankWebhookDto, ip: string) {
+  async tbankWebhook(data: TBankWebhookDto) {
     const allowedStatus = [
       'IN_PROGRESS',
       'EXECUTED',

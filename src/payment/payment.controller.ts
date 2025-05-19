@@ -61,11 +61,7 @@ export class PaymentController {
 
   @Post('tbank/webhook')
   async tbankWebhook(@Body() data: TBankWebhookDto, @Request() req: Request) {
-    const ip =
-      req.headers['x-forwarded-for']?.toString().split(',')[0].trim() ||
-      (req as any).socket.remoteAddress;
-    console.log('ip', ip, 'data', data);
-    return this.paymentService.tbankWebhook(data, ip);
+    return this.paymentService.tbankWebhook(data);
   }
 
   @Get('history')
