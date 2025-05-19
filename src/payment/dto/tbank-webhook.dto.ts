@@ -2,9 +2,6 @@ import { IsInt, IsOptional, IsString, IsDate, IsObject } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class TBankWebhookDto {
-  @IsString()
-  userId: string;
-
   @Type(() => Number)
   @IsInt()
   Amount: number;
@@ -29,13 +26,5 @@ export class TBankWebhookDto {
 
   @IsOptional()
   @IsString()
-  RebillId?: string;
-
-  @IsOptional()
-  @IsString()
   TerminalKey?: string;
-
-  @IsOptional()
-  @IsObject()
-  Raw?: object;
 }
