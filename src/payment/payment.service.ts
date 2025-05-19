@@ -135,7 +135,7 @@ export class PaymentService {
       'AUTHORIZED',
       'CONFIRMED',
     ];
-    const [userId, orderId] = [data.DATA.UserId, data.DATA.OrderId];
+    const [orderId, userId] = data.OrderId.split('_');
 
     if (data.Status && allowedStatus.includes(data.Status)) {
       await this.prisma.payment.create({
