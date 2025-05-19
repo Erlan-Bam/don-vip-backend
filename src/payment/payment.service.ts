@@ -132,7 +132,6 @@ export class PaymentService {
       'EXECUTED',
       'FAILED',
       'CANCELLED',
-      'AUTHORIZED',
       'CONFIRMED',
     ];
     const [orderId, userId] = data.OrderId.split('_');
@@ -144,15 +143,12 @@ export class PaymentService {
           method: 'T-Bank',
           order_id: orderId,
           user_id: Number(userId),
-          status:
-            data.Status === 'CONFIRMED' || data.Status === 'AUTHORIZED'
-              ? 'Paid'
-              : 'Cancelled',
+          status: data.Status === 'CONFIRMED' ? 'Paid' : 'Cancelled',
         },
       });
     }
 
-    if (data.Status !== 'CONFIRMED' && data.Status !== 'AUTHORIZED') {
+    if (data.Status !== 'CONFIRMED') {
       console.log('not success', data.Status);
       return 'success';
     }
