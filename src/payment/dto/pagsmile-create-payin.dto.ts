@@ -11,8 +11,9 @@ export class PagsmileCreatePayinDto {
     example: '550e8400-e29b-41d4-a716-446655440000',
     description: 'UUID of the order in the database',
   })
-  @IsUUID()
-  order_id: string;
+  @Type(() => Number)
+  @IsInt()
+  order_id: number;
 
   @ApiProperty({
     example: '1',
