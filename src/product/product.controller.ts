@@ -225,14 +225,6 @@ export class ProductController {
     return this.productService.findAll(parsedPage, parsedLimit, search);
   }
 
-  @Get('order')
-  async orderDetail() {
-    return await this.smileService.sendPUBGCode(
-      'SC250517110234429Q',
-      'erlanzh.gg@gmail.com',
-    );
-  }
-
   @Get('smile')
   @ApiOperation({ summary: 'Get all products from smile' })
   @UseGuards(AuthGuard('jwt'))

@@ -64,7 +64,7 @@ export class OrderService {
     };
   }
 
-  async finishOrder(id: string) {
+  async finishOrder(id: number) {
     const order = await this.prisma.order.findUnique({
       where: { id: id },
       select: {
@@ -155,11 +155,11 @@ export class OrderService {
     };
   }
 
-  async findOne(id: string) {
+  async findOne(id: number) {
     return await this.prisma.order.findUnique({ where: { id } });
   }
 
-  async remove(id: string) {
+  async remove(id: number) {
     const order = await this.prisma.order.delete({ where: { id } });
 
     if (!order) {

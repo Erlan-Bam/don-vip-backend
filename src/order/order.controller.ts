@@ -59,7 +59,7 @@ export class OrderController {
   @Get(':id')
   @ApiOperation({ summary: 'Get one order' })
   @ApiParam({ name: 'id', type: Number, example: 1 })
-  async findOne(@Param('id') id: string) {
+  async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.orderService.findOne(id);
   }
 
@@ -68,7 +68,7 @@ export class OrderController {
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Delete order' })
   @ApiParam({ name: 'id', type: Number, example: 1 })
-  async remove(@Param('id') id: string) {
+  async remove(@Param('id', ParseIntPipe) id: number) {
     return this.orderService.remove(id);
   }
 }

@@ -90,7 +90,8 @@ export class PaymentService {
       return 'success';
     }
 
-    const [userId, orderId, _] = data.out_trade_no.split(':');
+    const [userId, orderIdStr, _] = data.out_trade_no.split(':');
+    const orderId = parseInt(orderIdStr);
 
     const allowedStatus = [
       'SUCCESS',
@@ -134,7 +135,8 @@ export class PaymentService {
       'CANCELLED',
       'CONFIRMED',
     ];
-    const [orderId, userId] = data.OrderId.split('_');
+    const [orderIdStr, userId] = data.OrderId.split('_');
+    const orderId = parseInt(orderIdStr);
 
     if (data.Status !== 'CONFIRMED') {
       console.log('not success', data.Status);

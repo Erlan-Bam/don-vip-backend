@@ -109,7 +109,7 @@ model Payment {
   id         Int            @id @default(autoincrement())
   price      Decimal
   method     String
-  order_id   String
+  order_id   Int
   user_id    Int
   status     PaymentStatus
   created_at DateTime       @default(now())
@@ -117,6 +117,7 @@ model Payment {
 
   order      Order          @relation(fields: [order_id], references: [id], onDelete: Cascade)
   user       User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  @@unique([user_id, order_id])
 }
 
 model Feedback {
@@ -132,7 +133,7 @@ model Feedback {
 }
 
 model Order {
-  id           String         @id @default(uuid())
+  id           Int         @id @default(autoincrement())
   user_id      Int
   product_id   Int
   item_id      Int
