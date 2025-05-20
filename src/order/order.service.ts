@@ -72,6 +72,7 @@ export class OrderService {
         account_id: true,
         server_id: true,
         item_id: true,
+        status: true,
         product: {
           select: {
             replenishment: true,
@@ -82,7 +83,7 @@ export class OrderService {
       },
     });
 
-    if (!order) {
+    if (!order || order.status === 'Paid') {
       return order;
     }
 

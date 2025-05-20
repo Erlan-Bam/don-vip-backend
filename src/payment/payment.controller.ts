@@ -11,6 +11,7 @@ import {
   Query,
   ParseIntPipe,
   Res,
+  HttpCode,
 } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { PagsmileCreatePayinDto } from './dto/pagsmile-create-payin.dto';
@@ -62,6 +63,7 @@ export class PaymentController {
   }
 
   @Post('tbank/webhook')
+  @HttpCode(200)
   async tbankWebhook(@Body() data: TBankWebhookDto, @Res() res: Response) {
     return this.paymentService.tbankWebhook(data, res);
   }

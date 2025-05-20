@@ -136,18 +136,6 @@ export class PaymentService {
     ];
     const [orderId, userId] = data.OrderId.split('_');
 
-    if (data.Status && allowedStatus.includes(data.Status)) {
-      await this.prisma.payment.create({
-        data: {
-          price: data.Amount,
-          method: 'T-Bank',
-          order_id: orderId,
-          user_id: Number(userId),
-          status: data.Status === 'CONFIRMED' ? 'Paid' : 'Cancelled',
-        },
-      });
-    }
-
     if (data.Status !== 'CONFIRMED') {
       console.log('not success', data.Status);
       return res.json({ message: 'ok' }).status(200);
@@ -158,6 +146,18 @@ export class PaymentService {
     if (!order) {
       console.log('INVALID! ORDER ID NOT FOUND');
       return res.json({ message: 'ok' }).status(200);
+    }
+
+    if (data.Status && allowedStatus.includes(data.Status)) {
+      await this.prisma.payment.create({
+        data: {
+          price: data.Amount,
+          method: 'T-Bank',
+          order_id: orderId,
+          user_id: Number(userId),
+          status: data.Status === 'CONFIRMED' ? 'Paid' : 'Cancelled',
+        },
+      });
     }
 
     return res.json({ message: 'ok' }).status(200);
