@@ -8,6 +8,7 @@ import { LoginDto } from './dto/login.dto';
 import { PrismaService } from 'src/shared/services/prisma.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { EmailService } from 'src/shared/services/email.service';
+import { TwilioService } from 'src/shared/services/twilio.service';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +18,7 @@ export class AuthService {
     private jwtService: JwtService,
     private emailService: EmailService,
     private configService: ConfigService,
+    private twilioService: TwilioService,
   ) {}
   async register(data: RegisterDto) {
     let user = await this.prisma.user.findUnique({ where: { id: data.id } });
@@ -30,11 +32,15 @@ export class AuthService {
         data.password,
         code,
       );
-      await this.emailService.sendVerificationEmail(
-        data.identifier,
-        data.lang,
-        code,
-      );
+      if (data.identifier.includes('@')) {
+        await this.emailService.sendVerificationEmail(
+          data.identifier,
+          data.lang,
+          code,
+        );
+      } else {
+        await this.twilioService.sendSMS(data.identifier, code, data.lang);
+      }
     }
 
     const [accessToken, refreshToken] = await Promise.all([
