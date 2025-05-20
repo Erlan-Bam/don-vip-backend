@@ -1,6 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { Axios } from 'axios';
+import { EmailService } from './email.service';
 
 @Injectable()
 export class SmileService {
@@ -9,7 +10,10 @@ export class SmileService {
   private apiVersion: string;
   private secretKey: string;
 
-  constructor(private configService: ConfigService) {
+  constructor(
+    private configService: ConfigService,
+    private emailService: EmailService,
+  ) {
     const apiKey = this.configService.get<string>('SMILE_API_KEY');
     if (!apiKey) {
       throw new Error('SMILE API KEY IS NOT SET IN .ENV');
@@ -174,15 +178,48 @@ export class SmileService {
       });
       console.log(response.data);
       if (response.data.result) {
-        return {
-          status: 'success',
-          data: response.data.result.orderId,
-        };
+        if (apiGame === 'pubgmobile') {
+          await this.sendPUBGCode(response.data.result.orderId, user_id);
+        } else {
+          return {
+            status: 'success',
+            data: response.data.result.orderId,
+          };
+        }
       } else {
         return { status: 'error', error: response.data.error };
       }
     } else {
       throw new HttpException('Try coming later', 400);
+    }
+  }
+
+  async sendPUBGCode(orderId: string, email: string) {
+    const id = `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
+    const payload = {
+      jsonrpc: this.apiVersion,
+      id: id,
+      method: 'orderDetail',
+      params: {
+        iat: Math.floor(Date.now() / 1000),
+        orderId: orderId,
+      },
+    };
+    const token = await this.generateToken(payload);
+    const response = await this.smile.post('', null, {
+      params: payload,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (response.data.result) {
+      await this.emailService.sendPUBGCode(
+        email,
+        response.data.result.codeList[0].code,
+        response.data.result.codeList[0].expire_time,
+      );
+    } else {
+      throw new HttpException('Something went wrong', 500);
     }
   }
 

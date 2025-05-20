@@ -315,4 +315,108 @@ export class EmailService {
 
     return code;
   }
+  async sendPUBGCode(email: string, code: string, expire_time: string) {
+    const transporter = nodemailer.createTransport({
+      host: 'pkz66.hoster.kz',
+      port: 465,
+      secure: true,
+      auth: {
+        user: this.email,
+        pass: this.password,
+      },
+      tls: {
+        rejectUnauthorized: false,
+      },
+    });
+
+    const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Ваш код PUBG / Your PUBG Code</title>
+    </head>
+    <body style="margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background-color: #f5f5f5; color: #333333;">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+        <tr>
+          <td style="padding: 20px 0;">
+            <table role="presentation" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);" width="100%" cellspacing="0" cellpadding="0" border="0">
+
+              <!-- Header -->
+              <tr>
+                <td style="background: linear-gradient(135deg, #1c34ff 0%, #1c34ffcc 100%); padding: 30px 40px; text-align: center;">
+                  <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: bold;">Ваш код PUBG / Your PUBG Code</h1>
+                </td>
+              </tr>
+
+              <!-- Main Content -->
+              <tr>
+                <td style="padding: 40px;">
+                  <p style="font-size: 16px; color: #555555; margin-bottom: 10px;">
+                    <span style="display: block; margin-bottom: 8px;">Спасибо за вашу покупку. Вот ваш код активации PUBG:</span>
+                    <span style="display: block; color: #777777;">Thank you for your purchase. Here is your PUBG redemption code:</span>
+                  </p>
+
+                  <div style="background-color: #f8f8f8; border: 1px dashed #1c34ff; border-radius: 6px; padding: 20px; margin: 30px 0; text-align: center;">
+                    <p style="margin: 0 0 10px; font-size: 14px; color: #777777;">
+                      <span style="display: block; margin-bottom: 5px;">Ваш код:</span>
+                      <span style="display: block;">Your Code:</span>
+                    </p>
+                    <p style="font-family: 'Courier New', monospace; font-size: 24px; font-weight: bold; color: #1c34ff; margin: 0; letter-spacing: 1px;">${code}</p>
+                  </div>
+
+                  <div style="background-color: #fff8f5; border-left: 4px solid #f03d00; padding: 15px; margin: 25px 0;">
+                    <p style="font-size: 15px; color: #555555; margin: 0;">
+                      <span style="display: block; margin-bottom: 8px;">
+                        <strong>Примечание:</strong> Срок действия этого кода истекает <strong>${expire_time}</strong>. Пожалуйста, активируйте его до указанного срока.
+                      </span>
+                      <span style="display: block; color: #777777;">
+                        <strong>Note:</strong> This code will expire on <strong>${expire_time}</strong>. Please redeem it before the deadline.
+                      </span>
+                    </p>
+                  </div>
+
+                  <div style="text-align: center; margin: 30px 0;">
+                    <a href="https://www.midasbuy.com/" target="_blank" style="display: inline-block; background-color: #1c34ff; color: #ffffff; text-decoration: none; font-weight: bold; padding: 14px 30px; border-radius: 50px; font-size: 16px;">
+                      Активировать / Redeem Now
+                    </a>
+                  </div>
+
+                  <p style="font-size: 16px; color: #555555;">
+                    <span style="display: block; margin-bottom: 8px;">Если у вас возникли вопросы, обращайтесь в нашу службу поддержки.</span>
+                    <span style="display: block; color: #777777;">If you have any questions, feel free to contact our support team.</span>
+                  </p>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="background-color: #f5f5f5; padding: 20px; text-align: center; border-top: 1px solid #eeeeee;">
+                  <p style="font-size: 14px; color: #777777; margin: 0 0 5px;">
+                    &copy; 2025 DON-VIP.COM. Все права защищены / All rights reserved.
+                  </p>
+                  <p style="font-size: 12px; color: #999999; margin: 0;">
+                    <span style="display: block; margin-bottom: 3px;">Это автоматическое письмо. Пожалуйста, не отвечайте на него.</span>
+                    <span style="display: block;">This is an automated email. Please do not reply.</span>
+                  </p>
+                </td>
+              </tr>
+
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+
+    const mailOptions: nodemailer.SendMailOptions = {
+      from: this.email,
+      to: email,
+      subject: 'Ваш код PUBG готов / Your PUBG Code is Ready',
+      html,
+    };
+
+    await transporter.sendMail(mailOptions);
+  }
 }
