@@ -94,7 +94,7 @@ export class OrderService {
       replenishment = order.product
         .replenishment as unknown as ReplenishmentItem[];
     } else {
-      throw new HttpException('Invalid replenishments', 500);
+      return order;
     }
     const item: ReplenishmentItem = replenishment[order.item_id];
 

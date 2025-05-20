@@ -10,6 +10,7 @@ import {
   Get,
   Query,
   ParseIntPipe,
+  Res,
 } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { PagsmileCreatePayinDto } from './dto/pagsmile-create-payin.dto';
@@ -23,6 +24,7 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { PagsmileNotificationDto } from './dto/pagsmile-notification.dto';
 import { TBankWebhookDto } from './dto/tbank-webhook.dto';
+import { Response } from 'express';
 
 @ApiTags('Payment')
 @Controller('payment')
@@ -60,8 +62,8 @@ export class PaymentController {
   }
 
   @Post('tbank/webhook')
-  async tbankWebhook(@Body() data: TBankWebhookDto, @Request() req: Request) {
-    return this.paymentService.tbankWebhook(data);
+  async tbankWebhook(@Body() data: TBankWebhookDto, @Res() res: Response) {
+    return this.paymentService.tbankWebhook(data, res);
   }
 
   @Get('history')

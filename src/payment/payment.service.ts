@@ -1,12 +1,12 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { Axios } from 'axios';
 import { PrismaService } from 'src/shared/services/prisma.service';
-import * as base64 from 'base-64';
 import { PagsmileCreatePayinDto } from './dto/pagsmile-create-payin.dto';
 import { PagsmileNotificationDto } from './dto/pagsmile-notification.dto';
 import { OrderService } from 'src/order/order.service';
 import { TBankWebhookDto } from './dto/tbank-webhook.dto';
+import { Response } from 'express';
 
 @Injectable()
 export class PaymentService {
@@ -126,7 +126,7 @@ export class PaymentService {
 
     return 'success';
   }
-  async tbankWebhook(data: TBankWebhookDto) {
+  async tbankWebhook(data: TBankWebhookDto, res: Response) {
     const allowedStatus = [
       'IN_PROGRESS',
       'EXECUTED',
@@ -150,17 +150,17 @@ export class PaymentService {
 
     if (data.Status !== 'CONFIRMED') {
       console.log('not success', data.Status);
-      return 'success';
+      return res.json({ message: 'ok' }).status(200);
     }
 
     const order = await this.orderService.finishOrder(orderId);
 
     if (!order) {
       console.log('INVALID! ORDER ID NOT FOUND');
-      return 'success';
+      return res.json({ message: 'ok' }).status(200);
     }
 
-    return 'success';
+    return res.json({ message: 'ok' }).status(200);
   }
 
   async getHistory(userId: number, page: number, limit: number) {
