@@ -101,18 +101,6 @@ export class PaymentService {
       'REFUSE_FAILED',
     ];
 
-    if (data.trade_status && allowedStatus.includes(data.trade_status)) {
-      await this.prisma.payment.create({
-        data: {
-          price: data.amount,
-          method: data.method,
-          order_id: orderId,
-          user_id: Number(userId),
-          status: data.trade_status !== 'SUCCESS' ? 'Cancelled' : 'Paid',
-        },
-      });
-    }
-
     if (data.trade_status !== 'SUCCESS') {
       console.log('not success', data.trade_status);
       return 'success';
@@ -123,6 +111,18 @@ export class PaymentService {
     if (!order) {
       console.log('INVALID! ORDER ID NOT FOUND');
       return 'success';
+    }
+
+    if (data.trade_status && allowedStatus.includes(data.trade_status)) {
+      await this.prisma.payment.create({
+        data: {
+          price: data.amount,
+          method: data.method,
+          order_id: orderId,
+          user_id: Number(userId),
+          status: data.trade_status !== 'SUCCESS' ? 'Cancelled' : 'Paid',
+        },
+      });
     }
 
     return 'success';
