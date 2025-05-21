@@ -86,6 +86,46 @@ export class UserService {
     });
   }
 
+  async getUserPayments(userId: number, page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+
+    const [payments, total] = await this.prisma.$transaction([
+      this.prisma.payment.findMany({
+        where: { user_id: userId },
+        skip,
+        take: limit,
+        orderBy: { created_at: 'desc' },
+        include: {
+          order: {
+            include: {
+              product: true,
+            },
+          },
+        },
+      }),
+      this.prisma.payment.count({ where: { user_id: userId } }),
+    ]);
+
+    const formatted = payments.map((payment) => {
+      return {
+        id: payment.id,
+        method: payment.method,
+        status: payment.status,
+        price: Number(payment.price),
+        createdAt: payment.created_at,
+        orderId: payment.order_id,
+        product: payment.order?.product?.name ?? '—',
+      };
+    });
+
+    return {
+      total,
+      page,
+      limit,
+      data: formatted,
+    };
+  }
+
   async setVerified(identifier: string) {
     const user = await this.prisma.user.findUnique({
       where: { identifier },
