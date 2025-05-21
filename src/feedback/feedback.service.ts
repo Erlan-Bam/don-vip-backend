@@ -89,6 +89,41 @@ export class FeedbackService {
     return feedback;
   }
 
+  async findIncoming(page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await this.prisma.$transaction([
+      this.prisma.feedback.findMany({
+        where: { isVerified: false },
+        skip,
+        take: limit,
+        orderBy: { id: 'desc' },
+        include: {
+          product: {
+            select: {
+              name: true,
+              image: true,
+            },
+          },
+          user: {
+            select: {
+              first_name: true,
+              avatar: true,
+            },
+          },
+        },
+      }),
+      this.prisma.feedback.count({ where: { isVerified: true } }),
+    ]);
+
+    return {
+      data,
+      total,
+      page,
+      lastPage: Math.ceil(total / limit),
+    };
+  }
+
   async findAccepted(page = 1, limit = 10) {
     const skip = (page - 1) * limit;
 
