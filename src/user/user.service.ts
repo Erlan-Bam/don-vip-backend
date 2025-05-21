@@ -185,22 +185,50 @@ export class UserService {
 
     const where: Prisma.UserWhereInput = {
       ...searchFilter,
-      NOT: {
-        identifier: null,
-      },
+      NOT: { identifier: null },
     };
 
-    const users = await this.prisma.user.findMany({
-      where,
-      skip: (page - 1) * limit,
-      take: limit,
-      orderBy: { id: 'desc' },
+    const [users, total] = await this.prisma.$transaction([
+      this.prisma.user.findMany({
+        where,
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { id: 'desc' },
+        include: {
+          orders: {
+            include: {
+              payments: {
+                where: { status: 'Paid' },
+              },
+            },
+          },
+        },
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+
+    const enriched = users.map((user) => {
+      const allPayments = user.orders.flatMap((o) => o.payments);
+      const totalSpent = allPayments.reduce(
+        (sum, p) => sum + parseFloat(p.price.toString()),
+        0,
+      );
+      const orderCount = user.orders.length;
+      const avgCheck = orderCount > 0 ? totalSpent / orderCount : 0;
+
+      return {
+        id: user.id,
+        identifier: user.identifier,
+        phone: user.phone,
+        isBanned: user.is_banned,
+        orderCount,
+        totalSpent: Math.round(totalSpent),
+        avgCheck: Math.round(avgCheck),
+      };
     });
 
-    const total = await this.prisma.user.count({ where });
-
     return {
-      data: users,
+      data: enriched,
       total,
       page,
       limit,
