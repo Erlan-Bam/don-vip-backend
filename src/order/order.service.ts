@@ -64,7 +64,7 @@ export class OrderService {
     };
   }
 
-  async finishOrder(id: number) {
+  async finishOrder(id: any) {
     const order = await this.prisma.order.findUnique({
       where: { id: id },
       select: {
@@ -127,39 +127,72 @@ export class OrderService {
   async getHistory(userId: number, page: number, limit: number) {
     const skip = (page - 1) * limit;
 
-    const [data, total] = await this.prisma.$transaction([
+    const [orders, total] = await this.prisma.$transaction([
       this.prisma.order.findMany({
-        where: { user_id: userId, status: 'Paid' },
+        where: {
+          user_id: userId,
+          status: 'Paid',
+        },
         skip,
         take: limit,
-        select: {
-          item_id: true,
-          payment: true,
-          product: {
-            select: {
-              replenishment: true,
-            },
+        orderBy: {
+          created_at: 'desc',
+        },
+        include: {
+          product: true, // Get full product info
+          payments: {
+            where: { status: 'Paid' },
+            orderBy: { created_at: 'desc' },
+            take: 1, // Most recent paid payment
           },
         },
       }),
       this.prisma.order.count({
-        where: { user_id: userId, status: 'Paid' },
+        where: {
+          user_id: userId,
+          status: 'Paid',
+        },
       }),
     ]);
+
+    const formattedData = orders.map((order) => {
+      const product = order.product;
+      const payment = order.payments[0]; // Get the first (most recent) paid payment
+      const replenishment = Array.isArray(product.replenishment)
+        ? product.replenishment[0]
+        : JSON.parse(product.replenishment as any)[0];
+
+      return {
+        id: order.item_id,
+        date:
+          payment?.created_at?.toLocaleDateString() ??
+          order.created_at.toLocaleDateString(),
+        time:
+          payment?.created_at?.toLocaleTimeString() ??
+          order.created_at.toLocaleTimeString(),
+        gameImage: product.image,
+        currencyImage: product.currency_image ?? '/diamond.png',
+        status: 'success', // or map from order.status
+        playerId: order.account_id ?? 'N/A',
+        serverId: order.server_id ?? 'N/A',
+        diamonds: replenishment.amount,
+        price: payment ? `${payment.price.toFixed(0)}₽` : '—',
+      };
+    });
 
     return {
       total,
       page,
       limit,
-      data,
+      data: formattedData,
     };
   }
 
-  async findOne(id: number) {
+  async findOne(id: any) {
     return await this.prisma.order.findUnique({ where: { id } });
   }
 
-  async remove(id: number) {
+  async remove(id: any) {
     const order = await this.prisma.order.delete({ where: { id } });
 
     if (!order) {
