@@ -40,16 +40,18 @@ export class OrderController {
   @ApiOperation({ summary: 'Get all orders (admin only)' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  @ApiQuery({ name: 'search', required: false, type: String, example: '7999' }) // 👈 Add this
   async getAllForAdmin(
     @Request() req,
     @Query('page', ParseIntPipe) page = 1,
     @Query('limit', ParseIntPipe) limit = 10,
+    @Query('search') search?: string, // 👈 Accept search param
   ) {
     if (req.user.role !== 'Admin') {
       throw new HttpException('Forbidden', 403);
     }
 
-    return this.orderService.getAllForAdmin(page, limit);
+    return this.orderService.getAllForAdmin(page, limit, search);
   }
 
   @Get('history')
@@ -83,7 +85,7 @@ export class OrderController {
     return this.orderService.findOne(id);
   }
 
-  @Delete(':id')
+  @Delete('/delete/:id')
   @ApiBearerAuth('JWT')
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Delete order' })

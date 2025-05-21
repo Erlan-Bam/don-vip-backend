@@ -44,13 +44,32 @@ export class OrderService {
     });
   }
 
-  async getAllForAdmin(page: number, limit: number) {
+  async getAllForAdmin(page: number, limit: number, search?: string) {
     const skip = (page - 1) * limit;
+
+    const whereClause: any = {};
+
+    if (search) {
+      whereClause.OR = [
+        { account_id: { contains: search, mode: 'insensitive' } },
+        { server_id: { contains: search, mode: 'insensitive' } },
+        {
+          user: {
+            OR: [
+              { first_name: { contains: search, mode: 'insensitive' } },
+              { last_name: { contains: search, mode: 'insensitive' } },
+              { phone: { contains: search, mode: 'insensitive' } },
+            ],
+          },
+        },
+      ];
+    }
 
     const [orders, total] = await this.prisma.$transaction([
       this.prisma.order.findMany({
         skip,
         take: limit,
+        where: whereClause,
         orderBy: {
           created_at: 'desc',
         },
@@ -71,7 +90,7 @@ export class OrderService {
           },
         },
       }),
-      this.prisma.order.count(),
+      this.prisma.order.count({ where: whereClause }),
     ]);
 
     const formattedData = orders.map((order) => {
@@ -84,9 +103,7 @@ export class OrderService {
           ? product.replenishment
           : JSON.parse(product.replenishment as any);
         replenishment = parsed[order.item_id] || parsed[0] || replenishment;
-      } catch (err) {
-        // log if needed
-      }
+      } catch (err) {}
 
       return {
         orderId: order.id,
