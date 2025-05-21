@@ -258,6 +258,7 @@ export class UserService {
 
       return {
         id: user.id,
+        avatar: user.avatar,
         identifier: user.identifier,
         phone: user.phone,
         isBanned: user.is_banned,
