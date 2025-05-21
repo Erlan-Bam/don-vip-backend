@@ -93,4 +93,15 @@ export class FeedbackController {
 
     return this.feedbackService.findAccepted(safePage, safeLimit);
   }
+
+  @Get('/list/incoming')
+  @ApiOperation({ summary: 'Get accepted feedbacks only' })
+  @ApiQuery({ name: 'page', required: false, type: String, example: '1' })
+  @ApiQuery({ name: 'limit', required: false, type: String, example: '10' })
+  async findIncoming(@Query('page') page: any, @Query('limit') limit: any) {
+    const safePage = Number(page) || 1;
+    const safeLimit = Number(limit) || 10;
+
+    return this.feedbackService.findIncoming(safePage, safeLimit);
+  }
 }
