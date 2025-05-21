@@ -50,6 +50,8 @@ export class OrderService {
     const whereClause: any = {};
 
     if (search) {
+      const numericSearch = Number(search);
+
       whereClause.OR = [
         { account_id: { contains: search, mode: 'insensitive' } },
         { server_id: { contains: search, mode: 'insensitive' } },
@@ -62,6 +64,14 @@ export class OrderService {
             ],
           },
         },
+        // 👇 Add numeric ID matching (orderId, itemId, etc.)
+        ...(Number.isInteger(numericSearch) && numericSearch > 0
+          ? [
+              { id: numericSearch }, // order.id
+              { item_id: numericSearch }, // item_id
+              { product_id: numericSearch }, // product_id
+            ]
+          : []),
       ];
     }
 
@@ -108,6 +118,7 @@ export class OrderService {
       return {
         orderId: order.id,
         itemId: order.item_id,
+        productId: order.product_id,
         user: order.user,
         date:
           payment?.created_at?.toLocaleDateString() ??
