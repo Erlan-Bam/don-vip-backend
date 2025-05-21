@@ -84,7 +84,7 @@ export class OrderService {
     });
 
     if (!order || order.status === 'Paid') {
-      return order;
+      return null;
     }
 
     let replenishment: ReplenishmentItem[] = [];

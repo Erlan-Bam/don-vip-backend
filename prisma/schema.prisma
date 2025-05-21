@@ -117,7 +117,6 @@ model Payment {
 
   order      Order          @relation(fields: [order_id], references: [id], onDelete: Cascade)
   user       User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  @@unique([user_id, order_id])
 }
 
 model Feedback {
