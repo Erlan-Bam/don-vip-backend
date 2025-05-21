@@ -176,6 +176,7 @@ export class SmileService {
           Authorization: `Bearer ${token}`,
         },
       });
+      console.log('Smile data', response.data);
       if (response.data.result) {
         if (apiGame === 'pubgmobile') {
           await this.sendPUBGCode(response.data.result.orderId, user_id);
