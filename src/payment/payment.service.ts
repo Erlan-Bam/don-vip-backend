@@ -118,7 +118,7 @@ export class PaymentService {
         data: {
           price: data.amount,
           method: data.method,
-          order_id: orderId,
+          order_id: orderId as any,
           user_id: Number(userId),
           status: data.trade_status !== 'SUCCESS' ? 'Cancelled' : 'Paid',
         },
@@ -155,7 +155,7 @@ export class PaymentService {
         data: {
           price: data.Amount,
           method: 'T-Bank',
-          order_id: orderId,
+          order_id: orderId as any,
           user_id: Number(userId),
           status: data.Status === 'CONFIRMED' ? 'Paid' : 'Cancelled',
         },
@@ -170,20 +170,55 @@ export class PaymentService {
 
     const [data, total] = await this.prisma.$transaction([
       this.prisma.payment.findMany({
-        where: { user_id: userId, status: 'Paid' },
+        where: {
+          user_id: userId,
+          status: 'Paid',
+        },
         skip,
         take: limit,
+        orderBy: {
+          created_at: 'desc',
+        },
+        include: {
+          order: {
+            include: {
+              product: true,
+            },
+          },
+        },
       }),
       this.prisma.payment.count({
         where: { user_id: userId, status: 'Paid' },
       }),
     ]);
 
+    // Format response
+    const formattedData = data.map((payment) => {
+      const order = payment.order;
+      const product = order.product;
+      const replenishment = Array.isArray(product.replenishment)
+        ? product.replenishment[0]
+        : JSON.parse(product.replenishment as any)[0];
+
+      return {
+        id: order.item_id,
+        date: payment.created_at.toLocaleDateString(),
+        time: payment.created_at.toLocaleTimeString(),
+        gameImage: product.image,
+        currencyImage: product.currency_image ?? '/diamond.png',
+        status: 'success', // or map from order.status if needed
+        playerId: order.account_id ?? 'N/A',
+        serverId: order.server_id ?? 'N/A',
+        diamonds: replenishment.amount,
+        price: `${payment.price.toFixed(0)}₽`,
+      };
+    });
+
     return {
       total,
       page,
       limit,
-      data,
+      data: formattedData,
     };
   }
 
