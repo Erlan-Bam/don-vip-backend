@@ -192,7 +192,6 @@ export class PaymentService {
       }),
     ]);
 
-    // Format response
     const formattedData = data.map((payment) => {
       const order = payment.order;
       const product = order.product;
