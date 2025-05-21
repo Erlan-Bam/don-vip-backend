@@ -132,10 +132,8 @@ export class EmailService {
       </body>
       </html>
     `;
-    console.log(this.email, this.password);
     const transporter = nodemailer.createTransport({
-      pool: true,
-      host: 'mail.don-vip.com',
+      host: 'pkz66.hoster.kz',
       port: 465,
       secure: true,
       auth: {
@@ -166,7 +164,7 @@ export class EmailService {
     code: string,
   ) {
     const transporter = nodemailer.createTransport({
-      host: 'mail.don-vip.com',
+      host: 'pkz66.hoster.kz',
       port: 465,
       secure: true,
       auth: {
