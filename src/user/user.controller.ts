@@ -170,6 +170,15 @@ export class UserController {
     });
   }
 
+  @Get('count')
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
+  @ApiOperation({ summary: 'Get total user count' })
+  @ApiResponse({ status: 200, description: 'Total number of users' })
+  async getUsersCount() {
+    const total = await this.userService.getUsersCount();
+    return { total };
+  }
+
   @Get(':id')
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Get user by ID' })

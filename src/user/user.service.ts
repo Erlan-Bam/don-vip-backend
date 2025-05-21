@@ -150,6 +150,16 @@ export class UserService {
     });
   }
 
+  async getUsersCount(): Promise<number> {
+    return await this.prisma.user.count({
+      where: {
+        identifier: {
+          not: null,
+        },
+      },
+    });
+  }
+
   async findByIdentifier(identifier: string): Promise<User> {
     return await this.prisma.user.findUnique({
       where: { identifier: identifier },
