@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   UseGuards,
   Request,
+  HttpException,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -20,6 +21,7 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { AdminGuard } from 'src/shared/guards/admin.guards';
 
 @ApiTags('Orders')
 @Controller('order')
@@ -30,6 +32,24 @@ export class OrderController {
   @ApiOperation({ summary: 'Create order' })
   async create(@Body() data: CreateOrderDto) {
     return this.orderService.create(data);
+  }
+
+  @Get('/admin/history')
+  @ApiBearerAuth('JWT')
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
+  @ApiOperation({ summary: 'Get all orders (admin only)' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  async getAllForAdmin(
+    @Request() req,
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('limit', ParseIntPipe) limit = 10,
+  ) {
+    if (req.user.role !== 'Admin') {
+      throw new HttpException('Forbidden', 403);
+    }
+
+    return this.orderService.getAllForAdmin(page, limit);
   }
 
   @Get('history')

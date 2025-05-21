@@ -44,6 +44,80 @@ export class OrderService {
     });
   }
 
+  async getAllForAdmin(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+
+    const [orders, total] = await this.prisma.$transaction([
+      this.prisma.order.findMany({
+        skip,
+        take: limit,
+        orderBy: {
+          created_at: 'desc',
+        },
+        include: {
+          product: true,
+          payments: {
+            where: { status: 'Paid' },
+            orderBy: { created_at: 'desc' },
+            take: 1,
+          },
+          user: {
+            select: {
+              id: true,
+              first_name: true,
+              last_name: true,
+              phone: true,
+            },
+          },
+        },
+      }),
+      this.prisma.order.count(),
+    ]);
+
+    const formattedData = orders.map((order) => {
+      const product = order.product;
+      const payment = order.payments[0];
+
+      let replenishment = { amount: 0, price: 0 };
+      try {
+        const parsed = Array.isArray(product.replenishment)
+          ? product.replenishment
+          : JSON.parse(product.replenishment as any);
+        replenishment = parsed[order.item_id] || parsed[0] || replenishment;
+      } catch (err) {
+        // log if needed
+      }
+
+      return {
+        orderId: order.id,
+        itemId: order.item_id,
+        user: order.user,
+        date:
+          payment?.created_at?.toLocaleDateString() ??
+          order.created_at.toLocaleDateString(),
+        time:
+          payment?.created_at?.toLocaleTimeString() ??
+          order.created_at.toLocaleTimeString(),
+        gameImage: product.image,
+        currencyImage: product.currency_image ?? '/diamond.png',
+        status: order.status,
+        playerId: order.account_id ?? 'N/A',
+        serverId: order.server_id ?? 'N/A',
+        diamonds: replenishment.amount,
+        price: payment
+          ? `${(payment.price.toNumber() / 100).toFixed(2)}₽`
+          : '—',
+      };
+    });
+
+    return {
+      total,
+      page,
+      limit,
+      data: formattedData,
+    };
+  }
+
   async findAll(page: number, limit: number) {
     const skip = (page - 1) * limit;
 
