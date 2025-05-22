@@ -86,6 +86,46 @@ export class UserService {
     });
   }
 
+  async getUserPayments(userId: number, page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+
+    const [payments, total] = await this.prisma.$transaction([
+      this.prisma.payment.findMany({
+        where: { user_id: userId },
+        skip,
+        take: limit,
+        orderBy: { created_at: 'desc' },
+        include: {
+          order: {
+            include: {
+              product: true,
+            },
+          },
+        },
+      }),
+      this.prisma.payment.count({ where: { user_id: userId } }),
+    ]);
+
+    const formatted = payments.map((payment) => {
+      return {
+        id: payment.id,
+        method: payment.method,
+        status: payment.status,
+        price: Number(payment.price),
+        createdAt: payment.created_at,
+        orderId: payment.order_id,
+        product: payment.order?.product?.name ?? '—',
+      };
+    });
+
+    return {
+      total,
+      page,
+      limit,
+      data: formatted,
+    };
+  }
+
   async setVerified(identifier: string) {
     const user = await this.prisma.user.findUnique({
       where: { identifier },
@@ -150,6 +190,16 @@ export class UserService {
     });
   }
 
+  async getUsersCount(): Promise<number> {
+    return await this.prisma.user.count({
+      where: {
+        identifier: {
+          not: null,
+        },
+      },
+    });
+  }
+
   async findByIdentifier(identifier: string): Promise<User> {
     return await this.prisma.user.findUnique({
       where: { identifier: identifier },
@@ -175,22 +225,52 @@ export class UserService {
 
     const where: Prisma.UserWhereInput = {
       ...searchFilter,
-      NOT: {
-        identifier: null,
-      },
+      NOT: { identifier: null },
     };
 
-    const users = await this.prisma.user.findMany({
-      where,
-      skip: (page - 1) * limit,
-      take: limit,
-      orderBy: { id: 'desc' },
+    const [users, total] = await this.prisma.$transaction([
+      this.prisma.user.findMany({
+        where,
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { id: 'desc' },
+        include: {
+          orders: {
+            include: {
+              payments: {
+                where: { status: 'Paid' },
+              },
+            },
+          },
+        },
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+
+    const enriched = users.map((user) => {
+      const allPayments = user.orders.flatMap((o) => o.payments);
+      const totalSpent = allPayments.reduce(
+        (sum, p) => sum + parseFloat(p.price.toString()),
+        0,
+      );
+      const orderCount = user.orders.length;
+      const avgCheck = orderCount > 0 ? totalSpent / orderCount : 0;
+
+      return {
+        id: user.id,
+        avatar: user.avatar,
+        role: user.role,
+        identifier: user.identifier,
+        phone: user.phone,
+        isBanned: user.is_banned,
+        orderCount,
+        totalSpent: Math.round(totalSpent),
+        avgCheck: Math.round(avgCheck),
+      };
     });
 
-    const total = await this.prisma.user.count({ where });
-
     return {
-      data: users,
+      data: enriched,
       total,
       page,
       limit,

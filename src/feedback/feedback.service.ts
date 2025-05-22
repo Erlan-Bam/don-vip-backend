@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/shared/services/prisma.service';
 import { CreateFeedbackDto } from './dto/create-feedback.dto';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
@@ -70,7 +70,13 @@ export class FeedbackService {
   }
 
   async remove(id: number) {
-    return await this.prisma.feedback.delete({ where: { id } });
+    const feedback = await this.prisma.feedback.findUnique({ where: { id } });
+
+    if (!feedback) {
+      throw new HttpException('Feedback not found', 404);
+    }
+
+    return this.prisma.feedback.delete({ where: { id } });
   }
 
   async accept(id: number) {

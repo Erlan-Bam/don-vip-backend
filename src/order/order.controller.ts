@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   UseGuards,
   Request,
+  HttpException,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -20,6 +21,7 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { AdminGuard } from 'src/shared/guards/admin.guards';
 
 @ApiTags('Orders')
 @Controller('order')
@@ -30,6 +32,26 @@ export class OrderController {
   @ApiOperation({ summary: 'Create order' })
   async create(@Body() data: CreateOrderDto) {
     return this.orderService.create(data);
+  }
+
+  @Get('/admin/history')
+  @ApiBearerAuth('JWT')
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
+  @ApiOperation({ summary: 'Get all orders (admin only)' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  @ApiQuery({ name: 'search', required: false, type: String, example: '7999' }) // 👈 Add this
+  async getAllForAdmin(
+    @Request() req,
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('limit', ParseIntPipe) limit = 10,
+    @Query('search') search?: string, // 👈 Accept search param
+  ) {
+    if (req.user.role !== 'Admin') {
+      throw new HttpException('Forbidden', 403);
+    }
+
+    return this.orderService.getAllForAdmin(page, limit, search);
   }
 
   @Get('history')
@@ -63,12 +85,35 @@ export class OrderController {
     return this.orderService.findOne(id);
   }
 
-  @Delete(':id')
+  @Get('/admin/analytics')
+  @ApiBearerAuth('JWT')
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
+  @ApiOperation({ summary: 'Get analytics for admin' })
+  async getAnalytics(@Request() req) {
+    if (req.user.role !== 'Admin') {
+      throw new HttpException('Forbidden', 403);
+    }
+    return this.orderService.getAnalytics();
+  }
+
+  @Delete('/delete/:id')
   @ApiBearerAuth('JWT')
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Delete order' })
   @ApiParam({ name: 'id', type: Number, example: 1 })
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.orderService.remove(id);
+  }
+
+  @Get('/admin/monthly-sales')
+  @ApiBearerAuth('JWT')
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
+  @ApiOperation({ summary: 'Ежемесячные продажи за текущий год' })
+  async getMonthlySales(@Request() req) {
+    if (req.user.role !== 'Admin') {
+      throw new HttpException('Forbidden', 403);
+    }
+
+    return this.orderService.getMonthlySalesOverview();
   }
 }

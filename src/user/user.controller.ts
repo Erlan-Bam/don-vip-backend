@@ -98,6 +98,18 @@ export class UserController {
     return this.userService.resetPassword(data);
   }
 
+  @Get(':id/payments')
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
+  @ApiOperation({ summary: 'Get user payment history' })
+  @ApiResponse({ status: 200, description: 'List of payments for user' })
+  async getUserPayments(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('limit', ParseIntPipe) limit = 10,
+  ) {
+    return this.userService.getUserPayments(id, page, limit);
+  }
+
   @Patch('update-profile')
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Update user profile' })
@@ -168,6 +180,15 @@ export class UserController {
       id: req.user.id,
       avatar: avatarUrl,
     });
+  }
+
+  @Get('count')
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
+  @ApiOperation({ summary: 'Get total user count' })
+  @ApiResponse({ status: 200, description: 'Total number of users' })
+  async getUsersCount() {
+    const total = await this.userService.getUsersCount();
+    return { total };
   }
 
   @Get(':id')
