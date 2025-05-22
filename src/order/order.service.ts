@@ -90,6 +90,11 @@ export class OrderService {
             where: { status: 'Paid' },
             orderBy: { created_at: 'desc' },
             take: 1,
+            select: {
+              price: true,
+              method: true,
+              created_at: true,
+            },
           },
           user: {
             select: {
