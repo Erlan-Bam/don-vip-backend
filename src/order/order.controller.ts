@@ -85,6 +85,17 @@ export class OrderController {
     return this.orderService.findOne(id);
   }
 
+  @Get('/admin/analytics')
+  @ApiBearerAuth('JWT')
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
+  @ApiOperation({ summary: 'Get analytics for admin' })
+  async getAnalytics(@Request() req) {
+    if (req.user.role !== 'Admin') {
+      throw new HttpException('Forbidden', 403);
+    }
+    return this.orderService.getAnalytics();
+  }
+
   @Delete('/delete/:id')
   @ApiBearerAuth('JWT')
   @UseGuards(AuthGuard('jwt'))

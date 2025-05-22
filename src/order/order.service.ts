@@ -146,6 +146,55 @@ export class OrderService {
     };
   }
 
+  async getAnalytics() {
+    const totalOrders = await this.prisma.order.count();
+
+    const totalRevenue = await this.prisma.payment.aggregate({
+      where: { status: 'Paid' },
+      _sum: {
+        price: true,
+      },
+    });
+
+    const packagesCount = await this.prisma.order.groupBy({
+      by: ['product_id'],
+      _count: {
+        product_id: true,
+      },
+      orderBy: {
+        _count: {
+          product_id: 'desc',
+        },
+      },
+    });
+
+    const productDetails = await this.prisma.product.findMany({
+      where: {
+        id: {
+          in: packagesCount.map((item) => item.product_id),
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        type: true,
+      },
+    });
+
+    const productMap = new Map(productDetails.map((p) => [p.id, p]));
+
+    return {
+      totalOrders,
+      totalRevenue: totalRevenue._sum.price,
+      packages: packagesCount.map((item) => ({
+        productId: item.product_id,
+        name: productMap.get(item.product_id)?.name,
+        type: productMap.get(item.product_id)?.type,
+        count: item._count.product_id,
+      })),
+    };
+  }
+
   async findAll(page: number, limit: number) {
     const skip = (page - 1) * limit;
 
