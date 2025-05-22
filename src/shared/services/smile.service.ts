@@ -194,6 +194,42 @@ export class SmileService {
     }
   }
 
+  async sendBigo(user_id: string, amount: string) {
+    const list = await this.skuList('bigo');
+
+    if (list.status === 'success') {
+      const item = list.data.find((product) => product.id === amount);
+
+      const id = `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
+
+      const payload = {
+        jsonrpc: this.apiVersion,
+        id: id,
+        method: 'sendOrder',
+        params: {
+          iat: Math.floor(Date.now() / 1000),
+          apiGame: 'bigo',
+          items: [{ qty: 1, ...item }],
+          userAccount: { user_id: user_id },
+        },
+      };
+      const token = await this.generateToken(payload);
+      const response = await this.smile.post('', null, {
+        params: payload,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return {
+        status: 'success',
+        data: response.data.result.orderId,
+      };
+    } else {
+      throw new HttpException('Try coming later', 400);
+    }
+  }
+
   async sendPUBGCode(orderId: string, email: string) {
     const id = `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
     const payload = {

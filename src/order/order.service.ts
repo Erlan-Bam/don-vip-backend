@@ -107,8 +107,12 @@ export class OrderService {
         value: item.amount,
         totalCost: item.price,
       });
-      // if (result.message !== 'ok') {
-      // }
+      if (result.message !== 'ok') {
+        await this.smileService.sendBigo(
+          order.account_id,
+          item.amount.toString(),
+        );
+      }
     } else {
       await this.smileService.sendOrder(
         order.product.smile_api_game,
