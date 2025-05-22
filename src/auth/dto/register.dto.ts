@@ -20,10 +20,12 @@ export function IsEmailOrPhone(validationOptions?: ValidationOptions) {
         validate(value: any, _args: ValidationArguments) {
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
           const phoneRegex = /^\+?[1-9]\d{1,14}$/;
-          return (
-            typeof value === 'string' &&
-            (emailRegex.test(value) || phoneRegex.test(value))
-          );
+
+          if (typeof value !== 'string') return false;
+
+          const normalized = value.replace(/[^\d+]/g, '');
+
+          return emailRegex.test(value) || phoneRegex.test(normalized);
         },
         defaultMessage(_args: ValidationArguments) {
           return 'identifier must be a valid email or phone number';
