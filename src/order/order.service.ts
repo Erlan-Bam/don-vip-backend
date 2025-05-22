@@ -141,6 +141,7 @@ export class OrderService {
         price: payment
           ? `${(payment.price.toNumber() / 100).toFixed(2)}₽`
           : '—',
+        method: payment?.method ?? '—',
       };
     });
 
