@@ -104,4 +104,16 @@ export class OrderController {
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.orderService.remove(id);
   }
+
+  @Get('/admin/monthly-sales')
+  @ApiBearerAuth('JWT')
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
+  @ApiOperation({ summary: 'Ежемесячные продажи за текущий год' })
+  async getMonthlySales(@Request() req) {
+    if (req.user.role !== 'Admin') {
+      throw new HttpException('Forbidden', 403);
+    }
+
+    return this.orderService.getMonthlySalesOverview();
+  }
 }

@@ -4,6 +4,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { BigoService } from '../shared/services/bigo.service';
 import { ReplenishmentItem } from 'src/product/dto/create-product.dto';
 import { SmileService } from 'src/shared/services/smile.service';
+import { subYears, startOfYear } from 'date-fns';
 
 @Injectable()
 export class OrderService {
@@ -193,6 +194,49 @@ export class OrderService {
         count: item._count.product_id,
       })),
     };
+  }
+
+  async getMonthlySalesOverview() {
+    const now = new Date();
+    const startOfCurrentYear = new Date(now.getFullYear(), 0, 1);
+
+    const payments = await this.prisma.payment.findMany({
+      where: {
+        status: 'Paid',
+        created_at: {
+          gte: startOfCurrentYear,
+        },
+      },
+      select: {
+        price: true,
+        created_at: true,
+      },
+    });
+
+    const monthlyData: { [key: string]: { total: number; count: number } } = {};
+
+    for (let i = 0; i < 12; i++) {
+      const monthKey = `${now.getFullYear()}-${String(i + 1).padStart(2, '0')}`;
+      monthlyData[monthKey] = { total: 0, count: 0 };
+    }
+
+    for (const payment of payments) {
+      const date = new Date(payment.created_at);
+      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+
+      if (monthlyData[key]) {
+        monthlyData[key].total += Number(payment.price);
+        monthlyData[key].count += 1;
+      }
+    }
+
+    const result = Object.entries(monthlyData).map(([month, data]) => ({
+      month,
+      totalRevenue: data.total,
+      totalOrders: data.count,
+    }));
+
+    return result;
   }
 
   async findAll(page: number, limit: number) {
