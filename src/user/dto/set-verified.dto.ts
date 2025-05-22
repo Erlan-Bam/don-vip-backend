@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { IsString, Length } from 'class-validator';
 import { IsEmailOrPhone } from 'src/auth/dto/register.dto';
 
 export class SetVerifiedDto {
@@ -8,4 +9,9 @@ export class SetVerifiedDto {
   })
   @IsEmailOrPhone()
   identifier: string;
+
+  @ApiProperty({ example: '12345' })
+  @IsString()
+  @Length(5, 5) // assuming 5-digit code
+  code: string;
 }
