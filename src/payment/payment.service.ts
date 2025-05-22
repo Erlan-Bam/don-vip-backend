@@ -204,6 +204,7 @@ export class PaymentService {
         date: payment.created_at.toLocaleDateString(),
         time: payment.created_at.toLocaleTimeString(),
         gameImage: product.image,
+        method: payment.method,
         currencyImage: product.currency_image ?? '/diamond.png',
         status: 'success', // or map from order.status if needed
         playerId: order.account_id ?? 'N/A',
