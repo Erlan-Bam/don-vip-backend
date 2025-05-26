@@ -126,7 +126,7 @@ export class UserService {
     };
   }
 
-  async setVerified(identifier: string) {
+  async setVerified(identifier: string, code: string) {
     const user = await this.prisma.user.findUnique({
       where: { identifier },
     });
@@ -135,9 +135,20 @@ export class UserService {
       throw new HttpException('User not found', 404);
     }
 
+    if (user.is_verified) {
+      throw new HttpException('User is already verified', 409);
+    }
+
+    if (user.verification_code !== code) {
+      throw new HttpException('Invalid verification code', 400);
+    }
+
     return this.prisma.user.update({
       where: { identifier },
-      data: { is_verified: true },
+      data: {
+        is_verified: true,
+        verification_code: null, // очищаем после успешной верификации
+      },
     });
   }
 

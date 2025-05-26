@@ -204,6 +204,6 @@ export class UserController {
   @ApiOperation({ summary: 'Mark user as verified by identifier' })
   @ApiBody({ type: SetVerifiedDto })
   async setVerified(@Body() data: SetVerifiedDto) {
-    return await this.userService.setVerified(data.identifier);
+    return await this.userService.setVerified(data.identifier, data.code);
   }
 }
