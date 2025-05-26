@@ -194,22 +194,35 @@ export class UserController {
     const total = await this.userService.getUsersCount();
     return { total };
   }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get user' })
   async getUser(@Req() req, @Query('userId') userId?: number) {
+    console.log('Received request to get user');
     const authHeader = req.headers['authorization'];
+    console.log('Authorization header:', authHeader);
+
     if (authHeader?.startsWith('Bearer ')) {
       const token = authHeader.split(' ')[1];
       try {
         req.user = jwt.verify(token, process.env.JWT_SECRET);
+        console.log('JWT verified, user:', req.user);
       } catch (err) {
         req.user = null;
+        console.error('JWT verification failed:', err);
       }
     }
 
     const userIdToFind = req.user?.id ?? userId;
-    if (!userIdToFind) throw new BadRequestException('userId required');
-    return this.userService.findById(userIdToFind);
+    console.log('User ID to find:', userIdToFind);
+
+    if (!userIdToFind) {
+      console.error('userId required but not provided');
+      throw new BadRequestException('userId required');
+    }
+    const user = await this.userService.findById(userIdToFind);
+    console.log('Found user:', user);
+    return user;
   }
 
   @Post('verify')
