@@ -13,6 +13,8 @@ import {
   Param,
   Query,
   ParseIntPipe,
+  Req,
+  BadRequestException,
 } from '@nestjs/common';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -31,6 +33,7 @@ import { diskStorage } from 'multer';
 import { ConfigService } from '@nestjs/config';
 import { AdminGuard } from 'src/shared/guards/admin.guards';
 import { SetVerifiedDto } from './dto/set-verified.dto';
+import * as jwt from 'jsonwebtoken';
 
 @ApiTags('User')
 @Controller('user')
@@ -191,25 +194,21 @@ export class UserController {
     const total = await this.userService.getUsersCount();
     return { total };
   }
-
   @Get(':id')
-  @ApiOperation({ summary: 'Get user by ID or by optional userId query param' })
-  @ApiResponse({ status: 200, description: 'User data returned successfully' })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  async getUserById(
-    @Param('id') id: string,
-    @Query('userId') userId?: number,
-    @Request() req?,
-  ) {
-    // If JWT is present, use userId from query or param; if not, require userId query param
-    let userIdToFind: number;
-    if (req?.user) {
-      userIdToFind = userId ?? Number(id);
-    } else if (userId) {
-      userIdToFind = userId;
-    } else {
-      throw new HttpException('userId is required if not authenticated', 400);
+  @ApiOperation({ summary: 'Get user' })
+  async getUser(@Req() req, @Query('userId') userId?: number) {
+    const authHeader = req.headers['authorization'];
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      try {
+        req.user = jwt.verify(token, process.env.JWT_SECRET);
+      } catch (err) {
+        req.user = null;
+      }
     }
+
+    const userIdToFind = req.user?.id ?? userId;
+    if (!userIdToFind) throw new BadRequestException('userId required');
     return this.userService.findById(userIdToFind);
   }
 
