@@ -36,4 +36,22 @@ export class TwilioService {
       throw new HttpException('Something went wrong', 500);
     }
   }
+  async sendChangePasswordSMS(
+    to: string,
+    link: string,
+    lang: 'ru' | 'en',
+  ): Promise<void> {
+    try {
+      await this.twilioClient.messages.create({
+        body:
+          lang === 'en'
+            ? `Your link to reset password: ${link}`
+            : `Ваша ссылка для изменения пароля: ${link}`,
+        from: this.phoneNumber,
+        to: to,
+      });
+    } catch (error) {
+      throw new HttpException('Something went wrong', 500);
+    }
+  }
 }

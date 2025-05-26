@@ -106,7 +106,7 @@ export class AuthService {
     };
   }
   async changePassword(data: ChangePasswordDto) {
-    const user = await this.userService.findByIdentifier(data.email);
+    const user = await this.userService.findByIdentifier(data.identifier);
 
     if (!user) {
       throw new HttpException('User not found', 404);
@@ -115,11 +115,19 @@ export class AuthService {
     const token = await this.generateAccessToken(user);
     const resetLink = `https://don-vip.com/reset-password?token=${token}`;
 
-    await this.emailService.sendChangePasswordEmail(
-      data.email,
-      resetLink,
-      data.lang,
-    );
+    if (data.identifier.includes('@')) {
+      await this.emailService.sendChangePasswordEmail(
+        data.identifier,
+        resetLink,
+        data.lang,
+      );
+    } else {
+      await this.twilioService.sendChangePasswordSMS(
+        data.identifier,
+        resetLink,
+        data.lang,
+      );
+    }
 
     return { message: 'Form sent successfully' };
   }

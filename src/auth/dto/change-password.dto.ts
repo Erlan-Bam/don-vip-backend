@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsEnum } from 'class-validator';
+import { IsEnum } from 'class-validator';
+import { IsEmailOrPhone } from './register.dto';
 
 enum Language {
   ru = 'ru',
@@ -7,9 +8,12 @@ enum Language {
 }
 
 export class ChangePasswordDto {
-  @ApiProperty({ example: 'user@example.com' })
-  @IsEmail()
-  email: string;
+  @ApiProperty({
+    description: 'Email or phone number in E.164 format',
+    example: 'user@example.com or +77001112233',
+  })
+  @IsEmailOrPhone()
+  identifier: string;
 
   @ApiProperty({ enum: Language, example: 'ru' })
   @IsEnum(Language)
