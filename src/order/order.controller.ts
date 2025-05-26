@@ -88,20 +88,11 @@ export class OrderController {
     summary: 'Get order history for guest user by account and server id',
   })
   async getGuestHistory(
-    @Query('accountId') accountId: string,
-    @Query('serverId') serverId: string,
+    @Query('serverId') userId: string,
     @Query('page', ParseIntPipe) page = 1,
     @Query('limit', ParseIntPipe) limit = 10,
   ) {
-    if (!accountId || !serverId) {
-      throw new HttpException('accountId and serverId are required', 400);
-    }
-    return this.orderService.getGuestUserHistory(
-      accountId,
-      serverId,
-      page,
-      limit,
-    );
+    return this.orderService.getGuestUserHistory(userId, page, limit);
   }
 
   @Get()
