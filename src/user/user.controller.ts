@@ -50,10 +50,11 @@ export class UserController {
 
   @Get('me')
   @UseGuards(AuthGuard('jwt'))
-  @ApiOperation({ summary: 'Get current user' })
+  @ApiOperation({ summary: 'Get current user or by optional userId' })
   @ApiResponse({ status: 200, description: 'Current user profile' })
-  async getMe(@Request() request) {
-    return this.userService.findById(request.user.id);
+  async getMe(@Request() request, @Query('userId') userId?: number) {
+    const id = userId ?? request.user.id;
+    return this.userService.findById(id);
   }
 
   @Get()
