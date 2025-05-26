@@ -194,11 +194,12 @@ export class UserController {
 
   @Get(':id')
   @UseGuards(AuthGuard('jwt'))
-  @ApiOperation({ summary: 'Get user by ID' })
+  @ApiOperation({ summary: 'Get user by ID or by optional userId query param' })
   @ApiResponse({ status: 200, description: 'User data returned successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async getUserById(@Param('id') id: string) {
-    return this.userService.findById(Number(id));
+  async getUserById(@Param('id') id: string, @Query('userId') userId?: number) {
+    const userIdToFind = userId ?? Number(id);
+    return this.userService.findById(userIdToFind);
   }
 
   @Post('verify')
