@@ -13,8 +13,6 @@ import {
   Param,
   Query,
   ParseIntPipe,
-  Req,
-  BadRequestException,
 } from '@nestjs/common';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { AuthGuard } from '@nestjs/passport';
@@ -33,7 +31,6 @@ import { diskStorage } from 'multer';
 import { ConfigService } from '@nestjs/config';
 import { AdminGuard } from 'src/shared/guards/admin.guards';
 import { SetVerifiedDto } from './dto/set-verified.dto';
-import * as jwt from 'jsonwebtoken';
 
 @ApiTags('User')
 @Controller('user')
@@ -53,11 +50,10 @@ export class UserController {
 
   @Get('me')
   @UseGuards(AuthGuard('jwt'))
-  @ApiOperation({ summary: 'Get current user or by optional userId' })
+  @ApiOperation({ summary: 'Get current user' })
   @ApiResponse({ status: 200, description: 'Current user profile' })
-  async getMe(@Request() request, @Query('userId') userId?: number) {
-    const id = userId ?? request.user.id;
-    return this.userService.findById(id);
+  async getMe(@Request() request) {
+    return this.userService.findById(request.user.id);
   }
 
   @Get()
@@ -195,34 +191,15 @@ export class UserController {
     return { total };
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get user' })
-  async getUser(@Req() req, @Query('userId') userId?: number) {
-    console.log('Received request to get user');
-    const authHeader = req.headers['authorization'];
-    console.log('Authorization header:', authHeader);
-
-    if (authHeader?.startsWith('Bearer ')) {
-      const token = authHeader.split(' ')[1];
-      try {
-        req.user = jwt.verify(token, process.env.JWT_SECRET);
-        console.log('JWT verified, user:', req.user);
-      } catch (err) {
-        req.user = null;
-        console.error('JWT verification failed:', err);
-      }
-    }
-
-    const userIdToFind = req.user?.id ?? userId;
-    console.log('User ID to find:', userIdToFind);
-
-    if (!userIdToFind) {
-      console.error('userId required but not provided');
-      throw new BadRequestException('userId required');
-    }
-    const user = await this.userService.findById(userIdToFind);
-    console.log('Found user:', user);
-    return user;
+  @Get('/profile/:id')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiOperation({ summary: 'Get user by ID' })
+  @ApiResponse({ status: 200, description: 'User data returned successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async getUserById(@Param('id') id: string, @Query('userId') userId?: string) {
+    // If userId query is provided, use it instead of the path param
+    const targetId = userId ? Number(userId) : Number(id);
+    return this.userService.findById(targetId);
   }
 
   @Post('verify')
