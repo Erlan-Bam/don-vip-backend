@@ -190,15 +190,24 @@ export class UserController {
     const total = await this.userService.getUsersCount();
     return { total };
   }
-
   @Get('/profile/:id')
+  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Get user by ID' })
   @ApiResponse({ status: 200, description: 'User data returned successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async getUserById(@Param('id') id: string, @Query('userId') userId?: string) {
-    // If userId query is provided, use it instead of the path param
-    const targetId = userId ? Number(userId) : Number(id);
-    return this.userService.findById(targetId);
+  async getUserById(@Param('id', ParseIntPipe) id: number) {
+    return this.userService.findById(id);
+  }
+
+  @Get('/guest-profile/:id')
+  @ApiOperation({ summary: 'Get guest user profile by ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Guest user data returned successfully',
+  })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async getGuestProfile(@Param('id', ParseIntPipe) id: number) {
+    return this.userService.findGuestById(id);
   }
 
   @Post('verify')
