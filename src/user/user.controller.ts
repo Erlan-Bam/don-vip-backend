@@ -192,7 +192,6 @@ export class UserController {
   }
 
   @Get('/profile/:id')
-  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Get user by ID' })
   @ApiResponse({ status: 200, description: 'User data returned successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
