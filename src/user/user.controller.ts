@@ -197,8 +197,20 @@ export class UserController {
   @ApiOperation({ summary: 'Get user by ID or by optional userId query param' })
   @ApiResponse({ status: 200, description: 'User data returned successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async getUserById(@Param('id') id: string, @Query('userId') userId?: number) {
-    const userIdToFind = userId ?? Number(id);
+  async getUserById(
+    @Param('id') id: string,
+    @Query('userId') userId?: number,
+    @Request() req?,
+  ) {
+    // If JWT is present, use userId from query or param; if not, require userId query param
+    let userIdToFind: number;
+    if (req?.user) {
+      userIdToFind = userId ?? Number(id);
+    } else if (userId) {
+      userIdToFind = userId;
+    } else {
+      throw new HttpException('userId is required if not authenticated', 400);
+    }
     return this.userService.findById(userIdToFind);
   }
 
