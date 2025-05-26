@@ -67,6 +67,43 @@ export class OrderController {
     return this.orderService.getHistory(request.user.id, page, limit);
   }
 
+  @Get('guest/history')
+  @ApiQuery({
+    name: 'accountId',
+    required: true,
+    type: String,
+    example: '123456',
+    description: 'Account ID to search for a specific order',
+  })
+  @ApiQuery({
+    name: 'serverId',
+    required: true,
+    type: String,
+    example: '1',
+    description: 'Server ID to search for a specific order',
+  })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  @ApiOperation({
+    summary: 'Get order history for guest user by account and server id',
+  })
+  async getGuestHistory(
+    @Query('accountId') accountId: string,
+    @Query('serverId') serverId: string,
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('limit', ParseIntPipe) limit = 10,
+  ) {
+    if (!accountId || !serverId) {
+      throw new HttpException('accountId and serverId are required', 400);
+    }
+    return this.orderService.getGuestUserHistory(
+      accountId,
+      serverId,
+      page,
+      limit,
+    );
+  }
+
   @Get()
   @ApiOperation({ summary: 'Get all orders' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })

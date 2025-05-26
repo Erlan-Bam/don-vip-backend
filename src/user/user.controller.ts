@@ -56,6 +56,14 @@ export class UserController {
     return this.userService.findById(request.user.id);
   }
 
+  @Get('guest-me/:id')
+  @ApiOperation({ summary: 'Get guest user profile by ID (no auth)' })
+  @ApiResponse({ status: 200, description: 'Guest user profile' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async getGuestMe(@Param('id', ParseIntPipe) id: number) {
+    return this.userService.findGuestById(id);
+  }
+
   @Get()
   @UseGuards(AuthGuard('jwt'), AdminGuard)
   @ApiOperation({ summary: 'Find all users (pagination + search)' })

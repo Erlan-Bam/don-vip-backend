@@ -201,7 +201,85 @@ export class OrderService {
       })),
     };
   }
+  /**
+   * Get order history for guest users (users without a registered user_id).
+   * Finds orders by account_id and server_id, since guests do not have user_id.
+   */
+  async getGuestUserHistory(
+    accountId: string,
+    serverId: string,
+    page: number,
+    limit: number,
+  ) {
+    const skip = (page - 1) * limit;
 
+    const [orders, total] = await this.prisma.$transaction([
+      this.prisma.order.findMany({
+        where: {
+          account_id: accountId,
+          server_id: serverId,
+          status: 'Paid',
+        },
+        skip,
+        take: limit,
+        orderBy: {
+          created_at: 'desc',
+        },
+        include: {
+          product: true,
+          payments: {
+            where: { status: 'Paid' },
+            orderBy: { created_at: 'desc' },
+            take: 1,
+          },
+        },
+      }),
+      this.prisma.order.count({
+        where: {
+          account_id: accountId,
+          server_id: serverId,
+          status: 'Paid',
+        },
+      }),
+    ]);
+
+    const formattedData = orders.map((order) => {
+      const product = order.product;
+      const payment = order.payments[0];
+      let replenishment;
+      try {
+        replenishment = Array.isArray(product.replenishment)
+          ? product.replenishment[order.item_id]
+          : JSON.parse(product.replenishment as any)[order.item_id];
+      } catch {
+        replenishment = { amount: 0, price: 0 };
+      }
+
+      return {
+        id: order.item_id,
+        date:
+          payment?.created_at?.toLocaleDateString() ??
+          order.created_at.toLocaleDateString(),
+        time:
+          payment?.created_at?.toLocaleTimeString() ??
+          order.created_at.toLocaleTimeString(),
+        gameImage: product.image,
+        currencyImage: product.currency_image ?? '/diamond.png',
+        status: 'success',
+        playerId: order.account_id ?? 'N/A',
+        serverId: order.server_id ?? 'N/A',
+        diamonds: replenishment.amount,
+        price: payment ? `${payment.price.toFixed(0)}₽` : '—',
+      };
+    });
+
+    return {
+      total,
+      page,
+      limit,
+      data: formattedData,
+    };
+  }
   async getMonthlySalesOverview() {
     const now = new Date();
     const startOfCurrentYear = new Date(now.getFullYear(), 0, 1);
