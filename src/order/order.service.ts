@@ -205,19 +205,17 @@ export class OrderService {
    * Get order history for guest users (users without a registered user_id).
    * Finds orders by account_id and server_id, since guests do not have user_id.
    */
-  async getGuestUserHistory(
-    accountId: string,
-    serverId: string,
-    page: number,
-    limit: number,
-  ) {
+  /**
+   * Get order history for guest users by userId (account_id).
+   * Only accepts userId and pagination.
+   */
+  async getGuestUserHistory(userId: string, page: number, limit: number) {
     const skip = (page - 1) * limit;
 
     const [orders, total] = await this.prisma.$transaction([
       this.prisma.order.findMany({
         where: {
-          account_id: accountId,
-          server_id: serverId,
+          account_id: userId,
           status: 'Paid',
         },
         skip,
@@ -236,8 +234,7 @@ export class OrderService {
       }),
       this.prisma.order.count({
         where: {
-          account_id: accountId,
-          server_id: serverId,
+          account_id: userId,
           status: 'Paid',
         },
       }),
