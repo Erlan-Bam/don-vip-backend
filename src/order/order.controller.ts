@@ -88,7 +88,7 @@ export class OrderController {
     summary: 'Get order history for guest user by account and server id',
   })
   async getGuestHistory(
-    @Query('serverId') userId: string,
+    @Query('userId') userId: string,
     @Query('page', ParseIntPipe) page = 1,
     @Query('limit', ParseIntPipe) limit = 10,
   ) {
