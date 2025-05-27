@@ -56,6 +56,14 @@ export class UserController {
     return this.userService.findById(request.user.id);
   }
 
+  @Get('guest-me/:id')
+  @ApiOperation({ summary: 'Get guest user profile by ID (no auth)' })
+  @ApiResponse({ status: 200, description: 'Guest user profile' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async getGuestMe(@Param('id', ParseIntPipe) id: number) {
+    return this.userService.findGuestById(id);
+  }
+
   @Get()
   @UseGuards(AuthGuard('jwt'), AdminGuard)
   @ApiOperation({ summary: 'Find all users (pagination + search)' })
@@ -190,14 +198,24 @@ export class UserController {
     const total = await this.userService.getUsersCount();
     return { total };
   }
-
-  @Get(':id')
+  @Get('/profile/:id')
   @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Get user by ID' })
   @ApiResponse({ status: 200, description: 'User data returned successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async getUserById(@Param('id') id: string) {
-    return this.userService.findById(Number(id));
+  async getUserById(@Param('id', ParseIntPipe) id: number) {
+    return this.userService.findById(id);
+  }
+
+  @Get('/guest-profile/:id')
+  @ApiOperation({ summary: 'Get guest user profile by ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Guest user data returned successfully',
+  })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async getGuestProfile(@Param('id', ParseIntPipe) id: number) {
+    return this.userService.findGuestById(id);
   }
 
   @Post('verify')
