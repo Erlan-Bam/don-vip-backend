@@ -88,9 +88,8 @@ export class FeedbackService {
   }
 
   async decline(id: number) {
-    const feedback = await this.prisma.feedback.update({
+    const feedback = await this.prisma.feedback.delete({
       where: { id },
-      data: { isVerified: false },
     });
     return feedback;
   }
@@ -119,7 +118,7 @@ export class FeedbackService {
           },
         },
       }),
-      this.prisma.feedback.count({ where: { isVerified: true } }),
+      this.prisma.feedback.count({ where: { isVerified: false } }),
     ]);
 
     return {
