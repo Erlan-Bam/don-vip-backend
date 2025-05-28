@@ -57,7 +57,7 @@ export class PaymentService {
       {
         app_id: this.appId,
         method: 'SBP',
-        out_trade_no: `${data.user_id}:${data.order_id}:${Date.now()}`,
+        out_trade_no: `${data.user_id || 'unknown'}:${data.order_id}:${Date.now()}`,
         notify_url: `${this.backendURL}/api/payment/pagsmile/notification`,
         timestamp: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
         subject: 'Don Vip донат',
@@ -119,7 +119,7 @@ export class PaymentService {
           price: data.amount,
           method: data.method,
           order_id: orderId as any,
-          user_id: Number(userId),
+          user_id: userId === 'unknown' ? undefined : Number(userId),
           status: data.trade_status !== 'SUCCESS' ? 'Cancelled' : 'Paid',
         },
       });
@@ -156,7 +156,7 @@ export class PaymentService {
           price: data.Amount,
           method: 'T-Bank',
           order_id: orderId as any,
-          user_id: Number(userId),
+          user_id: userId === 'unknown' ? undefined : Number(userId),
           status: data.Status === 'CONFIRMED' ? 'Paid' : 'Cancelled',
         },
       });

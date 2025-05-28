@@ -36,11 +36,12 @@ export class CreateOrderDto {
   @ApiProperty({
     description: 'ID пользователя, совершающего заказ',
     example: 1,
-    required: true,
+    required: false,
   })
+  @IsOptional()
   @Type(() => Number)
   @IsInt()
-  user_id: number;
+  user_id?: number | null;
 
   @ApiPropertyOptional({
     description: 'ID аккаунта, связанного с заказом',

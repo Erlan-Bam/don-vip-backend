@@ -18,8 +18,10 @@ export class PagsmileCreatePayinDto {
   @ApiProperty({
     example: '1',
     description: 'ID пользователя который будет оплачивать',
+    required: false,
   })
+  @IsOptional()
   @Type(() => Number)
   @IsInt()
-  user_id: number;
+  user_id?: number;
 }

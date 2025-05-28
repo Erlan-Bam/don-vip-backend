@@ -110,13 +110,13 @@ model Payment {
   price      Decimal
   method     String
   order_id   Int
-  user_id    Int
+  user_id    Int?
   status     PaymentStatus
   created_at DateTime       @default(now())
   updated_at DateTime       @updatedAt @default(now())
 
   order      Order          @relation(fields: [order_id], references: [id], onDelete: Cascade)
-  user       User           @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user       User?           @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model Feedback {
@@ -133,7 +133,7 @@ model Feedback {
 
 model Order {
   id           Int         @id @default(autoincrement())
-  user_id      Int
+  user_id      Int?
   product_id   Int
   item_id      Int
   payment      String
@@ -147,7 +147,7 @@ model Order {
   coupon_id    Int?
   coupon       Coupon?        @relation(fields: [coupon_id], references: [id])
 
-  user         User           @relation(fields: [user_id], references: [id])
+  user         User?           @relation(fields: [user_id], references: [id])
   product      Product        @relation(fields: [product_id], references: [id], onDelete: Cascade)
   payments     Payment[]
 }
