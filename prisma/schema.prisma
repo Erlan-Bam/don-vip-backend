@@ -137,6 +137,7 @@ model Order {
   product_id   Int
   item_id      Int
   payment      String
+  identifier   String
   status       PaymentStatus  @default(Pending)
   account_id   String?
   server_id    String?

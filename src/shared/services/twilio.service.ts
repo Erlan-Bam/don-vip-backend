@@ -54,4 +54,15 @@ export class TwilioService {
       throw new HttpException('Something went wrong', 500);
     }
   }
+  async sendSuccessSMS(to: string): Promise<void> {
+    try {
+      await this.twilioClient.messages.create({
+        body: 'Спасибо за покупку! / Thank you for your purchase!',
+        from: this.phoneNumber,
+        to: to,
+      });
+    } catch (error) {
+      throw new HttpException('Something went wrong', 500);
+    }
+  }
 }

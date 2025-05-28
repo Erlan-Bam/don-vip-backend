@@ -5,6 +5,8 @@ import { BigoService } from '../shared/services/bigo.service';
 import { ReplenishmentItem } from 'src/product/dto/create-product.dto';
 import { SmileService } from 'src/shared/services/smile.service';
 import { subYears, startOfYear } from 'date-fns';
+import { EmailService } from 'src/shared/services/email.service';
+import { TwilioService } from 'src/shared/services/twilio.service';
 
 @Injectable()
 export class OrderService {
@@ -12,6 +14,8 @@ export class OrderService {
     private readonly prisma: PrismaService,
     private bigoService: BigoService,
     private smileService: SmileService,
+    private emailService: EmailService,
+    private twilioService: TwilioService,
   ) {}
 
   async create(data: CreateOrderDto) {
@@ -35,6 +39,7 @@ export class OrderService {
     }
     return await this.prisma.order.create({
       data: {
+        identifier: data.identifier,
         product_id: data.product_id,
         user_id: data.user_id,
         item_id: data.item_id,
@@ -344,6 +349,7 @@ export class OrderService {
     const order = await this.prisma.order.findUnique({
       where: { id: id },
       select: {
+        identifier: true,
         user_id: true,
         account_id: true,
         server_id: true,
@@ -396,6 +402,12 @@ export class OrderService {
         order.account_id,
         order.server_id,
       );
+    }
+
+    if (order.identifier.includes('@')) {
+      await this.emailService.sendSuccessMessage(order.identifier);
+    } else {
+      await this.twilioService.sendSuccessSMS(order.identifier);
     }
 
     return await this.prisma.order.update({

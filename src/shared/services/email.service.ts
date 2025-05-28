@@ -313,6 +313,114 @@ export class EmailService {
 
     return code;
   }
+
+  async sendSuccessMessage(toEmail: string) {
+    const transporter = nodemailer.createTransport({
+      host: 'pkz66.hoster.kz',
+      port: 465,
+      secure: true,
+      auth: {
+        user: this.email,
+        pass: this.password,
+      },
+      tls: {
+        rejectUnauthorized: false,
+      },
+    });
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Заказ успешно оформлен / Order Successfully Placed</title>
+      </head>
+      <body style="margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background-color: #f5f5f5; color: #333333;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+          <tr>
+            <td style="padding: 20px 0;">
+              <table role="presentation" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);" width="100%" cellspacing="0" cellpadding="0" border="0">
+
+                <!-- Header -->
+                <tr>
+                  <td style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); padding: 30px 40px; text-align: center;">
+                    <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: bold;">Заказ успешно оформлен / Order Successfully Placed</h1>
+                  </td>
+                </tr>
+
+                <!-- Main Content -->
+                <tr>
+                  <td style="padding: 40px;">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#28a745" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                      </svg>
+                    </div>
+
+                    <p style="font-size: 18px; color: #333333; margin-bottom: 20px; text-align: center;">
+                      <span style="display: block; margin-bottom: 8px; font-weight: bold;">Ваш заказ успешно оформлен!</span>
+                      <span style="display: block; color: #555555;">Your order has been successfully placed!</span>
+                    </p>
+
+                    <p style="font-size: 16px; color: #555555; margin-bottom: 25px; text-align: center;">
+                      <span style="display: block; margin-bottom: 8px;">Спасибо за ваш заказ! Мы начали обработку и скоро свяжемся с вами.</span>
+                      <span style="display: block; color: #777777;">Thank you for your order! We have started processing it and will contact you soon.</span>
+                    </p>
+
+                    <div style="background-color: #f8f8f8; border-radius: 6px; padding: 20px; margin: 30px 0;">
+                      <p style="font-size: 15px; color: #555555; margin: 0;">
+                        <span style="display: block; margin-bottom: 8px;">
+                          Ваш заказ обрабатывается нашей командой. Вы получите дополнительную информацию в ближайшее время.
+                        </span>
+                        <span style="display: block; color: #777777;">
+                          Your order is being processed by our team. You will receive additional information shortly.
+                        </span>
+                      </p>
+                    </div>
+
+                    <p style="font-size: 15px; color: #555555; text-align: center;">
+                      <span style="display: block; margin-bottom: 8px;">
+                        Если у вас возникли вопросы, обращайтесь в нашу службу поддержки.
+                      </span>
+                      <span style="display: block; color: #777777;">
+                        If you have any questions, feel free to contact our support team.
+                      </span>
+                    </p>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="background-color: #f5f5f5; padding: 20px; text-align: center; border-top: 1px solid #eeeeee;">
+                    <p style="font-size: 14px; color: #777777; margin: 0 0 5px;">
+                      &copy; 2025 DON-VIP.COM. Все права защищены / All rights reserved.
+                    </p>
+                    <p style="font-size: 12px; color: #999999; margin: 0;">
+                      <span style="display: block; margin-bottom: 3px;">Это автоматическое письмо. Пожалуйста, не отвечайте на него.</span>
+                      <span style="display: block;">This is an automated email. Please do not reply.</span>
+                    </p>
+                  </td>
+                </tr>
+
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
+    `;
+
+    const mailOptions: nodemailer.SendMailOptions = {
+      from: this.email,
+      to: toEmail,
+      subject: 'Заказ успешно оформлен / Order Successfully Placed',
+      html,
+    };
+
+    await transporter.sendMail(mailOptions);
+  }
+
   async sendPUBGCode(email: string, code: string, expire_time: string) {
     const transporter = nodemailer.createTransport({
       host: 'pkz66.hoster.kz',
