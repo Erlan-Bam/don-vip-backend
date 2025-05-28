@@ -37,14 +37,6 @@ export function IsEmailOrPhone(validationOptions?: ValidationOptions) {
 
 export class RegisterDto {
   @ApiProperty({
-    description: 'Unique user ID',
-    example: 1,
-  })
-  @IsInt()
-  @Type(() => Number)
-  id: number;
-
-  @ApiProperty({
     description: 'Email address or phone number in E.164 format',
     example: 'user@example.com or +77001112233',
   })
