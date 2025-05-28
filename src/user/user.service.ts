@@ -321,14 +321,4 @@ export class UserService {
 
     return await bcrypt.compare(password, hashedPassword);
   }
-
-  async findGuestById(id: number): Promise<User> {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
-    });
-    if (!user || user.identifier) {
-      throw new HttpException('Guest user not found', 404);
-    }
-    return user;
-  }
 }

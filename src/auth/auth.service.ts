@@ -53,10 +53,6 @@ export class AuthService {
       refresh_token: refreshToken,
     };
   }
-  async createGuest() {
-    const user = await this.prisma.user.create({ data: {} as any });
-    return user;
-  }
   async login(data: LoginDto) {
     const user = await this.userService.findByIdentifier(data.identifier);
     if (!user) {

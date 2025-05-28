@@ -41,11 +41,6 @@ export class AuthController {
         : 'https://don-vip.online';
   }
 
-  @Post('guest')
-  async createGuest() {
-    return this.authService.createGuest();
-  }
-
   @Post('login')
   @ApiOperation({ summary: 'Login user with email or phone and password' })
   @ApiBody({ type: LoginDto })
