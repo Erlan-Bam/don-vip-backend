@@ -21,26 +21,17 @@ export class AuthService {
     private twilioService: TwilioService,
   ) {}
   async register(data: RegisterDto) {
-    let user = await this.prisma.user.findUnique({ where: { id: data.id } });
-    if (!user) {
-      user = await this.userService.createUser(data);
-    } else {
-      const code = await this.generateCode();
-      user = await this.userService.updateToUser(
-        data.id,
+    const code = await this.generateCode();
+    const user = await this.userService.createUser(data, code);
+
+    if (data.identifier.includes('@')) {
+      await this.emailService.sendVerificationEmail(
         data.identifier,
-        data.password,
+        data.lang,
         code,
       );
-      if (data.identifier.includes('@')) {
-        await this.emailService.sendVerificationEmail(
-          data.identifier,
-          data.lang,
-          code,
-        );
-      } else {
-        await this.twilioService.sendSMS(data.identifier, code, data.lang);
-      }
+    } else {
+      await this.twilioService.sendSMS(data.identifier, code, data.lang);
     }
 
     const [accessToken, refreshToken] = await Promise.all([

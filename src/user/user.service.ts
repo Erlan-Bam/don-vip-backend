@@ -11,13 +11,14 @@ import { unlink } from 'fs/promises';
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  async createUser(data: RegisterDto) {
+  async createUser(data: RegisterDto, code: string) {
     const bcrypt = await import('bcryptjs');
     const hashedPassword = await bcrypt.hash(data.password, 10);
     return await this.prisma.user.create({
       data: {
         identifier: data.identifier,
         password: hashedPassword,
+        verification_code: code,
       },
     });
   }
