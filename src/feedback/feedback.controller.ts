@@ -55,13 +55,16 @@ export class FeedbackController {
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Update feedback' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateFeedbackDto })
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() data: UpdateFeedbackDto,
+    @Request() request,
   ) {
+    data.user_id = request.user_id;
     return this.feedbackService.update(id, data);
   }
 
