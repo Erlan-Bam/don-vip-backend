@@ -11,9 +11,10 @@ async function main() {
   // Optional: create some seed users
   await prisma.order.create({
     data: {
+      identifier: 'erlanzh.gg@gmail.com',
       user_id: 1, // замените на существующий user.id
       product_id: 1, // замените на существующий product.id
-      item_id: 123,
+      item_id: 0,
       payment: 'tbank',
     },
   });
