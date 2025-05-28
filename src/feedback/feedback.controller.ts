@@ -9,7 +9,7 @@ import {
   Patch,
   UseGuards,
   Query,
-  DefaultValuePipe,
+  Request,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -26,13 +26,16 @@ import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Feedback')
 @Controller('feedback')
+@ApiBearerAuth('JWT')
 export class FeedbackController {
   constructor(private readonly feedbackService: FeedbackService) {}
 
   @Post()
+  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Create feedback' })
   @ApiBody({ description: 'Create feedback data', type: CreateFeedbackDto })
-  async create(@Body() data: CreateFeedbackDto) {
+  async create(@Body() data: CreateFeedbackDto, @Request() request) {
+    data.user_id = request.user.id;
     return this.feedbackService.create(data);
   }
 
