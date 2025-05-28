@@ -304,6 +304,7 @@ export class OrderService {
     } else {
       return order;
     }
+    console.log('order', order, 'replenishment', replenishment);
     const item: ReplenishmentItem = replenishment[order.item_id];
 
     if (order.product.type === 'Bigo') {

@@ -136,7 +136,8 @@ export class PaymentService {
       'CONFIRMED',
     ];
     const [orderIdStr, userId] = data.OrderId.split('_');
-    const orderId = parseInt(orderIdStr);
+    const orderId = parseInt(orderIdStr, 10);
+    console.log('orderId', orderId);
 
     if (data.Status !== 'CONFIRMED') {
       console.log('not success', data.Status);
@@ -155,7 +156,7 @@ export class PaymentService {
         data: {
           price: data.Amount,
           method: 'T-Bank',
-          order_id: orderId as any,
+          order_id: orderId,
           user_id: userId === 'unknown' ? undefined : Number(userId),
           status: data.Status === 'CONFIRMED' ? 'Paid' : 'Cancelled',
         },
