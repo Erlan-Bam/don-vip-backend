@@ -1,8 +1,16 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { IsEmailOrPhone } from 'src/auth/dto/register.dto';
 
 export class CreateOrderDto {
+  @ApiProperty({
+    description: 'Email or phone number in E.164 format',
+    example: 'user@example.com or +77001112233',
+  })
+  @IsEmailOrPhone()
+  identifier: string;
+
   @ApiProperty({
     description: 'ID продукта, который покупается',
     example: 1,
