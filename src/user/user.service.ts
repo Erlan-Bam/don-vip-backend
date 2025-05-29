@@ -64,12 +64,16 @@ export class UserService {
   async resetPassword(data: ResetPasswordDto) {
     const user = await this.prisma.user.findUnique({
       where: { identifier: data.identifier },
+      select: { password: true },
     });
     if (!user) {
       throw new HttpException('User not found', 404);
     }
     const bcrypt = await import('bcryptjs');
-    const isMatch = bcrypt.compare(data.new_password, user.password);
+    const isMatch =
+      (await bcrypt.compare(data.new_password, user.password)) &&
+      user.password !== '';
+    console.log();
     if (isMatch) {
       throw new HttpException('New password must not match old password', 400);
     }
