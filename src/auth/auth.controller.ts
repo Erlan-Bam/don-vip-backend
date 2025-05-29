@@ -90,7 +90,7 @@ export class AuthController {
   @ApiBody({ type: ResendCodeDto })
   @ApiResponse({ status: 200, description: 'Code sent successfully' })
   async resendCode(@Body() data: ResendCodeDto) {
-    return await this.authService.changePassword(data);
+    return await this.authService.resendCode(data);
   }
 
   @ApiOperation({ summary: 'Send password reset email' })
