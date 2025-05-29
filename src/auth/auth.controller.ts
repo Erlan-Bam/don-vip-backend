@@ -25,6 +25,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { ResendCodeDto } from './dto/resend-code.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -82,6 +83,14 @@ export class AuthController {
       body.token,
     );
     return { access_token: newAccessToken };
+  }
+
+  @Post('resend-code')
+  @ApiOperation({ summary: 'Resend code' })
+  @ApiBody({ type: ResendCodeDto })
+  @ApiResponse({ status: 200, description: 'Code sent successfully' })
+  async resendCode(@Body() data: ResendCodeDto) {
+    return await this.authService.changePassword(data);
   }
 
   @ApiOperation({ summary: 'Send password reset email' })

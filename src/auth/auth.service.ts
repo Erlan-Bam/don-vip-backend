@@ -9,6 +9,7 @@ import { PrismaService } from 'src/shared/services/prisma.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { EmailService } from 'src/shared/services/email.service';
 import { TwilioService } from 'src/shared/services/twilio.service';
+import { ResendCodeDto } from './dto/resend-code.dto';
 
 @Injectable()
 export class AuthService {
@@ -92,6 +93,31 @@ export class AuthService {
       refresh_token: refreshToken,
     };
   }
+  async resendCode(data: ResendCodeDto) {
+    const user = await this.prisma.user.findUnique({
+      where: { identifier: data.identifier },
+    });
+
+    if (!user) {
+      throw new HttpException('User not found', 404);
+    }
+
+    if (data.identifier.includes('@')) {
+      await this.emailService.sendVerificationEmail(
+        data.identifier,
+        data.lang,
+        user.verification_code,
+      );
+    } else {
+      await this.twilioService.sendSMS(
+        data.identifier,
+        user.verification_code,
+        data.lang,
+      );
+    }
+
+    return { message: 'Code sent successfully' };
+  }
   async changePassword(data: ChangePasswordDto) {
     const user = await this.userService.findByIdentifier(data.identifier);
 
@@ -147,8 +173,7 @@ export class AuthService {
     );
   }
   async generateCode() {
-    const chars =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const chars = '0123456789';
     let code = '';
     for (let i = 0; i < 5; i++) {
       const randomIndex = Math.floor(Math.random() * chars.length);
