@@ -38,6 +38,7 @@ model User {
   last_name         String?
   gender            String?
   birth_date        String?
+  email             String?       @unique
   phone             String?       @unique
   avatar            String?
   role              Role          @default(User)

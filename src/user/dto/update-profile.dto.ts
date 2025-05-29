@@ -53,18 +53,18 @@ export class UpdateProfileDto {
   phone: string;
 
   @ApiPropertyOptional({
-    description: 'User email (used as identifier)',
-    example: 'mail@gmail.com',
-  })
-  @IsOptional()
-  @IsEmail()
-  identifier: string;
-
-  @ApiPropertyOptional({
     type: 'string',
     format: 'binary',
     description: 'Avatar image file (PNG, JPG, WEBP)',
   })
   @IsOptional()
   avatar: string;
+
+  @ApiPropertyOptional({
+    description: 'User email (used as identifier)',
+    example: 'mail@gmail.com',
+  })
+  @IsOptional()
+  @IsEmail()
+  email: string;
 }

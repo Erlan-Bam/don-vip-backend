@@ -162,6 +162,31 @@ export class UserService {
       where: { id: data.id },
     });
 
+    if (data.email) {
+      const exist = await this.prisma.user.findUnique({
+        where: { email: data.email },
+        select: {
+          id: true,
+          email: true,
+        },
+      });
+      if (exist && exist.id !== data.id) {
+        throw new HttpException('User with this email already exists', 400);
+      }
+    }
+    if (data.phone) {
+      const exist = await this.prisma.user.findUnique({
+        where: { phone: data.phone },
+        select: {
+          id: true,
+          phone: true,
+        },
+      });
+      if (exist && exist.id !== data.id) {
+        throw new HttpException('User with this email already exists', 400);
+      }
+    }
+
     if (!user) {
       throw new HttpException('User not found', 404);
     }
@@ -201,7 +226,7 @@ export class UserService {
         gender: data.gender,
         phone: data.phone,
         birth_date: formattedBirthDate,
-        identifier: data.identifier,
+        email: data.email,
       },
     });
   }
