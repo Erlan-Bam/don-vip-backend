@@ -183,7 +183,7 @@ export class UserService {
         },
       });
       if (exist && exist.id !== data.id) {
-        throw new HttpException('User with this email already exists', 400);
+        throw new HttpException('User with this phone already exists', 400);
       }
     }
 
