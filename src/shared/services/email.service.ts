@@ -484,7 +484,7 @@ export class EmailService {
                   </div>
 
                   <div style="text-align: center; margin: 30px 0;">
-                    <a href="https://www.midasbuy.com/" target="_blank" style="display: inline-block; background-color: #1c34ff; color: #ffffff; text-decoration: none; font-weight: bold; padding: 14px 30px; border-radius: 50px; font-size: 16px;">
+                    <a href="https://www.midasbuy.com/midasbuy/ae/redeem/pubgm" target="_blank" style="display: inline-block; background-color: #1c34ff; color: #ffffff; text-decoration: none; font-weight: bold; padding: 14px 30px; border-radius: 50px; font-size: 16px;">
                       Активировать / Redeem Now
                     </a>
                   </div>
