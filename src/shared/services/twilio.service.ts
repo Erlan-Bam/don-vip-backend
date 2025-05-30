@@ -24,42 +24,52 @@ export class TwilioService {
 
   async sendSMS(to: string, code: string, lang: 'ru' | 'en'): Promise<void> {
     try {
+      const body =
+        lang === 'en'
+          ? `Your verification code is: ${code}\n\nThis message was sent by DON-VIP.`
+          : `Ваш код подтверждения: ${code}\n\nСообщение отправлено от имени DON-VIP.`;
+
       await this.twilioClient.messages.create({
-        body:
-          lang === 'en'
-            ? `Your verification code: ${code}`
-            : `Ваш код для верификации: ${code}`,
+        body,
         from: this.phoneNumber,
-        to: to,
+        to,
       });
     } catch (error) {
       throw new HttpException('Something went wrong', 500);
     }
   }
+
   async sendChangePasswordSMS(
     to: string,
     link: string,
     lang: 'ru' | 'en',
   ): Promise<void> {
     try {
+      const body =
+        lang === 'en'
+          ? `To reset your password, please follow this link:\n${link}\n\nProvided by DON-VIP.`
+          : `Чтобы изменить пароль, перейдите по ссылке:\n${link}\n\nПредоставлено DON-VIP.`;
+
       await this.twilioClient.messages.create({
-        body:
-          lang === 'en'
-            ? `Your link to reset password: ${link}`
-            : `Ваша ссылка для изменения пароля: ${link}`,
+        body,
         from: this.phoneNumber,
-        to: to,
+        to,
       });
     } catch (error) {
       throw new HttpException('Something went wrong', 500);
     }
   }
+
   async sendSuccessSMS(to: string): Promise<void> {
     try {
+      const body =
+        `Thank you for your purchase!\nWe appreciate your trust.\n\n— DON-VIP\n\n` +
+        `Благодарим за покупку!\nС уважением, команда DON-VIP.`;
+
       await this.twilioClient.messages.create({
-        body: 'Спасибо за покупку! / Thank you for your purchase!',
+        body,
         from: this.phoneNumber,
-        to: to,
+        to,
       });
     } catch (error) {
       throw new HttpException('Something went wrong', 500);
