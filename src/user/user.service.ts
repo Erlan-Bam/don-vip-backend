@@ -6,6 +6,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { join } from 'path';
 import { unlink } from 'fs/promises';
+import { last } from 'rxjs';
 
 @Injectable()
 export class UserService {
@@ -300,6 +301,8 @@ export class UserService {
       return {
         id: user.id,
         avatar: user.avatar,
+        first_name: user.first_name,
+        last_name: user.last_name,
         role: user.role,
         identifier: user.identifier,
         phone: user.phone,
