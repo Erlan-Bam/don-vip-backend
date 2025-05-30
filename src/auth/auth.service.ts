@@ -22,6 +22,13 @@ export class AuthService {
     private twilioService: TwilioService,
   ) {}
   async register(data: RegisterDto) {
+    const exist = await this.prisma.user.findUnique({
+      where: { identifier: data.identifier },
+    });
+    if (exist) {
+      throw new HttpException('User with this email already exists', 400);
+    }
+
     const code = await this.generateCode();
     const user = await this.userService.createUser(data, code);
 
