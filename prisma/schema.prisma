@@ -128,8 +128,8 @@ model Feedback {
   isVerified  Boolean  @default(false)
   user_id     Int
 
-  product     Product  @relation(fields: [product_id], references: [id])
-  user        User     @relation(fields: [user_id], references: [id])
+  product     Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model Order {
