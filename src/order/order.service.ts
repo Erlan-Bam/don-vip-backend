@@ -391,7 +391,6 @@ export class OrderService {
         playerId: order.account_id,
         diamonds: replenishment.amount,
         price: payment ? `${payment.price.toFixed(0)}₽` : '—',
-        // Вот магия: если order.server_id определён, добавляем ключ serverId
         ...(order.server_id !== undefined && { serverId: order.server_id }),
       };
     });
