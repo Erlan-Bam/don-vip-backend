@@ -349,7 +349,6 @@ export class OrderService {
       this.prisma.order.findMany({
         where: {
           user_id: userId,
-          status: 'Paid',
         },
         skip,
         take: limit,
@@ -373,7 +372,6 @@ export class OrderService {
       this.prisma.order.count({
         where: {
           user_id: userId,
-          status: 'Paid',
         },
       }),
     ]);
