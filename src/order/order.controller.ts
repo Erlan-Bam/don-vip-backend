@@ -9,7 +9,6 @@ import {
   ParseIntPipe,
   UseGuards,
   Request,
-  HttpException,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -42,15 +41,10 @@ export class OrderController {
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
   @ApiQuery({ name: 'search', required: false, type: String, example: '7999' }) // 👈 Add this
   async getAllForAdmin(
-    @Request() req,
     @Query('page', ParseIntPipe) page = 1,
     @Query('limit', ParseIntPipe) limit = 10,
     @Query('search') search?: string, // 👈 Accept search param
   ) {
-    if (req.user.role !== 'Admin') {
-      throw new HttpException('Forbidden', 403);
-    }
-
     return this.orderService.getAllForAdmin(page, limit, search);
   }
 
@@ -89,10 +83,7 @@ export class OrderController {
   @ApiBearerAuth('JWT')
   @UseGuards(AuthGuard('jwt'), AdminGuard)
   @ApiOperation({ summary: 'Get analytics for admin' })
-  async getAnalytics(@Request() req) {
-    if (req.user.role !== 'Admin') {
-      throw new HttpException('Forbidden', 403);
-    }
+  async getAnalytics() {
     return this.orderService.getAnalytics();
   }
 
@@ -109,11 +100,7 @@ export class OrderController {
   @ApiBearerAuth('JWT')
   @UseGuards(AuthGuard('jwt'), AdminGuard)
   @ApiOperation({ summary: 'Ежемесячные продажи за текущий год' })
-  async getMonthlySales(@Request() req) {
-    if (req.user.role !== 'Admin') {
-      throw new HttpException('Forbidden', 403);
-    }
-
+  async getMonthlySales() {
     return this.orderService.getMonthlySalesOverview();
   }
 }
