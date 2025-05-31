@@ -388,10 +388,11 @@ export class OrderService {
         gameImage: product.image,
         currencyImage: product.currency_image,
         status: 'success',
-        playerId: order.account_id ?? 'N/A',
-        serverId: order.server_id ?? 'N/A',
+        playerId: order.account_id,
         diamonds: replenishment.amount,
         price: payment ? `${payment.price.toFixed(0)}₽` : '—',
+        // Вот магия: если order.server_id определён, добавляем ключ serverId
+        ...(order.server_id !== undefined && { serverId: order.server_id }),
       };
     });
 
