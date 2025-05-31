@@ -363,7 +363,6 @@ export class OrderService {
           server_id: true,
           product: true,
           payments: {
-            where: { status: 'Paid' },
             orderBy: { created_at: 'desc' },
             take: 1,
           },
