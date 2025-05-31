@@ -22,7 +22,7 @@ export class PaymentService {
   ) {
     const backendURL =
       this.configService.get<string>('NODE_ENV') === 'production'
-        ? 'https://api.don-vip.online/api'
+        ? 'https://api.don-vip.online'
         : 'http://localhost:6001';
     this.backendURL = backendURL;
     const baseURL =
@@ -66,7 +66,7 @@ export class PaymentService {
         content: `Донат на сайте Don Vip на сумму: ${data.amount}`,
         buyer_id: this.merchantId,
         trade_type: 'WEB',
-        return_url: 'https://don-vip.online/ru/payment/success',
+        return_url: 'https://don-vip.online/payment/success',
         version: '2.0',
       },
       {
