@@ -26,7 +26,7 @@ export class AuthService {
       where: { identifier: data.identifier },
     });
     if (exist) {
-      throw new HttpException('User with this email already exists', 400);
+      throw new HttpException('User with this email already exists', 409);
     }
 
     const code = await this.generateCode();
