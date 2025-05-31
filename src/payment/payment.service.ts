@@ -22,7 +22,7 @@ export class PaymentService {
   ) {
     const backendURL =
       this.configService.get<string>('NODE_ENV') === 'production'
-        ? 'https://don-vip.online/api'
+        ? 'https://api.don-vip.online/api'
         : 'http://localhost:6001';
     this.backendURL = backendURL;
     const baseURL =
