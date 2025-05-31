@@ -76,21 +76,24 @@ export class PaymentService {
         },
       },
     );
-    console.log({
-      app_id: this.appId,
-      method: 'SBP',
-      out_trade_no: `${data.user_id || 'unknown'}:${data.order_id}:${Date.now()}`,
-      notify_url: `${this.backendURL}/api/payment/pagsmile/notification`,
-      timestamp: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
-      subject: 'Don Vip донат',
-      order_amount: data.amount,
-      order_currency: 'RUB',
-      content: `Донат на сайте Don Vip на сумму: ${data.amount}`,
-      buyer_id: this.merchantId,
-      trade_type: 'WEB',
-      return_url: 'https://don-vip.online/payment/success',
-      version: '2.0',
-    });
+    console.log(
+      {
+        app_id: this.appId,
+        method: 'SBP',
+        out_trade_no: `${data.user_id || 'unknown'}:${data.order_id}:${Date.now()}`,
+        notify_url: `${this.backendURL}/api/payment/pagsmile/notification`,
+        timestamp: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
+        subject: 'Don Vip донат',
+        order_amount: data.amount,
+        order_currency: 'RUB',
+        content: `Донат на сайте Don Vip на сумму: ${data.amount}`,
+        buyer_id: this.merchantId,
+        trade_type: 'WEB',
+        return_url: 'https://don-vip.online/payment/success',
+        version: '2.0',
+      },
+      payment.data,
+    );
     return payment.data;
   }
   async pagsmileNotification(
