@@ -362,6 +362,7 @@ export class OrderService {
           account_id: true,
           server_id: true,
           product: true,
+          status: true,
           payments: {
             orderBy: { created_at: 'desc' },
             take: 1,
@@ -389,10 +390,10 @@ export class OrderService {
           order.created_at.toLocaleDateString(),
         gameImage: product.image,
         currencyImage: product.currency_image,
-        status: 'success',
+        status: order.status,
         playerId: order.account_id,
         diamonds: replenishment.amount,
-        price: payment ? `${payment.price.toFixed(0)}₽` : '—',
+        price: `${replenishment[order.item_id].price}₽`,
         ...(order.server_id !== undefined && { serverId: order.server_id }),
       };
     });
