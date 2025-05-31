@@ -356,12 +356,17 @@ export class OrderService {
         orderBy: {
           created_at: 'desc',
         },
-        include: {
-          product: true, // Get full product info
+        select: {
+          id: true,
+          item_id: true,
+          created_at: true,
+          account_id: true,
+          server_id: true,
+          product: true,
           payments: {
             where: { status: 'Paid' },
             orderBy: { created_at: 'desc' },
-            take: 1, // Most recent paid payment
+            take: 1,
           },
         },
       }),
@@ -381,7 +386,7 @@ export class OrderService {
         : JSON.parse(product.replenishment as any)[order.item_id];
 
       return {
-        id: order.item_id,
+        id: order.id,
         date:
           payment?.created_at?.toLocaleDateString() ??
           order.created_at.toLocaleDateString(),
