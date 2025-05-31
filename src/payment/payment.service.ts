@@ -101,18 +101,6 @@ export class PaymentService {
       'REFUSE_FAILED',
     ];
 
-    if (data.trade_status !== 'SUCCESS') {
-      console.log('not success', data.trade_status);
-      return 'success';
-    }
-
-    const order = await this.orderService.finishOrder(orderId);
-
-    if (!order) {
-      console.log('INVALID! ORDER ID NOT FOUND');
-      return 'success';
-    }
-
     if (data.trade_status && allowedStatus.includes(data.trade_status)) {
       await this.prisma.payment.create({
         data: {
@@ -125,9 +113,24 @@ export class PaymentService {
       });
     }
 
+    if (data.trade_status !== 'SUCCESS') {
+      console.log('not success', data.trade_status);
+      return 'success';
+    }
+
+    const order = await this.orderService.finishOrder(orderId);
+
+    if (!order) {
+      console.log('INVALID! ORDER ID NOT FOUND');
+      return 'success';
+    }
+
     return 'success';
   }
   async tbankWebhook(data: TBankWebhookDto, res: Response) {
+    const [orderIdStr, userId] = data.OrderId.split('_');
+    const orderId = parseInt(orderIdStr, 10);
+
     const allowedStatus = [
       'IN_PROGRESS',
       'EXECUTED',
@@ -135,21 +138,6 @@ export class PaymentService {
       'CANCELLED',
       'CONFIRMED',
     ];
-    const [orderIdStr, userId] = data.OrderId.split('_');
-    const orderId = parseInt(orderIdStr, 10);
-    console.log('orderId', orderId);
-
-    if (data.Status !== 'CONFIRMED') {
-      console.log('not success', data.Status);
-      return res.json({ message: 'ok' }).status(200);
-    }
-
-    const order = await this.orderService.finishOrder(orderId);
-
-    if (!order) {
-      console.log('INVALID! ORDER ID NOT FOUND');
-      return res.json({ message: 'ok' }).status(200);
-    }
 
     if (data.Status && allowedStatus.includes(data.Status)) {
       await this.prisma.payment.create({
@@ -161,6 +149,17 @@ export class PaymentService {
           status: data.Status === 'CONFIRMED' ? 'Paid' : 'Cancelled',
         },
       });
+    }
+
+    if (data.Status !== 'CONFIRMED') {
+      return res.json({ message: 'ok' }).status(200);
+    }
+
+    const order = await this.orderService.finishOrder(orderId);
+
+    if (!order) {
+      console.log('INVALID! ORDER ID NOT FOUND');
+      return res.json({ message: 'ok' }).status(200);
     }
 
     return res.json({ message: 'ok' }).status(200);
