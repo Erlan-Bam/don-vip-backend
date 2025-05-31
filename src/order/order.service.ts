@@ -393,8 +393,9 @@ export class OrderService {
         status: order.status,
         playerId: order.account_id,
         diamonds: replenishment.amount,
-        price: `${replenishment.price}₽`,
+        price: `${replenishment.price * 100}₽`,
         ...(order.server_id !== undefined && { serverId: order.server_id }),
+        payment: payment,
       };
     });
 
