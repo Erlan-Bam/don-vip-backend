@@ -375,22 +375,19 @@ export class OrderService {
 
     const formattedData = orders.map((order) => {
       const product = order.product;
-      const payment = order.payments[0]; // Get the first (most recent) paid payment
+      const payment = order.payments[0];
       const replenishment = Array.isArray(product.replenishment)
-        ? product.replenishment[0]
-        : JSON.parse(product.replenishment as any)[0];
+        ? product.replenishment[order.item_id]
+        : JSON.parse(product.replenishment as any)[order.item_id];
 
       return {
         id: order.item_id,
         date:
           payment?.created_at?.toLocaleDateString() ??
           order.created_at.toLocaleDateString(),
-        time:
-          payment?.created_at?.toLocaleTimeString() ??
-          order.created_at.toLocaleTimeString(),
         gameImage: product.image,
-        currencyImage: product.currency_image ?? '/diamond.png',
-        status: 'success', // or map from order.status
+        currencyImage: product.currency_image,
+        status: 'success',
         playerId: order.account_id ?? 'N/A',
         serverId: order.server_id ?? 'N/A',
         diamonds: replenishment.amount,
