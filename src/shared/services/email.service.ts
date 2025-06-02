@@ -314,7 +314,6 @@ export class EmailService {
   }
 
   async sendSuccessMessage(toEmail: string) {
-    console.log('Sending success message to:', toEmail);
     const transporter = nodemailer.createTransport({
       host: 'pkz66.hoster.kz',
       port: 465,
@@ -367,7 +366,7 @@ export class EmailService {
                       <h2 style="font-size: 22px; color: #28a745; margin: 0 0 15px 0; font-weight: bold;">
                         Спасибо за ваш заказ!
                       </h2>
-                      <h3 style="font-size: 20px; color: #20c997; margin: 0 0 20px 0; font-weight: bold;">
+                      <h3 style="font-size: 20px; color: #28a745; margin: 0 0 20px 0; font-weight: bold;">
                         Thank you for your order!
                       </h3>
                     </div>
@@ -437,8 +436,7 @@ export class EmailService {
       html: html,
     };
 
-    const result = await transporter.sendMail(mailOptions);
-    console.log('Email sent successfully:', result);
+    await transporter.sendMail(mailOptions);
   }
 
   async sendPUBGCode(email: string, code: string, expire_time: string) {
