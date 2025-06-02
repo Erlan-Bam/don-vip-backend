@@ -40,7 +40,7 @@ export class EmailService {
                 <tr>
                   <td align="center" style="padding: 30px 30px 20px; border-bottom: 1px solid #eee;">
                     <h1 style="margin: 0; font-size: 18px; color: #333; font-weight: bold;">DON-VIP.COM</h1>
-                    <p style="margin: 0; font-size: 12px; color: #0066ff;">Деньги - это просто!</p>
+                    <p style="margin: 0; font-size: 12px; color: #0066ff;">Донат - это просто!</p>
                   </td>
                 </tr>
                 <tr>
