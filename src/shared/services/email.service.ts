@@ -315,7 +315,7 @@ export class EmailService {
   }
 
   async sendSuccessMessage(toEmail: string) {
-    const transporter = nodemailer.createTransport({
+    const transporter = nodemailer.createTransporter({
       host: 'pkz66.hoster.kz',
       port: 465,
       secure: true,
@@ -341,14 +341,17 @@ export class EmailService {
           <tr>
             <td style="padding: 20px 0;">
               <table role="presentation" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);" width="100%" cellspacing="0" cellpadding="0" border="0">
-
+  
                 <!-- Header -->
                 <tr>
                   <td style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); padding: 30px 40px; text-align: center;">
-                    <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: bold;">Заказ успешно оформлен / Order Successfully Placed</h1>
+                    <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: bold; line-height: 1.2;">
+                      Заказ успешно оформлен<br>
+                      <span style="font-size: 24px; font-weight: normal;">Order Successfully Placed</span>
+                    </h1>
                   </td>
                 </tr>
-
+  
                 <!-- Main Content -->
                 <tr>
                   <td style="padding: 40px;">
@@ -358,51 +361,67 @@ export class EmailService {
                         <polyline points="22 4 12 14.01 9 11.01"></polyline>
                       </svg>
                     </div>
-
-                    <p style="font-size: 18px; color: #333333; margin-bottom: 20px; text-align: center;">
-                      <span style="display: block; margin-bottom: 8px; font-weight: bold;">Ваш заказ успешно оформлен!</span>
-                      <span style="display: block; color: #555555;">Your order has been successfully placed!</span>
-                    </p>
-
-                    <p style="font-size: 16px; color: #555555; margin-bottom: 25px; text-align: center;">
-                      <span style="display: block; margin-bottom: 8px;">Спасибо за ваш заказ! Мы начали обработку и скоро свяжемся с вами.</span>
-                      <span style="display: block; color: #777777;">Thank you for your order! We have started processing it and will contact you soon.</span>
-                    </p>
-
-                    <div style="background-color: #f8f8f8; border-radius: 6px; padding: 20px; margin: 30px 0;">
-                      <p style="font-size: 15px; color: #555555; margin: 0;">
-                        <span style="display: block; margin-bottom: 8px;">
-                          Ваш заказ обрабатывается нашей командой. Вы получите дополнительную информацию в ближайшее время.
-                        </span>
-                        <span style="display: block; color: #777777;">
-                          Your order is being processed by our team. You will receive additional information shortly.
-                        </span>
+  
+                    <!-- Success Message -->
+                    <div style="text-align: center; margin-bottom: 30px;">
+                      <h2 style="font-size: 22px; color: #28a745; margin: 0 0 15px 0; font-weight: bold;">
+                        Спасибо за ваш заказ!
+                      </h2>
+                      <h3 style="font-size: 20px; color: #20c997; margin: 0 0 20px 0; font-weight: bold;">
+                        Thank you for your order!
+                      </h3>
+                    </div>
+  
+                    <!-- Payment Confirmation -->
+                    <div style="background-color: #f8f9fa; border-left: 4px solid #28a745; border-radius: 6px; padding: 20px; margin: 30px 0;">
+                      <p style="font-size: 16px; color: #333333; margin: 0 0 10px 0; font-weight: 600;">
+                        ✅ Ваш платеж успешно обработан
+                      </p>
+                      <p style="font-size: 16px; color: #333333; margin: 0; font-weight: 600;">
+                        ✅ Your payment has been successfully processed
                       </p>
                     </div>
-
-                    <p style="font-size: 15px; color: #555555; text-align: center;">
-                      <span style="display: block; margin-bottom: 8px;">
+  
+                    <!-- Order Details -->
+                    <div style="background-color: #ffffff; border: 1px solid #e9ecef; border-radius: 6px; padding: 25px; margin: 25px 0;">
+                      <p style="font-size: 16px; color: #333333; margin: 0 0 15px 0; line-height: 1.5;">
+                        <strong>Ваш заказ подтвержден и готов к использованию.</strong><br>
+                        Все необходимые данные и инструкции отправлены на ваш email.
+                      </p>
+                      <p style="font-size: 16px; color: #333333; margin: 0; line-height: 1.5;">
+                        <strong>Your order is confirmed and ready to use.</strong><br>
+                        All necessary data and instructions have been sent to your email.
+                      </p>
+                    </div>
+  
+                    <!-- Support Information -->
+                    <div style="text-align: center; margin-top: 30px;">
+                      <p style="font-size: 15px; color: #666666; margin: 0 0 10px 0; line-height: 1.4;">
                         Если у вас возникли вопросы, обращайтесь в нашу службу поддержки.
-                      </span>
-                      <span style="display: block; color: #777777;">
+                      </p>
+                      <p style="font-size: 15px; color: #666666; margin: 0; line-height: 1.4;">
                         If you have any questions, feel free to contact our support team.
-                      </span>
-                    </p>
+                      </p>
+                    </div>
                   </td>
                 </tr>
-
+  
+                <!-- Footer -->
                 <tr>
-                  <td style="background-color: #f5f5f5; padding: 20px; text-align: center; border-top: 1px solid #eeeeee;">
-                    <p style="font-size: 14px; color: #777777; margin: 0 0 5px;">
-                      &copy; 2025 DON-VIP.COM. Все права защищены / All rights reserved.
+                  <td style="background-color: #f8f9fa; padding: 25px; text-align: center; border-top: 1px solid #e9ecef;">
+                    <p style="font-size: 14px; color: #666666; margin: 0 0 8px 0; line-height: 1.4;">
+                      &copy; 2025 DON-VIP.COM
                     </p>
-                    <p style="font-size: 12px; color: #999999; margin: 0;">
-                      <span style="display: block; margin-bottom: 3px;">Это автоматическое письмо. Пожалуйста, не отвечайте на него.</span>
-                      <span style="display: block;">This is an automated email. Please do not reply.</span>
+                    <p style="font-size: 14px; color: #666666; margin: 0 0 15px 0; line-height: 1.4;">
+                      Все права защищены / All rights reserved
+                    </p>
+                    <p style="font-size: 12px; color: #999999; margin: 0; line-height: 1.3;">
+                      Это автоматическое письмо. Пожалуйста, не отвечайте на него.<br>
+                      This is an automated email. Please do not reply.
                     </p>
                   </td>
                 </tr>
-
+  
               </table>
             </td>
           </tr>
