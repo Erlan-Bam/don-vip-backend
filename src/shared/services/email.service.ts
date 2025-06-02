@@ -434,7 +434,7 @@ export class EmailService {
       from: this.email,
       to: toEmail,
       subject: 'Заказ успешно оформлен / Order Successfully Placed',
-      html,
+      html: html,
     };
 
     await transporter.sendMail(mailOptions);

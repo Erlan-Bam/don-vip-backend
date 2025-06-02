@@ -348,16 +348,18 @@ export class OrderService {
       }
     }
 
+    await this.prisma.order.update({
+      where: { id: id },
+      data: { status: 'Paid', response: JSON.stringify(response) },
+    });
+
     if (order.identifier.includes('@')) {
       await this.emailService.sendSuccessMessage(order.identifier);
     } else {
       await this.twilioService.sendSuccessSMS(order.identifier);
     }
 
-    return await this.prisma.order.update({
-      where: { id: id },
-      data: { status: 'Paid', response: JSON.stringify(response) },
-    });
+    return { status: 'success', message: 'Order finished successfully' };
   }
 
   async getHistory(userId: number, page: number, limit: number) {
