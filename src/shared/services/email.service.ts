@@ -155,8 +155,7 @@ export class EmailService {
       html: emailTemplate,
     };
 
-    const result = await transporter.sendMail(mailOptions);
-    console.log('worked', result);
+    await transporter.sendMail(mailOptions);
   }
   async sendVerificationEmail(
     email: string,
@@ -315,6 +314,7 @@ export class EmailService {
   }
 
   async sendSuccessMessage(toEmail: string) {
+    console.log('Sending success message to:', toEmail);
     const transporter = nodemailer.createTransporter({
       host: 'pkz66.hoster.kz',
       port: 465,
@@ -437,7 +437,8 @@ export class EmailService {
       html: html,
     };
 
-    await transporter.sendMail(mailOptions);
+    const result = await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully:', result);
   }
 
   async sendPUBGCode(email: string, code: string, expire_time: string) {
