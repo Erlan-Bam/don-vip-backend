@@ -315,7 +315,7 @@ export class EmailService {
 
   async sendSuccessMessage(toEmail: string) {
     console.log('Sending success message to:', toEmail);
-    const transporter = nodemailer.createTransporter({
+    const transporter = nodemailer.createTransport({
       host: 'pkz66.hoster.kz',
       port: 465,
       secure: true,
