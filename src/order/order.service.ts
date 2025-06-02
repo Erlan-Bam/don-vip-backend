@@ -295,6 +295,10 @@ export class OrderService {
     }
 
     let replenishment: ReplenishmentItem[] = [];
+    let response: {
+      type: string;
+      message: string;
+    };
 
     if (typeof order.product.replenishment === 'string') {
       replenishment = JSON.parse(order.product.replenishment);
@@ -314,6 +318,10 @@ export class OrderService {
         value: item.amount,
         totalCost: item.price,
       });
+      response = {
+        type: 'bigo',
+        message: result.message,
+      };
       if (result.message !== 'ok') {
         await this.smileService.sendBigo(
           order.account_id,
@@ -321,12 +329,23 @@ export class OrderService {
         );
       }
     } else {
-      await this.smileService.sendOrder(
+      const result = await this.smileService.sendOrder(
         order.product.smile_api_game,
         item.sku,
         order.account_id,
         order.server_id,
       );
+      if (result.status === 'success') {
+        response = {
+          type: 'smile',
+          message: 'success',
+        };
+      } else {
+        response = {
+          type: 'smile',
+          message: result.error,
+        };
+      }
     }
 
     if (order.identifier.includes('@')) {
@@ -337,7 +356,7 @@ export class OrderService {
 
     return await this.prisma.order.update({
       where: { id: id },
-      data: { status: 'Paid' },
+      data: { status: 'Paid', response: JSON.stringify(response) },
     });
   }
 

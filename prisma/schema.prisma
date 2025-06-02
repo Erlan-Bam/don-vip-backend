@@ -144,6 +144,7 @@ model Order {
   server_id    String?
   created_at   DateTime       @default(now())
   updated_at   DateTime       @updatedAt @default(now())
+  response     Json?
 
   coupon_id    Int?
   coupon       Coupon?        @relation(fields: [coupon_id], references: [id])
