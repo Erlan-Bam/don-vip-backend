@@ -25,13 +25,12 @@ export class UnimatrixService {
           ? `Your verification code is: ${code}`
           : `Ваш код подтверждения: ${code}`;
 
-      await this.client.messages.send({
-        text: text,
+      await this.client.otp.send({
+        digits: 5,
         to: to,
         templateId: lang === 'en' ? 'pub_otp_en_basic2' : 'pub_otp_ru',
-        templateData: {
-          code: code,
-        },
+        channel: 'sms',
+        code: code,
         // signature: 'DON-VIP',
       });
     } catch (error) {
