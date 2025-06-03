@@ -420,6 +420,11 @@ export class OrderService {
         price: `${replenishment.price}₽`,
         ...(order.server_id !== undefined && { serverId: order.server_id }),
         payment: payment,
+        product: {
+          id: product.id,
+          name: product.name,
+          type: product.type,
+        },
       };
     });
 
