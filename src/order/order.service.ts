@@ -383,12 +383,21 @@ export class OrderService {
           created_at: true,
           account_id: true,
           server_id: true,
-          product: true,
           response: true,
           status: true,
           payments: {
             orderBy: { created_at: 'desc' },
             take: 1,
+          },
+          product: {
+            select: {
+              id: true,
+              name: true,
+              type: true,
+              image: true,
+              currency_image: true,
+              replenishment: true,
+            },
           },
         },
       }),
