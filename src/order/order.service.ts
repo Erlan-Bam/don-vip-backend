@@ -149,6 +149,14 @@ export class OrderService {
           ? `${(payment.price.toNumber() / 100).toFixed(2)}₽`
           : '—',
         method: payment?.method ?? '—',
+        product: {
+          id: product.id,
+          name: product.name,
+          type: product.type,
+          image: product.image,
+          currencyImage: product.currency_image,
+          replenishment: product.replenishment,
+        },
       };
     });
 
