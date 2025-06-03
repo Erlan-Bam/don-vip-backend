@@ -133,7 +133,7 @@ export class EmailService {
       </html>
     `;
     const transporter = nodemailer.createTransport({
-      host: 'pkz66.hoster.kz',
+      host: 'mail.don-vip.online',
       port: 465,
       secure: true,
       auth: {
@@ -163,7 +163,7 @@ export class EmailService {
     code: string,
   ) {
     const transporter = nodemailer.createTransport({
-      host: 'pkz66.hoster.kz',
+      host: 'mail.don-vip.online',
       port: 465,
       secure: true,
       auth: {
@@ -308,14 +308,15 @@ export class EmailService {
       html: emailTemplate,
     };
 
-    await transporter.sendMail(mailOptions);
+    const result = await transporter.sendMail(mailOptions);
+    console.log(result);
 
     return code;
   }
 
   async sendSuccessMessage(toEmail: string) {
     const transporter = nodemailer.createTransport({
-      host: 'pkz66.hoster.kz',
+      host: 'mail.don-vip.online',
       port: 465,
       secure: true,
       auth: {
@@ -441,7 +442,7 @@ export class EmailService {
 
   async sendPUBGCode(email: string, code: string, expire_time: string) {
     const transporter = nodemailer.createTransport({
-      host: 'pkz66.hoster.kz',
+      host: 'mail.don-vip.online',
       port: 465,
       secure: true,
       auth: {
