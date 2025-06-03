@@ -421,6 +421,7 @@ export class OrderService {
           payment?.created_at?.toLocaleDateString() ??
           order.created_at.toLocaleDateString(),
         gameImage: product.image,
+        productName: product.name,
         currencyImage: product.currency_image,
         status: order.status,
         playerId: order.account_id,
