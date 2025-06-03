@@ -382,6 +382,7 @@ export class OrderService {
           account_id: true,
           server_id: true,
           product: true,
+          response: true,
           status: true,
           payments: {
             orderBy: { created_at: 'desc' },
@@ -413,6 +414,7 @@ export class OrderService {
         status: order.status,
         playerId: order.account_id,
         diamonds: replenishment.amount,
+        response: order.response,
         price: `${replenishment.price}₽`,
         ...(order.server_id !== undefined && { serverId: order.server_id }),
         payment: payment,
