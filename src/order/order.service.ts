@@ -7,6 +7,7 @@ import { SmileService } from 'src/shared/services/smile.service';
 import { subYears, startOfYear } from 'date-fns';
 import { EmailService } from 'src/shared/services/email.service';
 import { UnimatrixService } from 'src/shared/services/unimatrix.service';
+import { response } from 'express';
 
 @Injectable()
 export class OrderService {
@@ -143,6 +144,7 @@ export class OrderService {
         playerId: order.account_id ?? 'N/A',
         serverId: order.server_id ?? 'N/A',
         diamonds: replenishment.amount,
+        response: order.response ?? '—',
         price: payment
           ? `${(payment.price.toNumber() / 100).toFixed(2)}₽`
           : '—',
