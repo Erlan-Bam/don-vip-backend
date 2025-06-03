@@ -1,0 +1,75 @@
+import { HttpException, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { UniClient } from 'uni-sdk';
+
+@Injectable()
+export class UnimatrixService {
+  private client: UniClient;
+
+  constructor(private configService: ConfigService) {
+    const [accessKeyId] = [
+      this.configService.get<string>('UNIMTX_ACCESS_KEY_ID'),
+    ];
+    if (!accessKeyId) {
+      throw new Error('MISSING UNIMTX_ACCESS_KEY_ID IN ENVIRONMENT VARIABLES');
+    }
+    this.client = new UniClient({
+      accessKeyId: accessKeyId,
+    });
+  }
+
+  async sendSMS(to: string, code: string, lang: 'ru' | 'en'): Promise<void> {
+    try {
+      const text =
+        lang === 'en'
+          ? `Your verification code is: ${code}`
+          : `Ваш код подтверждения: ${code}`;
+      console.log('Sending SMS:', text, 'to:', to);
+
+      const result = await this.client.messages.send({
+        text: text,
+        to: to,
+        // signature: 'DON-VIP',
+      });
+    } catch (error) {
+      console.log(error);
+      throw new HttpException('Something went wrong', 500);
+    }
+  }
+
+  async sendChangePasswordSMS(
+    to: string,
+    link: string,
+    lang: 'ru' | 'en',
+  ): Promise<void> {
+    try {
+      const text =
+        lang === 'en'
+          ? `To reset your password, please follow this link:\n${link}`
+          : `Чтобы изменить пароль, перейдите по ссылке:\n${link}`;
+
+      await this.client.messages.send({
+        text: text,
+        to: to,
+        // signature: 'DON-VIP',
+      });
+    } catch (error) {
+      throw new HttpException('Something went wrong', 500);
+    }
+  }
+
+  async sendSuccessSMS(to: string): Promise<void> {
+    try {
+      const text =
+        `Thank you for your purchase!\n` + `Благодарим за покупку!\n`;
+
+      await this.client.messages.send({
+        text: text,
+        to: to,
+        // signature: 'DON-VIP',
+      });
+    } catch (error) {
+      throw new HttpException('Something went wrong', 500);
+    }
+  }
+}

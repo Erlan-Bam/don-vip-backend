@@ -8,7 +8,7 @@ import { LoginDto } from './dto/login.dto';
 import { PrismaService } from 'src/shared/services/prisma.service';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { EmailService } from 'src/shared/services/email.service';
-import { TwilioService } from 'src/shared/services/twilio.service';
+import { UnimatrixService } from 'src/shared/services/unimatrix.service';
 import { ResendCodeDto } from './dto/resend-code.dto';
 
 @Injectable()
@@ -19,7 +19,7 @@ export class AuthService {
     private jwtService: JwtService,
     private emailService: EmailService,
     private configService: ConfigService,
-    private twilioService: TwilioService,
+    private unimatrixService: UnimatrixService,
   ) {}
   async register(data: RegisterDto) {
     const exist = await this.prisma.user.findUnique({
@@ -39,7 +39,7 @@ export class AuthService {
         code,
       );
     } else {
-      await this.twilioService.sendSMS(data.identifier, code, data.lang);
+      await this.unimatrixService.sendSMS(data.identifier, code, data.lang);
     }
 
     const [accessToken, refreshToken] = await Promise.all([
@@ -116,7 +116,7 @@ export class AuthService {
         user.verification_code,
       );
     } else {
-      await this.twilioService.sendSMS(
+      await this.unimatrixService.sendSMS(
         data.identifier,
         user.verification_code,
         data.lang,
@@ -142,7 +142,7 @@ export class AuthService {
         data.lang,
       );
     } else {
-      await this.twilioService.sendChangePasswordSMS(
+      await this.unimatrixService.sendChangePasswordSMS(
         data.identifier,
         resetLink,
         data.lang,

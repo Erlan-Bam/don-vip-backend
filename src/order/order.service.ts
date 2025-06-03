@@ -6,7 +6,7 @@ import { ReplenishmentItem } from 'src/product/dto/create-product.dto';
 import { SmileService } from 'src/shared/services/smile.service';
 import { subYears, startOfYear } from 'date-fns';
 import { EmailService } from 'src/shared/services/email.service';
-import { TwilioService } from 'src/shared/services/twilio.service';
+import { UnimatrixService } from 'src/shared/services/unimatrix.service';
 
 @Injectable()
 export class OrderService {
@@ -15,7 +15,7 @@ export class OrderService {
     private bigoService: BigoService,
     private smileService: SmileService,
     private emailService: EmailService,
-    private twilioService: TwilioService,
+    private unimatrixService: UnimatrixService,
   ) {}
 
   async create(data: CreateOrderDto) {
@@ -356,7 +356,7 @@ export class OrderService {
     if (order.identifier.includes('@')) {
       await this.emailService.sendSuccessMessage(order.identifier);
     } else {
-      await this.twilioService.sendSuccessSMS(order.identifier);
+      await this.unimatrixService.sendSuccessSMS(order.identifier);
     }
 
     return { status: 'success', message: 'Order finished successfully' };
