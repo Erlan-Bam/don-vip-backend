@@ -1,15 +1,13 @@
+// src/techworks/techworks.controller.ts
 import {
   Controller,
   Get,
-  Post,
-  Body,
   Patch,
   Param,
-  Delete,
+  Body,
   ParseIntPipe,
 } from '@nestjs/common';
 import { TechworksService } from './techworks.service';
-import { CreateTechworkDto } from './dto/create-techwork.dto';
 import { UpdateTechWorksDto } from './dto/update-techwork.dto';
 
 @Controller('techworks')
@@ -29,7 +27,6 @@ export class TechworksController {
     return this.techworksService.updateTechWorks(id, dto);
   }
 
-  // (Опционально) эндпоинт, который просто переключает текущее значение
   @Patch(':id/tech-works/toggle')
   async toggleTechWorks(@Param('id', ParseIntPipe) id: number) {
     return this.techworksService.toggleTechWorks(id);
