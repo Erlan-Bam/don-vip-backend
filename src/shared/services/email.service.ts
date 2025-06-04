@@ -133,7 +133,7 @@ export class EmailService {
       </html>
     `;
     const transporter = nodemailer.createTransport({
-      host: 'mail.don-vip.online',
+      host: 'gator4216.hostgator.com',
       port: 465,
       secure: true,
       auth: {

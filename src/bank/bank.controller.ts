@@ -27,15 +27,14 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { AdminGuard } from 'src/shared/guards/admin.guards';
 
-@ApiTags('banks')
+@ApiTags('Banks')
 @Controller('banks')
-@UseGuards(AuthGuard('jwt')) // Все маршруты требуют аутентификации
 export class BankController {
   constructor(private readonly bankService: BankService) {}
 
   @Post()
-  @ApiBearerAuth()
-  @UseGuards(AdminGuard) // Только администратор может создать новый банк
+  @ApiBearerAuth('JWT')
+  @UseGuards(AuthGuard('jwt'), AdminGuard)
   @ApiOperation({ summary: 'Создать новый банк' })
   @ApiResponse({
     status: 201,
@@ -56,8 +55,8 @@ export class BankController {
   }
 
   @Patch(':id')
-  @ApiBearerAuth()
-  @UseGuards(AdminGuard) // Только администратор может обновить
+  @ApiBearerAuth('JWT')
+  @UseGuards(AuthGuard('jwt'), AdminGuard) // Только администратор может обновить
   @ApiOperation({ summary: 'Обновить банк по ID' })
   @ApiParam({
     name: 'id',
@@ -177,8 +176,8 @@ export class BankController {
   }
 
   @Delete(':id')
-  @ApiBearerAuth()
-  @UseGuards(AdminGuard) // Только администратор может удалить
+  @ApiBearerAuth('JWT')
+  @UseGuards(AuthGuard('jwt'), AdminGuard) // Только администратор может удалить
   @ApiOperation({ summary: 'Удалить банк по ID' })
   @ApiParam({
     name: 'id',

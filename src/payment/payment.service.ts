@@ -52,7 +52,10 @@ export class PaymentService {
     const bank = await this.prisma.bank.findUnique({
       where: { name: data.name },
     });
-    if (bank && !bank.isActive) {
+    if (!bank) {
+      throw new HttpException(`Bank ${data.name} not found`, 404);
+    }
+    if (!bank.isActive) {
       throw new HttpException(`Bank ${data.name} is not active`, 400);
     }
     const base64 = await import('base-64');
@@ -81,24 +84,6 @@ export class PaymentService {
           Authorization: `Basic ${credentials}`,
         },
       },
-    );
-    console.log(
-      {
-        app_id: this.appId,
-        method: 'SBP',
-        out_trade_no: `${data.user_id || 'unknown'}:${data.order_id}:${Date.now()}`,
-        notify_url: `${this.backendURL}/api/payment/pagsmile/notification`,
-        timestamp: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
-        subject: 'Don Vip донат',
-        order_amount: data.amount,
-        order_currency: 'RUB',
-        content: `Донат на сайте Don Vip на сумму: ${data.amount}`,
-        buyer_id: this.merchantId,
-        trade_type: 'WEB',
-        return_url: 'https://don-vip.online/payment/success',
-        version: '2.0',
-      },
-      payment.data,
     );
     return payment.data;
   }

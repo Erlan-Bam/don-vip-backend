@@ -8,4 +8,4 @@ import { SharedModule } from 'src/shared/shared.module';
   providers: [BankService],
   controllers: [BankController],
 })
-export class BanksModule {}
+export class BankModule {}
