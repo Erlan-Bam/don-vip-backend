@@ -30,6 +30,11 @@ enum CouponStatus {
   Disabled
 }
 
+model Website{
+  id           Int           @id @default(autoincrement())
+  isTechWorks   Boolean
+}
+
 model User {
   id                Int           @id @default(autoincrement())
   identifier        String?       @unique

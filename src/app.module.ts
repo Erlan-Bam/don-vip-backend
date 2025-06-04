@@ -10,6 +10,7 @@ import { FeedbackModule } from './feedback/feedback.module';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { LoggerMiddleware } from './shared/logger';
+import { TechworksModule } from './techworks/techworks.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { LoggerMiddleware } from './shared/logger';
     PaymentModule,
     ProductModule,
     FeedbackModule,
+    TechworksModule,
   ],
 })
 export class AppModule implements NestModule {
