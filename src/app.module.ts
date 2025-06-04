@@ -12,9 +12,11 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { LoggerMiddleware } from './shared/logger';
 import { TechworksModule } from './techworks/techworks.module';
 import { BankModule } from './bank/bank.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'uploads'),
       serveRoot: '/uploads', // exposes /uploads path

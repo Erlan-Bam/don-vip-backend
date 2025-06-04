@@ -1,5 +1,11 @@
 // src/techworks/techworks.service.ts
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  Logger,
+  BadRequestException,
+} from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from 'src/shared/services/prisma.service';
 import { UpdateTechWorksDto } from './dto/update-techwork.dto';
 
@@ -9,7 +15,7 @@ export class TechworksService {
 
   constructor(private readonly prisma: PrismaService) {}
 
-  // Получить запись Website
+  // 1) Получаем сайт по id
   async getById(id: number) {
     const site = await this.prisma.website.findUnique({
       where: { id },
@@ -20,82 +26,108 @@ export class TechworksService {
     return site;
   }
 
-  // Обновить флаг isTechWorks и запустить таймер, если нужно
+  // 2) Обновляем флаг isTechWorks и записываем techWorksEndsAt из DTO
   async updateTechWorks(id: number, dto: UpdateTechWorksDto) {
-    // Проверяем, существует ли сайт
+    // Убеждаемся, что сайт существует
     const site = await this.getById(id);
 
-    // Вычисляем точку выключения, если пришла duration
-    let techWorksEndsAt: Date | null = null;
-    if (dto.durationMinutes && dto.isTechWorks) {
+    // Если клиент хочет включить техработы
+    let parsedEndsAt: Date | null = null;
+    if (dto.isTechWorks) {
+      if (!dto.techWorksEndsAt) {
+        throw new BadRequestException(
+          'Когда isTechWorks=true, нужно передавать valid ISO-дату в поле techWorksEndsAt',
+        );
+      }
+      // Парсим ISO-строку
+      parsedEndsAt = new Date(dto.techWorksEndsAt);
+      if (isNaN(parsedEndsAt.getTime())) {
+        throw new BadRequestException(
+          `Невалидная дата в techWorksEndsAt: ${dto.techWorksEndsAt}`,
+        );
+      }
+      // Дополнительно можно проверить: дата в будущем
       const now = new Date();
-      techWorksEndsAt = new Date(
-        now.getTime() + dto.durationMinutes * 60 * 1000,
-      );
+      if (parsedEndsAt <= now) {
+        throw new BadRequestException(
+          'techWorksEndsAt должна быть датой в будущем',
+        );
+      }
     }
 
-    // Делаем обновление в БД
+    // Если клиент выключает техработы, сразу сбросим дату
+    if (!dto.isTechWorks) {
+      parsedEndsAt = null;
+    }
+
+    // Обновляем запись в БД
     const updated = await this.prisma.website.update({
       where: { id },
       data: {
         isTechWorks: dto.isTechWorks,
-        techWorksEndsAt: techWorksEndsAt,
+        techWorksEndsAt: parsedEndsAt,
       },
     });
 
-    // Если включаем тех. работы и задали duration – ставим setTimeout
-    if (dto.durationMinutes && dto.isTechWorks) {
-      const ms = dto.durationMinutes * 60 * 1000;
-      this.logger.log(
-        `Scheduling auto-disable of tech works for Website ${id} in ${dto.durationMinutes} minutes`,
-      );
-      setTimeout(async () => {
-        try {
-          // Повторно проверяем в БД: если всё ещё в тех. работах и время вышло — выключаем
-          const current = await this.prisma.website.findUnique({
-            where: { id },
-          });
-          if (current && current.isTechWorks) {
-            // Дополнительно можем свериться current.techWorksEndsAt <= now, но примерно так:
-            const nowCheck = new Date();
-            if (
-              current.techWorksEndsAt &&
-              current.techWorksEndsAt <= nowCheck
-            ) {
-              await this.prisma.website.update({
-                where: { id },
-                data: { isTechWorks: false },
-              });
-              this.logger.log(`Auto-disabled tech works for Website ${id}`);
-            }
-          }
-        } catch (error) {
-          this.logger.error(
-            `Ошибка при авто-выключении tech works для Website ${id}: ${error.message}`,
-          );
-        }
-      }, ms);
-    }
-
-    // Если же isTechWorks=false, обнуляем techWorksEndsAt
+    // Логging
     if (!dto.isTechWorks) {
-      // При query выше уже записали techWorksEndsAt = null
       this.logger.log(`Tech works manually disabled for Website ${id}`);
+    } else {
+      this.logger.log(
+        `Tech works enabled for Website ${id} until ${parsedEndsAt.toISOString()}`,
+      );
     }
 
     return updated;
   }
+  @Cron(CronExpression.EVERY_MINUTE)
+  private async handleExpiredTechWorks() {
+    const now = new Date();
+    // Ищем сайты с истёкшим техработным периодом
+    const sitesToDisable = await this.prisma.website.findMany({
+      where: {
+        isTechWorks: true,
+        techWorksEndsAt: { lte: now },
+      },
+    });
 
-  // Переключить флаг вручную (toggle), таймер не трогаем
+    if (sitesToDisable.length > 0) {
+      this.logger.log(
+        `Найдены ${sitesToDisable.length} сайтов для авто-выключения техработ (до сейчас ${now.toISOString()})`,
+      );
+    }
+
+    for (const site of sitesToDisable) {
+      try {
+        await this.prisma.website.update({
+          where: { id: site.id },
+          data: {
+            isTechWorks: false,
+            techWorksEndsAt: null,
+          },
+        });
+        this.logger.log(`Auto-disabled tech works for Website ${site.id}`);
+      } catch (error) {
+        this.logger.error(
+          `Ошибка при авто-выключении tech works для Website ${site.id}: ${error.message}`,
+        );
+      }
+    }
+  }
+
+  // 4) Ручное переключение флага без учёта переданной даты
   async toggleTechWorks(id: number) {
     const site = await this.getById(id);
     const updated = await this.prisma.website.update({
       where: { id },
       data: {
         isTechWorks: !site.isTechWorks,
-        techWorksEndsAt: null, // сбрасываем таймер при ручном переключении
+        techWorksEndsAt: null, // сбрасываем дату, когда переключаем вручную
       },
     });
+    this.logger.log(
+      `Tech works toggled manually for Website ${id}, new isTechWorks=${updated.isTechWorks}`,
+    );
     return updated;
   }
 }
