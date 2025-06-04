@@ -314,7 +314,7 @@ export class EmailService {
     return code;
   }
 
-  async sendSuccessMessage(toEmail: string) {
+  async sendSuccessMessage(toEmail: string, orderId: number) {
     const transporter = nodemailer.createTransport({
       host: 'mail.don-vip.online',
       port: 465,

@@ -60,15 +60,19 @@ export class UnimatrixService {
     }
   }
 
-  async sendSuccessSMS(to: string): Promise<void> {
+  async sendSuccessSMS(to: string, orderId: number): Promise<void> {
     try {
-      const text =
-        `Thank you for your purchase!\n` + `Благодарим за покупку!\n`;
+      const text = `
+      Спасибо за вашу покупку! Ваш номер заказа: ${orderId}\n
+      Thank you for your purchase! Your order number: ${orderId}`;
 
       await this.client.messages.send({
-        text: text,
+        signature: 'DON-VIP',
         to: to,
-        // signature: 'DON-VIP',
+        templateId: 'success_message',
+        templateData: {
+          orderId: orderId,
+        },
       });
     } catch (error) {
       throw new HttpException('Something went wrong', 500);

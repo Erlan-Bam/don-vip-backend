@@ -284,6 +284,7 @@ export class OrderService {
     const order = await this.prisma.order.findUnique({
       where: { id: id },
       select: {
+        id: true,
         identifier: true,
         user_id: true,
         account_id: true,
@@ -364,9 +365,9 @@ export class OrderService {
     });
 
     if (order.identifier.includes('@')) {
-      await this.emailService.sendSuccessMessage(order.identifier);
+      await this.emailService.sendSuccessMessage(order.identifier, order.id);
     } else {
-      await this.unimatrixService.sendSuccessSMS(order.identifier);
+      await this.unimatrixService.sendSuccessSMS(order.identifier, order.id);
     }
 
     return { status: 'success', message: 'Order finished successfully' };
