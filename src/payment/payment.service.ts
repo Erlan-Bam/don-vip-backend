@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { Axios } from 'axios';
 import { PrismaService } from 'src/shared/services/prisma.service';
@@ -49,6 +49,12 @@ export class PaymentService {
     this.merchantId = merchantId;
   }
   async createPagsmilePayin(data: PagsmileCreatePayinDto) {
+    const bank = await this.prisma.bank.findUnique({
+      where: { name: data.name },
+    });
+    if (bank && !bank.isActive) {
+      throw new HttpException(`Bank ${data.name} is not active`, 400);
+    }
     const base64 = await import('base-64');
     const { format } = await import('date-fns');
     const credentials = base64.encode(`${this.appId}:${this.secretKey}`);
@@ -56,7 +62,7 @@ export class PaymentService {
       '/trade/create',
       {
         app_id: this.appId,
-        method: 'SBP',
+        method: data.name,
         out_trade_no: `${data.user_id || 'unknown'}:${data.order_id}:${Date.now()}`,
         notify_url: `${this.backendURL}/api/payment/pagsmile/notification`,
         timestamp: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),

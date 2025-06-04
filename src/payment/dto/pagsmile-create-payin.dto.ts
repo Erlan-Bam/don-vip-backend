@@ -1,4 +1,10 @@
-import { IsDecimal, IsInt, IsOptional, IsUUID } from 'class-validator';
+import {
+  IsDecimal,
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
@@ -24,4 +30,12 @@ export class PagsmileCreatePayinDto {
   @Type(() => Number)
   @IsInt()
   user_id?: number;
+
+  @ApiProperty({
+    example: 'SBP',
+    description: 'Bank payment method',
+    required: false,
+  })
+  @IsString()
+  name?: string = 'SBP';
 }

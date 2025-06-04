@@ -11,6 +11,7 @@ import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { LoggerMiddleware } from './shared/logger';
 import { TechworksModule } from './techworks/techworks.module';
+import { BanksModule } from './bank/bank.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { TechworksModule } from './techworks/techworks.module';
     ProductModule,
     FeedbackModule,
     TechworksModule,
+    BanksModule,
   ],
 })
 export class AppModule implements NestModule {

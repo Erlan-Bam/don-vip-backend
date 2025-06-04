@@ -35,6 +35,13 @@ model Website {
   isTechWorks      Boolean
   techWorksEndsAt  DateTime? // точка, когда “тех. работы” автоматически выключатся
 }
+model Bank {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt @default(now())
+}
 model User {
   id                Int           @id @default(autoincrement())
   identifier        String?       @unique
