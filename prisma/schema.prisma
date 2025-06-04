@@ -30,6 +30,11 @@ enum CouponStatus {
   Disabled
 }
 
+model Website {
+  id               Int       @id @default(autoincrement())
+  isTechWorks      Boolean
+  techWorksEndsAt  DateTime? // точка, когда “тех. работы” автоматически выключатся
+}
 model User {
   id                Int           @id @default(autoincrement())
   identifier        String?       @unique
