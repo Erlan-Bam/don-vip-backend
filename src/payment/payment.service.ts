@@ -140,13 +140,7 @@ export class PaymentService {
     const [orderIdStr, userId] = data.OrderId.split('_');
     const orderId = parseInt(orderIdStr, 10);
 
-    const allowedStatus = [
-      'IN_PROGRESS',
-      'EXECUTED',
-      'REJECTED',
-      'CANCELLED',
-      'CONFIRMED',
-    ];
+    const allowedStatus = ['REJECTED', 'CONFIRMED'];
 
     if (data.Status && allowedStatus.includes(data.Status)) {
       await this.prisma.payment.create({
