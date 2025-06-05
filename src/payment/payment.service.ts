@@ -152,6 +152,12 @@ export class PaymentService {
           status: data.Status === 'CONFIRMED' ? 'Paid' : 'Cancelled',
         },
       });
+      if (data.Status === 'REJECTED') {
+        await this.prisma.order.update({
+          where: { id: orderId },
+          data: { status: 'Cancelled' },
+        });
+      }
     }
 
     if (data.Status !== 'CONFIRMED') {
