@@ -120,6 +120,12 @@ export class PaymentService {
           status: data.trade_status !== 'SUCCESS' ? 'Cancelled' : 'Paid',
         },
       });
+      if (data.trade_status !== 'SUCCESS') {
+        await this.prisma.order.update({
+          where: { id: orderId },
+          data: { status: 'Cancelled' },
+        });
+      }
     }
 
     if (data.trade_status !== 'SUCCESS') {
