@@ -143,7 +143,7 @@ export class PaymentService {
     const allowedStatus = [
       'IN_PROGRESS',
       'EXECUTED',
-      'FAILED',
+      'REJECTED',
       'CANCELLED',
       'CONFIRMED',
     ];
