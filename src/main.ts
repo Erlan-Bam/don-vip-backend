@@ -27,7 +27,7 @@ async function bootstrap() {
     origin: [
       'http://localhost:3000',
       'https://don-vip.online',
-      'https://admin.don-vip.online',
+      'https://admin-panel.don-vip.online',
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: [
