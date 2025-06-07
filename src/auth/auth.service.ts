@@ -86,6 +86,8 @@ export class AuthService {
         data: {
           identifier: profile.email,
           password: '',
+          is_verified: true,
+          email: profile.email,
         },
       });
     }
