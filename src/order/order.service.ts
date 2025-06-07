@@ -38,6 +38,10 @@ export class OrderService {
         400,
       );
     }
+    const coupon = await this.prisma.coupon.findUnique({
+      where: { code: data.coupon_code },
+      select: { id: true, status: true },
+    });
     return await this.prisma.order.create({
       data: {
         identifier: data.identifier,
@@ -47,6 +51,7 @@ export class OrderService {
         payment: data.payment,
         account_id: data.account_id,
         server_id: data.server_id,
+        coupon_id: coupon && coupon.status === 'Active' ? coupon.id : null,
       },
     });
   }

@@ -55,6 +55,7 @@ export class CouponService {
     }
 
     return {
+      isValid: coupon.status === 'Active',
       code: coupon.code,
       limit: coupon.limit,
       discount: coupon.discount,

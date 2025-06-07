@@ -19,6 +19,14 @@ export class CreateOrderDto {
   product_id: number;
 
   @ApiProperty({
+    description: 'Купонный код для скидки или промо-акции',
+    example: 'SUMMER',
+  })
+  @IsOptional()
+  @IsString()
+  coupon_code?: string;
+
+  @ApiProperty({
     description: 'ID позиции пополнения из массива replenishment (Пакетов)',
     example: 0,
   })
