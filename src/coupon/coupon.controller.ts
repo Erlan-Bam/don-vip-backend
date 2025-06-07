@@ -28,11 +28,11 @@ import { ApplyCouponDto } from './dto/apply-coupon.dto';
 
 @ApiTags('Coupon')
 @Controller('coupon')
-@ApiBearerAuth('JWT')
 export class CouponController {
   constructor(private couponService: CouponService) {}
 
   @Post()
+  @ApiBearerAuth('JWT')
   @UseGuards(AuthGuard('jwt'), AdminGuard)
   @ApiOperation({ summary: 'Create a new coupon' })
   @ApiBody({ type: CreateCouponDto })
@@ -51,6 +51,7 @@ export class CouponController {
   }
 
   @Patch(':id')
+  @ApiBearerAuth('JWT')
   @UseGuards(AuthGuard('jwt'), AdminGuard)
   @ApiOperation({ summary: 'Update a coupon' })
   @ApiParam({ name: 'id', type: Number })
@@ -65,7 +66,6 @@ export class CouponController {
   }
 
   @Get('check')
-  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Check a coupon code' })
   @ApiResponse({ status: 200, description: 'Coupon validity result' })
   async checkCoupon(@Query() data: CheckCouponDto) {
@@ -81,6 +81,7 @@ export class CouponController {
   }
 
   @Delete(':id')
+  @ApiBearerAuth('JWT')
   @UseGuards(AuthGuard('jwt'), AdminGuard)
   @ApiOperation({ summary: 'Delete a coupon by ID' })
   @ApiParam({ name: 'id', type: Number })

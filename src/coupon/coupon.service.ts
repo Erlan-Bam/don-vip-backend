@@ -44,18 +44,11 @@ export class CouponService {
       throw new HttpException('Invalid code', 404);
     }
 
-    if (coupon.limit !== null && coupon.limit <= 0) {
-      if (coupon.status !== 'Expired') {
-        await this.prisma.coupon.update({
-          where: { code: data.code },
-          data: { status: 'Expired' },
-        });
-      }
-      throw new HttpException('Expired code', 400);
+    if (coupon.status !== 'Active') {
+      throw new HttpException('Coupon is not active', 400);
     }
 
     return {
-      isValid: coupon.status === 'Active',
       code: coupon.code,
       limit: coupon.limit,
       discount: coupon.discount,

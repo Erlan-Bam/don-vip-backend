@@ -303,6 +303,13 @@ export class OrderService {
             smile_api_game: true,
           },
         },
+        coupon: {
+          select: {
+            id: true,
+            limit: true,
+            status: true,
+          },
+        },
       },
     });
 
@@ -364,6 +371,18 @@ export class OrderService {
       }
     }
 
+    if (order.coupon && order.coupon.status === 'Active') {
+      if (order.coupon.limit !== null && order.coupon.limit > 0) {
+        await this.prisma.coupon.update({
+          where: { id: order.coupon.id },
+          data: {
+            limit: { decrement: 1 },
+          },
+        });
+      } else if (order.coupon.limit === 0) {
+        await this.prisma.coupon.delete({ where: { id: order.coupon.id } });
+      }
+    }
     await this.prisma.order.update({
       where: { id: id },
       data: { status: 'Paid', response: JSON.stringify(response) },
