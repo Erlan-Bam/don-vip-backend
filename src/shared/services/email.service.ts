@@ -133,15 +133,10 @@ export class EmailService {
       </html>
     `;
     const transporter = nodemailer.createTransport({
-      host: 'gator4216.hostgator.com',
-      port: 465,
-      secure: true,
+      service: 'gmail',
       auth: {
         user: this.email,
         pass: this.password,
-      },
-      tls: {
-        rejectUnauthorized: false,
       },
     });
 
@@ -163,15 +158,10 @@ export class EmailService {
     code: string,
   ) {
     const transporter = nodemailer.createTransport({
-      host: 'mail.don-vip.online',
-      port: 465,
-      secure: true,
+      service: 'gmail',
       auth: {
         user: this.email,
         pass: this.password,
-      },
-      tls: {
-        rejectUnauthorized: false,
       },
     });
 
@@ -316,15 +306,10 @@ export class EmailService {
 
   async sendSuccessMessage(toEmail: string, orderId: number) {
     const transporter = nodemailer.createTransport({
-      host: 'mail.don-vip.online',
-      port: 465,
-      secure: true,
+      service: 'gmail',
       auth: {
         user: this.email,
         pass: this.password,
-      },
-      tls: {
-        rejectUnauthorized: false,
       },
     });
 
@@ -346,8 +331,8 @@ export class EmailService {
                 <tr>
                   <td style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); padding: 30px 40px; text-align: center;">
                     <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: bold; line-height: 1.2;">
-                      Заказ успешно оформлен<br>
-                      <span style="font-size: 24px; font-weight: normal;">Order Successfully Placed</span>
+                      Заказ успешно оформлен! #${orderId}<br>
+                      <span style="font-size: 24px; font-weight: normal;">Order Successfully Placed! #${orderId}</span>
                     </h1>
                   </td>
                 </tr>
@@ -442,15 +427,10 @@ export class EmailService {
 
   async sendPUBGCode(email: string, code: string, expire_time: string) {
     const transporter = nodemailer.createTransport({
-      host: 'mail.don-vip.online',
-      port: 465,
-      secure: true,
+      service: 'gmail',
       auth: {
         user: this.email,
         pass: this.password,
-      },
-      tls: {
-        rejectUnauthorized: false,
       },
     });
 
