@@ -55,7 +55,6 @@ export class PaymentController {
     @Request() req,
   ) {
     const rawBody = req.rawBody as string;
-    console.log(rawBody);
     return await this.paymentService.pagsmileNotification(
       data,
       signature,

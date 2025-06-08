@@ -38,7 +38,7 @@ export class OrderService {
         400,
       );
     }
-    const coupon = await this.prisma.coupon.findUnique({
+    const coupon = await this.prisma.coupon.findFirst({
       where: { code: data.coupon_code },
       select: { id: true, status: true },
     });
