@@ -43,7 +43,7 @@ export class OrderController {
   async getAllForAdmin(
     @Query('page', ParseIntPipe) page = 1,
     @Query('limit', ParseIntPipe) limit = 10,
-    @Query('search') search?: string, // 👈 Accept search param
+    @Query('search') search?: string,
   ) {
     return this.orderService.getAllForAdmin(page, limit, search);
   }

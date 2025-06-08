@@ -77,6 +77,7 @@ export class PaymentService {
         trade_type: 'WEB',
         return_url: 'https://don-vip.online/payment/success',
         version: '2.0',
+        regions: ['RUS'],
       },
       {
         headers: {
