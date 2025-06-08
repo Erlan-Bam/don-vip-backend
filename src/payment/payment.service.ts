@@ -65,7 +65,7 @@ export class PaymentService {
       '/trade/create',
       {
         app_id: this.appId,
-        method: data.name === 'SBP' ? 'SBP' : '',
+        // method: data.name === 'SBP' ? 'SBP' : '',
         out_trade_no: `${data.user_id || 'unknown'}:${data.order_id}:${Date.now()}`,
         notify_url: `${this.backendURL}/api/payment/pagsmile/notification`,
         timestamp: format(new Date(), 'yyyy-MM-dd HH:mm:ss'),
