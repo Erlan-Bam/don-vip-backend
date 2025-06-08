@@ -7,17 +7,25 @@ async function main() {
   await prisma.$executeRawUnsafe(`
     ALTER SEQUENCE "Order_id_seq" RESTART WITH 20000;
   `);
-
-  // Optional: create some seed users
-  await prisma.order.create({
+  await prisma.bank.create({
     data: {
-      identifier: 'erlanzh.gg@gmail.com',
-      user_id: 1, // замените на существующий user.id
-      product_id: 1, // замените на существующий product.id
-      item_id: 0,
-      payment: 'tbank',
+      name: 'T-Bank',
+      isActive: true,
     },
   });
+  await prisma.bank.create({
+    data: {
+      name: 'SBP',
+      isActive: true,
+    },
+  });
+  await prisma.bank.create({
+    data: {
+      name: 'Card',
+      isActive: true,
+    },
+  });
+  await prisma.website.create({ data: { isTechWorks: false } });
 }
 
 main()
