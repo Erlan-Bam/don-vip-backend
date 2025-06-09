@@ -20,11 +20,6 @@ export class UnimatrixService {
 
   async sendSMS(to: string, code: string, lang: 'ru' | 'en'): Promise<void> {
     try {
-      const text =
-        lang === 'en'
-          ? `Your verification code is: ${code}`
-          : `Ваш код подтверждения: ${code}`;
-
       await this.client.otp.send({
         digits: 5,
         to: to,
@@ -67,7 +62,11 @@ export class UnimatrixService {
       Thank you for your purchase! Your order number: ${orderId}`;
 
       const result = await this.client.messages.send({
-        text: text,
+        templateId: 'successful_purchase',
+        templateData: {
+          order_number_en: orderId,
+          order_number_ru: orderId,
+        },
         signature: 'DON-VIP',
         to: to,
       });
