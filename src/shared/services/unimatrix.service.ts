@@ -66,12 +66,14 @@ export class UnimatrixService {
       Спасибо за вашу покупку! Ваш номер заказа: ${orderId}\n
       Thank you for your purchase! Your order number: ${orderId}`;
 
-      await this.client.messages.send({
+      const result = await this.client.messages.send({
         text: text,
         signature: 'DON-VIP',
         to: to,
       });
+      console.log(result);
     } catch (error) {
+      console.log(error);
       throw new HttpException('Something went wrong', 500);
     }
   }
