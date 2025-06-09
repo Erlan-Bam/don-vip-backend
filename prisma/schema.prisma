@@ -65,6 +65,13 @@ model User {
   activeCoupons     ActiveCoupon[] // ✅ multiple active coupons
 }
 
+model Banner {
+  id           Int           @id @default(autoincrement())
+  image     String
+  mobileImage String
+  buttonLink  String
+}
+
 model Coupon {
   id           Int           @id @default(autoincrement())
   code         String        @unique

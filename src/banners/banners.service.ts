@@ -1,0 +1,38 @@
+import { Injectable } from '@nestjs/common';
+import { CreateBannerDto } from './dto/create-banner.dto';
+import { UpdateBannerDto } from './dto/update-banner.dto';
+import { PrismaService } from 'src/shared/services/prisma.service';
+
+@Injectable()
+export class BannersService {
+  constructor(private prisma: PrismaService) {}
+
+  create(createBannerDto: CreateBannerDto) {
+    return this.prisma.banner.create({
+      data: createBannerDto,
+    });
+  }
+
+  findAll() {
+    return this.prisma.banner.findMany();
+  }
+
+  findOne(id: number) {
+    return this.prisma.banner.findUnique({
+      where: { id },
+    });
+  }
+
+  update(id: number, updateBannerDto: UpdateBannerDto) {
+    return this.prisma.banner.update({
+      where: { id },
+      data: updateBannerDto,
+    });
+  }
+
+  remove(id: number) {
+    return this.prisma.banner.delete({
+      where: { id },
+    });
+  }
+}

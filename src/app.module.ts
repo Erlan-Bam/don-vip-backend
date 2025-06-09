@@ -13,6 +13,7 @@ import { LoggerMiddleware } from './shared/logger';
 import { TechworksModule } from './techworks/techworks.module';
 import { BankModule } from './bank/bank.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { BannersModule } from './banners/banners.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     FeedbackModule,
     TechworksModule,
     BankModule,
+    BannersModule,
   ],
 })
 export class AppModule implements NestModule {
