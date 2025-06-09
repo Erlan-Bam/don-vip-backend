@@ -272,37 +272,41 @@ export class ProductController {
   @Patch(':id')
   @UseGuards(AuthGuard('jwt'), AdminGuard)
   @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({
-        destination: './uploads/products',
-        filename: (req, file, callback) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname);
-          callback(null, `product-${uniqueSuffix}${ext}`);
+    FileFieldsInterceptor(
+      [
+        { name: 'image', maxCount: 1 },
+        { name: 'currency_image', maxCount: 1 },
+      ],
+      {
+        storage: diskStorage({
+          destination: './uploads/products',
+          filename: (req, file, callback) => {
+            const uniqueSuffix =
+              Date.now() + '-' + Math.round(Math.random() * 1e9);
+            const ext = extname(file.originalname);
+            callback(null, `product-${uniqueSuffix}${ext}`);
+          },
+        }),
+        fileFilter: (req, file, callback) => {
+          if (
+            ['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'].includes(
+              file.mimetype,
+            )
+          ) {
+            callback(null, true);
+          } else {
+            callback(
+              new HttpException(
+                'Only .png, .jpeg, .svg and .webp formats are allowed!',
+                400,
+              ),
+              false,
+            );
+          }
         },
-      }),
-      fileFilter: (req, file, callback) => {
-        if (
-          ['image/png', 'image/jpeg', 'image/webp', 'image/svg'].includes(
-            file.mimetype,
-          )
-        ) {
-          callback(null, true);
-        } else {
-          callback(
-            new HttpException(
-              'Only .png, .jpeg, .svg and .webp formats are allowed!',
-              400,
-            ),
-            false,
-          );
-        }
+        limits: { fileSize: 10 * 1024 * 1024 },
       },
-      limits: {
-        fileSize: 10 * 1024 * 1024,
-      },
-    }),
+    ),
   )
   @ApiOperation({ summary: 'Update product by ID' })
   @ApiParam({ name: 'id', type: Number })
