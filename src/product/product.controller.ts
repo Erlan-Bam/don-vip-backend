@@ -315,9 +315,17 @@ export class ProductController {
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() data: UpdateProductDto,
-    @UploadedFile() file?: Express.Multer.File,
+    @UploadedFiles()
+    files: {
+      image?: Express.Multer.File[];
+      currency_image?: Express.Multer.File[];
+    },
   ) {
-    if (file) data.image = `${this.baseUrl}/uploads/products/${file.filename}`;
+    if (files.image?.[0])
+      data.image = `${this.baseUrl}/uploads/products/${files.image[0].filename}`;
+
+    if (files.currency_image?.[0])
+      data.currency_image = `${this.baseUrl}/uploads/products/${files.currency_image[0].filename}`;
 
     return this.productService.update(id, data);
   }
