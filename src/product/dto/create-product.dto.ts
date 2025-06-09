@@ -88,10 +88,12 @@ export class CreateProductDto {
   type: ProductType;
 
   @ApiProperty({
-    example: 'https://cdn.example.com/icons/usd.png',
-    description: 'URL изображения валюты (иконка)',
+    type: 'string',
+    format: 'binary',
+    required: true,
+    description: 'Изображение валюты (multipart/form-data)',
   })
-  @IsString()
+  @IsOptional()
   currency_image: any;
 
   @ApiProperty({
