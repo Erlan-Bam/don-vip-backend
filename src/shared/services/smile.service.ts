@@ -230,7 +230,7 @@ export class SmileService {
         throw new HttpException('Try coming later', 400);
       }
     } catch (error) {
-      console.error('Error sending Bigo order:', error);
+      console.error(`Error sending Bigo order: ${user_id}, ${amount}`, error);
       throw new HttpException('Failed to send Bigo order', 500);
     }
   }
