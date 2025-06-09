@@ -386,7 +386,13 @@ export class OrderService {
     }
     await this.prisma.order.update({
       where: { id: id },
-      data: { status: 'Paid', response: JSON.stringify(response) },
+      data: {
+        status:
+          response.message === 'ok' || response.message === 'success'
+            ? 'Paid'
+            : 'Cancelled',
+        response: JSON.stringify(response),
+      },
     });
 
     if (order.identifier.includes('@')) {
