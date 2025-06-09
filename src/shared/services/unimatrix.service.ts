@@ -67,12 +67,9 @@ export class UnimatrixService {
       Thank you for your purchase! Your order number: ${orderId}`;
 
       await this.client.messages.send({
+        text: text,
         signature: 'DON-VIP',
         to: to,
-        templateId: 'success_message',
-        templateData: {
-          orderId: orderId,
-        },
       });
     } catch (error) {
       throw new HttpException('Something went wrong', 500);
