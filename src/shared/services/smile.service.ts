@@ -180,6 +180,10 @@ export class SmileService {
       if (response.data.result) {
         if (apiGame === 'pubgmobile') {
           await this.sendPUBGCode(response.data.result.orderId, user_id);
+          return {
+            status: 'success',
+            data: response.data.result.orderId,
+          };
         } else {
           return {
             status: 'success',
