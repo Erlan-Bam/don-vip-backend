@@ -341,7 +341,6 @@ export class OrderService {
         value: item.amount,
         totalCost: item.price,
       });
-      console.log('Bigo recharge result:', result, result.message);
       response = {
         type: 'bigo',
         message: result.message,
@@ -387,10 +386,7 @@ export class OrderService {
     await this.prisma.order.update({
       where: { id: id },
       data: {
-        status:
-          response.message === 'ok' || response.message === 'success'
-            ? 'Paid'
-            : 'Cancelled',
+        status: 'Paid',
         response: JSON.stringify(response),
       },
     });
