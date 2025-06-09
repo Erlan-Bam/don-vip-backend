@@ -324,6 +324,9 @@ export class ProductController {
     if (files.image?.[0])
       data.image = `${this.baseUrl}/uploads/products/${files.image[0].filename}`;
 
+    console.log('Files:', files);
+    console.log('Body:', data);
+
     if (files.currency_image?.[0])
       data.currency_image = `${this.baseUrl}/uploads/products/${files.currency_image[0].filename}`;
 
