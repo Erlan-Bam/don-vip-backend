@@ -95,10 +95,11 @@ export class CreateProductDto {
   currency_image: any;
 
   @ApiProperty({
-    example: 'USD',
-    description: 'Название валюты (например, USD, EUR, RUB)',
+    type: 'string',
+    format: 'binary',
+    required: true,
+    description: 'Изображение валюты (multipart/form-data)',
   })
-  @IsString()
   @IsOptional()
   currency_name: string;
 }
