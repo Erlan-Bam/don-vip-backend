@@ -26,7 +26,7 @@ export class UnimatrixService {
         templateId: lang === 'en' ? 'pub_otp_en_basic2' : 'pub_otp_ru',
         channel: 'sms',
         code: code,
-        // signature: 'DON-VIP',
+        signature: 'DON-VIP',
       });
     } catch (error) {
       console.log(error);
@@ -40,15 +40,11 @@ export class UnimatrixService {
     lang: 'ru' | 'en',
   ): Promise<void> {
     try {
-      const text =
-        lang === 'en'
-          ? `To reset your password, please follow this link:\n${link}`
-          : `Чтобы изменить пароль, перейдите по ссылке:\n${link}`;
-
       await this.client.messages.send({
-        text: text,
         to: to,
-        // signature: 'DON-VIP',
+        templateId: lang === 'en' ? 'reset_password_en' : 'reset_password_ru',
+        templateData: { link: link },
+        signature: 'DON-VIP',
       });
     } catch (error) {
       throw new HttpException('Something went wrong', 500);
@@ -57,10 +53,6 @@ export class UnimatrixService {
 
   async sendSuccessSMS(to: string, orderId: number): Promise<void> {
     try {
-      const text = `
-      Спасибо за вашу покупку! Ваш номер заказа: ${orderId}\n
-      Thank you for your purchase! Your order number: ${orderId}`;
-
       const result = await this.client.messages.send({
         templateId: 'successful_purchase',
         templateData: {
