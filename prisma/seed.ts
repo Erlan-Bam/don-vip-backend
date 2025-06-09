@@ -4,28 +4,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   // Reset auto-increment for User.id to start from 20000
-  await prisma.$executeRawUnsafe(`
-    ALTER SEQUENCE "Order_id_seq" RESTART WITH 20000;
-  `);
-  await prisma.bank.create({
-    data: {
-      name: 'T-Bank',
-      isActive: true,
-    },
-  });
-  await prisma.bank.create({
-    data: {
-      name: 'SBP',
-      isActive: true,
-    },
-  });
-  await prisma.bank.create({
-    data: {
-      name: 'Card',
-      isActive: true,
-    },
-  });
-  await prisma.website.create({ data: { isTechWorks: false } });
+  await prisma.user.delete({ where: { identifier: '+77085673295' } });
 }
 
 main()
