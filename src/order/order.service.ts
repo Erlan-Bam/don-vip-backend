@@ -341,6 +341,7 @@ export class OrderService {
         value: item.amount,
         totalCost: item.price,
       });
+      console.log('Bigo recharge result:', result, result.message);
       response = {
         type: 'bigo',
         message: result.message,
