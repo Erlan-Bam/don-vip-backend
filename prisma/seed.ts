@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 
 async function main() {
   await prisma.user.update({
-    where: { identifier: 'Hoyakap@gmail.com' },
+    where: { identifier: 'hoyakap@gmail.com' },
     data: {
       role: 'Admin',
     },
