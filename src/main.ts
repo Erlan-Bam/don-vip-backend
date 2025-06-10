@@ -26,10 +26,8 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       'http://localhost:3000',
-      'https://don-vip.online',
       'https://don-vip.com',
       'https://admin-panel.don-vip.com',
-      'https://admin-panel.don-vip.online',
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: [

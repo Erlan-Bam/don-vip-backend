@@ -45,7 +45,7 @@ export class UserController {
     this.baseUrl =
       nodeEnv === 'development'
         ? 'http://localhost:6001'
-        : 'https://don-vip.online';
+        : 'https://don-vip.com';
   }
 
   @Get('me')

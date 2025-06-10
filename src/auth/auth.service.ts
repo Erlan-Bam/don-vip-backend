@@ -135,7 +135,7 @@ export class AuthService {
     }
 
     const token = await this.generateAccessToken(user);
-    const resetLink = `https://don-vip.online/reset-password?token=${token}`;
+    const resetLink = `https://don-vip.com/reset-password?token=${token}`;
 
     if (data.identifier.includes('@')) {
       await this.emailService.sendChangePasswordEmail(
