@@ -13,14 +13,14 @@ async function bootstrap() {
     }
   };
 
-  app.use(bodyParser.json({ limit: '50mb', verify: rawBodySaver }));
-  app.use(
-    bodyParser.urlencoded({
-      extended: true,
-      limit: '50mb',
-      verify: rawBodySaver,
-    }),
-  );
+  // app.use(bodyParser.json({ limit: '50mb', verify: rawBodySaver }));
+  // app.use(
+  //   bodyParser.urlencoded({
+  //     extended: true,
+  //     limit: '50mb',
+  //     verify: rawBodySaver,
+  //   }),
+  // );
 
   app.setGlobalPrefix('api');
   app.enableCors({
