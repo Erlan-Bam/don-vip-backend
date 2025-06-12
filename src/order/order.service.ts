@@ -130,7 +130,9 @@ export class OrderService {
           ? product.replenishment
           : JSON.parse(product.replenishment as any);
         replenishment = parsed[order.item_id];
-      } catch (err) {}
+      } catch (err) {
+        console.log('Error when parsing replenishment in getAllForAdmin', err);
+      }
 
       return {
         orderId: order.id,

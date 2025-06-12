@@ -298,7 +298,9 @@ export class UserService {
             ? order.product.replenishment
             : JSON.parse(order.product.replenishment as any);
           replenishment = parsed[order.item_id];
-        } catch (err) {}
+        } catch (err) {
+          console.log('Error when parsing replenishment in findAllUsers', err);
+        }
         return sum + replenishment.price;
       }, 0);
       const orderCount = user.orders.length;
