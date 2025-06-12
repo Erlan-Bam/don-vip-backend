@@ -94,6 +94,7 @@ export class UserService {
 
   async getUserPayments(userId: number, page = 1, limit = 10) {
     const skip = (page - 1) * limit;
+    console.log('USER ID', userId);
 
     const [payments, total] = await this.prisma.$transaction([
       this.prisma.payment.findMany({
@@ -111,13 +112,17 @@ export class UserService {
       }),
       this.prisma.payment.count({ where: { user_id: userId } }),
     ]);
+    console.log('PAYMENTS', payments);
 
     const formatted = payments.map((payment) => {
       return {
         id: payment.id,
         method: payment.method,
         status: payment.status,
-        price: Number(payment.price),
+        price:
+          payment.method === 'T-Bank'
+            ? payment.price.toNumber() / 100
+            : payment.price,
         createdAt: payment.created_at,
         orderId: payment.order_id,
         product: payment.order?.product?.name ?? '—',
