@@ -150,9 +150,7 @@ export class OrderService {
         serverId: order.server_id ?? 'N/A',
         diamonds: replenishment.amount,
         response: order.response ?? '—',
-        price: payment
-          ? `${(payment.price.toNumber() / 100).toFixed(2)}₽`
-          : '—',
+        price: `${replenishment.price} ₽`,
         method: payment?.method ?? '—',
         product: {
           id: product.id,
