@@ -174,14 +174,45 @@ export class OrderService {
   }
 
   async getAnalytics() {
-    const totalOrders = await this.prisma.order.count();
+    const now = new Date();
+    const startOfCurrentYear = new Date(now.getFullYear(), 0, 1);
+    const [orders, totalOrders] = await this.prisma.$transaction([
+      this.prisma.order.findMany({
+        where: {
+          status: 'Paid',
+          created_at: {
+            gte: startOfCurrentYear,
+          },
+        },
+        select: {
+          item_id: true,
+          created_at: true,
+          product: {
+            select: {
+              replenishment: true,
+            },
+          },
+        },
+      }),
+      this.prisma.order.count(),
+    ]);
+    const totalRevenue = orders.reduce((acc, order) => {
+      let replenishment = { amount: 0, price: 0 };
 
-    const totalRevenue = await this.prisma.payment.aggregate({
-      where: { status: 'Paid' },
-      _sum: {
-        price: true,
-      },
-    });
+      try {
+        const parsed = Array.isArray(order.product.replenishment)
+          ? order.product.replenishment
+          : JSON.parse(order.product.replenishment as any);
+
+        if (parsed && parsed[order.item_id]) {
+          replenishment = parsed[order.item_id];
+        }
+      } catch (err) {
+        console.log('Error when parsing replenishment in getAllForAdmin', err);
+      }
+
+      return acc + (replenishment.price || 0);
+    }, 0);
 
     const packagesCount = await this.prisma.order.groupBy({
       by: ['product_id'],
@@ -212,7 +243,7 @@ export class OrderService {
 
     return {
       totalOrders,
-      totalRevenue: totalRevenue._sum.price,
+      totalRevenue: totalRevenue,
       packages: packagesCount.map((item) => ({
         productId: item.product_id,
         name: productMap.get(item.product_id)?.name,
