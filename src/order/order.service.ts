@@ -226,7 +226,7 @@ export class OrderService {
     const now = new Date();
     const startOfCurrentYear = new Date(now.getFullYear(), 0, 1);
 
-    const payments = await this.prisma.payment.findMany({
+    const orders = await this.prisma.order.findMany({
       where: {
         status: 'Paid',
         created_at: {
@@ -234,8 +234,13 @@ export class OrderService {
         },
       },
       select: {
-        price: true,
+        item_id: true,
         created_at: true,
+        product: {
+          select: {
+            replenishment: true,
+          },
+        },
       },
     });
 
@@ -246,12 +251,24 @@ export class OrderService {
       monthlyData[monthKey] = { total: 0, count: 0 };
     }
 
-    for (const payment of payments) {
-      const date = new Date(payment.created_at);
+    for (const order of orders) {
+      const date = new Date(order.created_at);
       const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
 
       if (monthlyData[key]) {
-        monthlyData[key].total += Number(payment.price);
+        let replenishment = { amount: 0, price: 0 };
+        try {
+          const parsed = Array.isArray(order.product.replenishment)
+            ? order.product.replenishment
+            : JSON.parse(order.product.replenishment as any);
+          replenishment = parsed[order.item_id];
+        } catch (err) {
+          console.log(
+            'Error when parsing replenishment in getAllForAdmin',
+            err,
+          );
+        }
+        monthlyData[key].total += replenishment.price;
         monthlyData[key].count += 1;
       }
     }
