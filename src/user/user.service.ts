@@ -278,10 +278,11 @@ export class UserService {
         orderBy: { id: 'desc' },
         include: {
           orders: {
+            where: {
+              status: 'Paid',
+            },
             include: {
-              payments: {
-                where: { status: 'Paid' },
-              },
+              product: true,
             },
           },
         },
@@ -290,11 +291,16 @@ export class UserService {
     ]);
 
     const enriched = users.map((user) => {
-      const allPayments = user.orders.flatMap((o) => o.payments);
-      const totalSpent = allPayments.reduce(
-        (sum, p) => sum + parseFloat(p.price.toString()),
-        0,
-      );
+      const totalSpent = user.orders.reduce((sum, order) => {
+        let replenishment = { amount: 0, price: 0 };
+        try {
+          const parsed = Array.isArray(order.product.replenishment)
+            ? order.product.replenishment
+            : JSON.parse(order.product.replenishment as any);
+          replenishment = parsed[order.item_id];
+        } catch (err) {}
+        return sum + replenishment.price;
+      }, 0);
       const orderCount = user.orders.length;
       const avgCheck = orderCount > 0 ? totalSpent / orderCount : 0;
 

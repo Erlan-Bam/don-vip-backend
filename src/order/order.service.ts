@@ -129,7 +129,7 @@ export class OrderService {
         const parsed = Array.isArray(product.replenishment)
           ? product.replenishment
           : JSON.parse(product.replenishment as any);
-        replenishment = parsed[order.item_id] || parsed[0] || replenishment;
+        replenishment = parsed[order.item_id];
       } catch (err) {}
 
       return {
