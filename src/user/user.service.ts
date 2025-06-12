@@ -122,7 +122,7 @@ export class UserService {
         price:
           payment.method === 'T-Bank'
             ? payment.price.toNumber() / 100
-            : payment.price,
+            : Number(payment.price),
         createdAt: payment.created_at,
         orderId: payment.order_id,
         product: payment.order?.product?.name ?? '—',
