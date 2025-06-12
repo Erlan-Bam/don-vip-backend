@@ -147,6 +147,14 @@ export class PaymentService {
     const [orderIdStr, userId] = data.OrderId.split('_');
     const orderId = parseInt(orderIdStr, 10);
 
+    const orderStatus = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      select: { status: true },
+    });
+    if (orderStatus.status === 'Paid') {
+      return res.json({ message: 'ok' }).status(200);
+    }
+
     const allowedStatus = ['REJECTED', 'CONFIRMED'];
 
     if (data.Status && allowedStatus.includes(data.Status)) {
