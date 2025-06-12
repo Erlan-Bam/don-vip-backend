@@ -112,7 +112,7 @@ export class UserService {
       }),
       this.prisma.payment.count({ where: { user_id: userId } }),
     ]);
-    console.log('PAYMENTS', payments);
+    console.log('PAYMENTS', payments.length, 'TOTAL', total);
 
     const formatted = payments.map((payment) => {
       return {
