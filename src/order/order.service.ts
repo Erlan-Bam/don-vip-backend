@@ -139,12 +139,18 @@ export class OrderService {
         itemId: order.item_id,
         productId: order.product_id,
         user: order.user,
-        date:
-          payment?.created_at?.toLocaleDateString() ??
-          order.created_at.toLocaleDateString(),
-        time:
-          payment?.created_at?.toLocaleTimeString() ??
-          order.created_at.toLocaleTimeString(),
+        date: (payment?.created_at ?? order.created_at).toLocaleDateString(
+          'ru-RU',
+          {
+            timeZone: 'Europe/Moscow',
+          },
+        ),
+        time: (payment?.created_at ?? order.created_at).toLocaleTimeString(
+          'ru-RU',
+          {
+            timeZone: 'Europe/Moscow',
+          },
+        ),
         gameImage: product.image,
         currencyImage: product.currency_image ?? '/diamond.png',
         status: order.status,
