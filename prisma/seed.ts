@@ -3,12 +3,23 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.user.update({
-    where: { identifier: 'hoyakap@gmail.com' },
-    data: {
-      role: 'Admin',
-    },
+  const now = new Date();
+
+  // Получаем все подтверждённые отзывы
+  const verifiedFeedbacks = await prisma.feedback.findMany({
+    where: { isVerified: true },
+    select: { id: true },
   });
+
+  for (const feedback of verifiedFeedbacks) {
+    const randomHours = Math.floor(Math.random() * 72);
+    const randomDate = new Date(now.getTime() - randomHours * 60 * 60 * 1000);
+
+    await prisma.feedback.update({
+      where: { id: feedback.id },
+      data: { created_at: randomDate },
+    });
+  }
 }
 
 main()
