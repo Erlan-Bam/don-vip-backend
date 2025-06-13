@@ -88,7 +88,8 @@ model Coupon {
 model Product {
   id              Int        @id @default(autoincrement())
   name            String
-  description     String
+  description     String   
+  description_en  String     @default("")
   image           String
   replenishment   Json
   currency_image  String?
