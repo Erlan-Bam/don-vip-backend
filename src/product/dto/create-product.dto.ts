@@ -50,6 +50,13 @@ export class CreateProductDto {
   description: string;
 
   @ApiProperty({
+    example: 'in Bigo LIVE you can buy diamonds',
+    description: 'Краткое описание продукта и его назначения',
+  })
+  @IsString()
+  description_en: string;
+
+  @ApiProperty({
     type: 'string',
     format: 'binary',
     required: true,

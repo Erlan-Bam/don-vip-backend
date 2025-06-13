@@ -12,6 +12,7 @@ export class ProductService {
       data: {
         name: data.name,
         description: data.description,
+        description_en: data.description_en,
         image: data.image,
         replenishment: JSON.parse(JSON.stringify(data.replenishment)),
         type: data.type,
