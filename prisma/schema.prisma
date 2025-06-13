@@ -146,6 +146,8 @@ model Feedback {
   product_id  Int
   isVerified  Boolean  @default(false)
   user_id     Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt @default(now())
 
   product     Product  @relation(fields: [product_id], references: [id], onDelete: Cascade)
   user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
