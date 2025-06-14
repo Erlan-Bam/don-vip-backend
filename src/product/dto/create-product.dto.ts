@@ -111,4 +111,9 @@ export class CreateProductDto {
   })
   @IsOptional()
   currency_name: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  order_number: number;
 }
