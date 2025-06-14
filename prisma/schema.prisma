@@ -96,6 +96,7 @@ model Product {
   currency_name   String?
   smile_api_game  String?    @unique
   type            ProductType
+  order_number    Int        @default(1)
 
   feedbacks       Feedback[]
   orders          Order[]
