@@ -40,14 +40,14 @@ export class UnimatrixService {
     lang: 'ru' | 'en',
   ): Promise<void> {
     try {
-      await this.client.otp.send({
-        digits: 5,
-        to: to,
+      await this.client.messages.send({
         templateId:
           lang === 'en' ? 'pub_otp_en_reset_pass' : 'pub_otp_ru_security',
-        channel: 'sms',
-        code: code,
+        templateData: {
+          code: code,
+        },
         signature: 'DON-VIP',
+        to: to,
       });
     } catch (error) {
       throw new HttpException('Something went wrong', 500);
