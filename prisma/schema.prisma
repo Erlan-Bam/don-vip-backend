@@ -57,6 +57,7 @@ model User {
   is_banned         Boolean       @default(false)
   is_verified       Boolean       @default(false)
   verification_code String?
+  change_password_code String?
 
   orders            Order[]
   feedbacks         Feedback[]

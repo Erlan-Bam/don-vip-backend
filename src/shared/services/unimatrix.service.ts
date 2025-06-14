@@ -36,14 +36,17 @@ export class UnimatrixService {
 
   async sendChangePasswordSMS(
     to: string,
-    link: string,
+    code: string,
     lang: 'ru' | 'en',
   ): Promise<void> {
     try {
-      await this.client.messages.send({
+      await this.client.otp.send({
+        digits: 5,
         to: to,
-        templateId: lang === 'en' ? 'reset_password_en' : 'reset_password_ru',
-        templateData: { link: link },
+        templateId:
+          lang === 'en' ? 'pub_otp_en_reset_pass' : 'pub_otp_ru_security',
+        channel: 'sms',
+        code: code,
         signature: 'DON-VIP',
       });
     } catch (error) {

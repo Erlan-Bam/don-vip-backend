@@ -65,16 +65,18 @@ export class UserService {
   async resetPassword(data: ResetPasswordDto) {
     const user = await this.prisma.user.findUnique({
       where: { identifier: data.identifier },
-      select: { password: true },
+      select: { password: true, change_password_code: true },
     });
     if (!user) {
       throw new HttpException('User not found', 404);
+    }
+    if (user.change_password_code !== data.code) {
+      throw new HttpException('Invalid code', 400);
     }
     const bcrypt = await import('bcryptjs');
     const isMatch =
       (await bcrypt.compare(data.new_password, user.password)) &&
       user.password !== '';
-    console.log();
     if (isMatch) {
       throw new HttpException('New password must not match old password', 400);
     }
@@ -83,6 +85,7 @@ export class UserService {
       where: { identifier: data.identifier },
       data: {
         password: hashedPassword,
+        change_password_code: null,
       },
       select: {
         id: true,

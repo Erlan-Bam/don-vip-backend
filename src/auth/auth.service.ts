@@ -134,19 +134,24 @@ export class AuthService {
       throw new HttpException('User not found', 404);
     }
 
-    const token = await this.generateAccessToken(user);
-    const resetLink = `https://don-vip.com/reset-password?token=${token}`;
+    const code = await this.generateCode();
+    await this.prisma.user.update({
+      where: { identifier: data.identifier },
+      data: {
+        change_password_code: code,
+      },
+    });
 
     if (data.identifier.includes('@')) {
       await this.emailService.sendChangePasswordEmail(
         data.identifier,
-        resetLink,
+        code,
         data.lang,
       );
     } else {
       await this.unimatrixService.sendChangePasswordSMS(
         data.identifier,
-        resetLink,
+        code,
         data.lang,
       );
     }

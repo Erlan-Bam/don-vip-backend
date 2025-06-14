@@ -89,7 +89,6 @@ export class UserController {
   }
 
   @Post('reset-password')
-  @UseGuards(AuthGuard('jwt'))
   @ApiOperation({ summary: 'Reset password for authenticated user' })
   @ApiBody({ type: ResetPasswordDto })
   @ApiResponse({ status: 200, description: 'Password reset successful' })
