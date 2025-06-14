@@ -39,7 +39,7 @@ export class ProductService {
         where,
         skip,
         take: limit,
-        orderBy: { id: 'asc' },
+        orderBy: { order_number: 'asc' },
       }),
       this.prisma.product.count({ where }),
     ]);
