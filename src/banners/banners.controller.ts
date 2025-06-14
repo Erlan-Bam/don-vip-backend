@@ -8,14 +8,21 @@ import {
   Delete,
   UploadedFile,
   UseInterceptors,
+  UploadedFiles,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import {
+  FileFieldsInterceptor,
+  FileInterceptor,
+} from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
 
 import { BannersService } from './banners.service';
 import { CreateBannerDto } from './dto/create-banner.dto';
 import { UpdateBannerDto } from './dto/update-banner.dto';
+import { ConfigService } from '@nestjs/config';
 
 const generateFilename = (prefix: string, originalName: string): string => {
   const ext = extname(originalName);
@@ -25,10 +32,67 @@ const generateFilename = (prefix: string, originalName: string): string => {
 
 @Controller('banners')
 export class BannersController {
-  constructor(private readonly bannersService: BannersService) {}
+  baseUrl: string;
+  constructor(
+    private readonly bannersService: BannersService,
+    private configService: ConfigService,
+  ) {
+    const nodeEnv = this.configService.get<string>('NODE_ENV');
+    this.baseUrl =
+      nodeEnv === 'development'
+        ? 'http://localhost:6001'
+        : 'https://don-vip.com';
+  }
 
   @Post()
-  create(@Body() createBannerDto: CreateBannerDto) {
+  @UsePipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: false,
+      transform: true,
+    }),
+  )
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'pcImage', maxCount: 1 },
+        { name: 'mobileImage', maxCount: 1 },
+      ],
+      {
+        storage: diskStorage({
+          destination: './uploads/banners',
+          filename: (req, file, cb) => {
+            const prefix = file.fieldname === 'pcImage' ? 'pc' : 'mobile';
+            const ext = extname(file.originalname);
+            const name = file.originalname
+              .split('.')
+              .slice(0, -1)
+              .join('.')
+              .replace(/\s+/g, '-');
+            cb(null, `${prefix}-${Date.now()}-${name}${ext}`);
+          },
+        }),
+      },
+    ),
+  )
+  async create(
+    @Body() createBannerDto: CreateBannerDto,
+    @UploadedFiles()
+    files: {
+      pcImage?: Express.Multer.File[];
+      mobileImage?: Express.Multer.File[];
+    },
+  ) {
+    const pc = files.pcImage?.[0];
+    const mob = files.mobileImage?.[0];
+
+    if (pc) {
+      createBannerDto.image = `${this.baseUrl}/uploads/banners/${pc.filename}`;
+    }
+    if (mob) {
+      createBannerDto.mobileImage = `${this.baseUrl}/uploads/banners/${mob.filename}`;
+    }
+
     return this.bannersService.create(createBannerDto);
   }
 
@@ -67,7 +131,7 @@ export class BannersController {
     @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    const imageUrl = `/uploads/banners/${file.filename}`;
+    const imageUrl = `${this.baseUrl}/uploads/banners/${file.filename}`;
     return this.bannersService.update(+id, { image: imageUrl });
   }
 
@@ -86,7 +150,7 @@ export class BannersController {
     @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    const mobileImageUrl = `/uploads/banners/${file.filename}`;
+    const mobileImageUrl = `${this.baseUrl}/uploads/banners/${file.filename}`;
     return this.bannersService.update(+id, { mobileImage: mobileImageUrl });
   }
 }
