@@ -29,6 +29,7 @@ async function bootstrap() {
       'https://don-vip.com',
       'https://admin-panel.don-vip.com',
       'https://test.don-vip.com',
+      'http://test.don-vip.com',
       'https://don-vip.vercel.app',
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
