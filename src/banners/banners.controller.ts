@@ -45,13 +45,7 @@ export class BannersController {
   }
 
   @Post()
-  @UsePipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: false,
-      transform: true,
-    }),
-  )
+  @Post()
   @UseInterceptors(
     FileFieldsInterceptor(
       [
@@ -76,7 +70,14 @@ export class BannersController {
     ),
   )
   async create(
-    @Body() createBannerDto: CreateBannerDto,
+    @Body(
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: false,
+        transform: true,
+      }),
+    )
+    createBannerDto: CreateBannerDto,
     @UploadedFiles()
     files: {
       pcImage?: Express.Multer.File[];
