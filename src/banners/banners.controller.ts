@@ -45,7 +45,6 @@ export class BannersController {
   }
 
   @Post()
-  @Post()
   @UseInterceptors(
     FileFieldsInterceptor(
       [
@@ -87,9 +86,11 @@ export class BannersController {
     const pc = files.pcImage?.[0];
     const mob = files.mobileImage?.[0];
 
+    // Override with uploaded file URLs if files are provided
     if (pc) {
       createBannerDto.image = `${this.baseUrl}/uploads/banners/${pc.filename}`;
     }
+
     if (mob) {
       createBannerDto.mobileImage = `${this.baseUrl}/uploads/banners/${mob.filename}`;
     }
