@@ -48,7 +48,7 @@ export class BannersController {
   @UseInterceptors(
     FileFieldsInterceptor(
       [
-        { name: 'pcImage', maxCount: 1 },
+        { name: 'image', maxCount: 1 },
         { name: 'mobileImage', maxCount: 1 },
       ],
       {
