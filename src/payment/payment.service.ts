@@ -86,6 +86,9 @@ export class PaymentService {
         },
       },
     );
+    if (payment.data.web_url) {
+      payment.data.web_url += `&return_url=${encodeURIComponent('https://don-vip.com/payment/success')}`;
+    }
     return payment.data;
   }
   async pagsmileNotification(
