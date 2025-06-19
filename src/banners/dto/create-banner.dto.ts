@@ -1,4 +1,4 @@
-import { IsString, IsUrl } from 'class-validator';
+import { IsString, IsUrl, IsOptional } from 'class-validator';
 
 export class CreateBannerDto {
   @IsString()

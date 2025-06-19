@@ -45,13 +45,6 @@ export class BannersController {
   }
 
   @Post()
-  @UsePipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: false,
-      transform: true,
-    }),
-  )
   @UseInterceptors(
     FileFieldsInterceptor(
       [
@@ -76,7 +69,14 @@ export class BannersController {
     ),
   )
   async create(
-    @Body() createBannerDto: CreateBannerDto,
+    @Body(
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: false,
+        transform: true,
+      }),
+    )
+    createBannerDto: CreateBannerDto,
     @UploadedFiles()
     files: {
       image?: Express.Multer.File[];
@@ -86,9 +86,11 @@ export class BannersController {
     const pc = files.image?.[0];
     const mob = files.mobileImage?.[0];
 
+    // Override with uploaded file URLs if files are provided
     if (pc) {
       createBannerDto.image = `${this.baseUrl}/uploads/banners/${pc.filename}`;
     }
+
     if (mob) {
       createBannerDto.mobileImage = `${this.baseUrl}/uploads/banners/${mob.filename}`;
     }
