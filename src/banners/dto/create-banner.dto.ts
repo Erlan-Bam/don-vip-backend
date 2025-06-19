@@ -1,12 +1,10 @@
 import { IsString, IsUrl, IsOptional } from 'class-validator';
 
 export class CreateBannerDto {
-  @IsString()
-  @IsUrl({}, { message: 'Image must be a valid URL' })
+  @IsOptional()
   image: string;
 
-  @IsString()
-  @IsUrl({}, { message: 'Mobile image must be a valid URL' })
+  @IsOptional()
   mobileImage: string;
 
   @IsString()
