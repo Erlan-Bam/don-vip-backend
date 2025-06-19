@@ -55,14 +55,14 @@ export class BannersController {
   @UseInterceptors(
     FileFieldsInterceptor(
       [
-        { name: 'pcImage', maxCount: 1 },
+        { name: 'image', maxCount: 1 },
         { name: 'mobileImage', maxCount: 1 },
       ],
       {
         storage: diskStorage({
           destination: './uploads/banners',
           filename: (req, file, cb) => {
-            const prefix = file.fieldname === 'pcImage' ? 'pc' : 'mobile';
+            const prefix = file.fieldname === 'image' ? 'pc' : 'mobile';
             const ext = extname(file.originalname);
             const name = file.originalname
               .split('.')
@@ -79,11 +79,11 @@ export class BannersController {
     @Body() createBannerDto: CreateBannerDto,
     @UploadedFiles()
     files: {
-      pcImage?: Express.Multer.File[];
+      image?: Express.Multer.File[];
       mobileImage?: Express.Multer.File[];
     },
   ) {
-    const pc = files.pcImage?.[0];
+    const pc = files.image?.[0];
     const mob = files.mobileImage?.[0];
 
     if (pc) {
@@ -127,7 +127,7 @@ export class BannersController {
       }),
     }),
   )
-  uploadPcImage(
+  uploadimage(
     @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File,
   ) {
