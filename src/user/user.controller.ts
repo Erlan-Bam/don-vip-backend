@@ -93,7 +93,7 @@ export class UserController {
   @ApiBody({ type: ResetPasswordDto })
   @ApiResponse({ status: 200, description: 'Password reset successful' })
   async resetPassword(@Body() data: ResetPasswordDto, @Request() request) {
-    data.identifier = request.user.identifier;
+    data.identifier = data.identifier;
     return this.userService.resetPassword(data);
   }
 
