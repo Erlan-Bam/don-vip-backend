@@ -10,7 +10,7 @@ export class ResetPasswordDto {
   @IsString()
   new_password: string;
 
-  @ApiPropertyOptional()
-  @IsOptional()
+  @ApiProperty({ example: '+77999999999' })
+  @IsString()
   identifier: string;
 }
