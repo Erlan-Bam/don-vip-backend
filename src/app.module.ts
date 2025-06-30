@@ -9,7 +9,6 @@ import { ProductModule } from './product/product.module';
 import { FeedbackModule } from './feedback/feedback.module';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { LoggerMiddleware } from './shared/logger';
 import { TechworksModule } from './techworks/techworks.module';
 import { BankModule } from './bank/bank.module';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -35,8 +34,4 @@ import { BannersModule } from './banners/banners.module';
     BannersModule,
   ],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggerMiddleware).forRoutes('*'); // or specific routes
-  }
-}
+export class AppModule {}
