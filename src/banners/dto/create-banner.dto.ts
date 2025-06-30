@@ -10,4 +10,7 @@ export class CreateBannerDto {
   @IsString()
   @IsUrl({}, { message: 'Button link must be a valid URL' })
   buttonLink: string;
+
+  @IsString()
+  title: string;
 }

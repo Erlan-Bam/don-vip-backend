@@ -9,7 +9,12 @@ export class BannersService {
 
   create(createBannerDto: CreateBannerDto) {
     return this.prisma.banner.create({
-      data: createBannerDto,
+      data: {
+        image: createBannerDto.image,
+        mobileImage: createBannerDto.mobileImage,
+        buttonLink: createBannerDto.buttonLink,
+        title: createBannerDto.title, // Add title explicitly
+      },
     });
   }
 
@@ -26,7 +31,10 @@ export class BannersService {
   update(id: number, updateBannerDto: UpdateBannerDto) {
     return this.prisma.banner.update({
       where: { id },
-      data: updateBannerDto,
+      data: {
+        ...updateBannerDto,
+        title: updateBannerDto.title, // Add title explicitly for update
+      },
     });
   }
 
