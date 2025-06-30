@@ -71,7 +71,7 @@ model Banner {
   image        String
   mobileImage  String
   buttonLink   String
-  title        String?
+  title        String?      @default("")
 }
 
 model Coupon {
