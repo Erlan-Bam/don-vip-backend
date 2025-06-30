@@ -68,9 +68,10 @@ model User {
 
 model Banner {
   id           Int           @id @default(autoincrement())
-  image     String
-  mobileImage String
-  buttonLink  String
+  image        String
+  mobileImage  String
+  buttonLink   String
+  title        String        // New field for banner title
 }
 
 model Coupon {
