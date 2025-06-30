@@ -71,7 +71,7 @@ model Banner {
   image        String
   mobileImage  String
   buttonLink   String
-  title        String        // New field for banner title
+  title        String?        // New field for banner title
 }
 
 model Coupon {
