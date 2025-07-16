@@ -140,11 +140,7 @@ export class OrderService {
 
       const replenishment = parsed[order.item_id];
       if (!replenishment) {
-        console.warn(
-          `No replenishment entry at index ${order.item_id} for order ${order.id}:`,
-          order,
-        );
-        return order;
+        return null;
       }
 
       return {
