@@ -135,7 +135,7 @@ export class OrderService {
       }
       if (!replenishment?.amount) {
         console.warn(
-          `Order ${order.id} has no replenishment ${replenishment} and order: ${order}`,
+          `Order ${order.id} has no replenishment ${replenishment} and order: ${(order.item_id, order.product_id)}`,
           replenishment,
         );
         return null; // skip if out-of-bounds or zero
