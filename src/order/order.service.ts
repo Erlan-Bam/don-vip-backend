@@ -159,7 +159,7 @@ export class OrderService {
         status: order.status,
         playerId: order.account_id ?? 'N/A',
         serverId: order.server_id ?? 'N/A',
-        diamonds: replenishment.amount ?? '-',
+        diamonds: replenishment.amount,
         response: order.response ?? '—',
         price: `${replenishment.price} ₽`,
         method: payment?.method ?? '—',
