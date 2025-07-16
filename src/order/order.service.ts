@@ -133,13 +133,6 @@ export class OrderService {
       } catch (err) {
         console.log('Error when parsing replenishment in getAllForAdmin', err);
       }
-      if (!replenishment?.amount) {
-        console.warn(
-          `Order ${order.id} has no replenishment ${replenishment} and order: ${(order.item_id, order.product_id)}`,
-          replenishment,
-        );
-        return null; // skip if out-of-bounds or zero
-      }
 
       return {
         orderId: order.id,
