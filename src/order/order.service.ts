@@ -133,6 +133,7 @@ export class OrderService {
       } catch (err) {
         console.log('Error when parsing replenishment in getAllForAdmin', err);
       }
+      if (!replenishment.amount) console.log(replenishment, order);
 
       return {
         orderId: order.id,
