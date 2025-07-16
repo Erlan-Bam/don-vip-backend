@@ -124,14 +124,27 @@ export class OrderService {
       const product = order.product;
       const payment = order.payments[0];
 
-      let replenishment = { amount: 0, price: 0 };
+      let parsed: ReplenishmentItem[];
       try {
-        const parsed = Array.isArray(product.replenishment)
-          ? product.replenishment
-          : JSON.parse(product.replenishment as any);
-        replenishment = parsed[order.item_id];
+        parsed = Array.isArray(product.replenishment)
+          ? (product.replenishment as any)
+          : (JSON.parse(product.replenishment as any) as ReplenishmentItem[]);
       } catch (err) {
-        console.log('Error when parsing replenishment in getAllForAdmin', err);
+        console.error(
+          `Error parsing replenishment for order ${order.id}:`,
+          order,
+          err,
+        );
+        return order;
+      }
+
+      const replenishment = parsed[order.item_id];
+      if (!replenishment) {
+        console.warn(
+          `No replenishment entry at index ${order.item_id} for order ${order.id}:`,
+          order,
+        );
+        return order;
       }
 
       return {
