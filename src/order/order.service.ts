@@ -308,8 +308,10 @@ export class OrderService {
             err,
           );
         }
-        monthlyData[key].total += replenishment.price;
-        monthlyData[key].count += 1;
+        if (replenishment) {
+          monthlyData[key].total += replenishment.price;
+          monthlyData[key].count += 1;
+        }
       }
     }
 
