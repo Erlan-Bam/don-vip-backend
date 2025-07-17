@@ -120,7 +120,7 @@ export class OrderService {
       this.prisma.order.count({ where: whereClause }),
     ]);
 
-    const formattedData = orders.map((order) => {
+    const formattedData = orders.flatMap((order) => {
       const product = order.product;
       const payment = order.payments[0];
 
@@ -135,12 +135,12 @@ export class OrderService {
           order,
           err,
         );
-        return order;
+        return [];
       }
 
       const replenishment = parsed[order.item_id];
       if (!replenishment) {
-        return;
+        return [];
       }
 
       return {
