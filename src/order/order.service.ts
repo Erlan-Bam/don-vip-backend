@@ -140,7 +140,7 @@ export class OrderService {
 
       const replenishment = parsed[order.item_id];
       if (!replenishment) {
-        return null;
+        return;
       }
 
       return {
