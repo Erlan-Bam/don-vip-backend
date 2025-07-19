@@ -34,7 +34,7 @@ enum CouponStatus {
 model Website {
   id               Int       @id @default(autoincrement())
   isTechWorks      Boolean
-  techWorksEndsAt  DateTime? // точка, когда “тех. работы” автоматически выключатся
+  techWorksEndsAt  DateTime? // ?????, ????? �???. ??????� ????????????? ??????????
 }
 model Bank {
   id          Int      @id @default(autoincrement())
@@ -64,7 +64,7 @@ model User {
   feedbacks         Feedback[]
   payments          Payment[]
   usedCoupons       UsedCoupon[]
-  activeCoupons     ActiveCoupon[] // ✅ multiple active coupons
+  activeCoupons     ActiveCoupon[] // ? multiple active coupons
 }
 
 model Banner {
@@ -83,7 +83,7 @@ model Coupon {
   status       CouponStatus  @default(Active)
 
   usedBy       UsedCoupon[]
-  activeUsers  ActiveCoupon[] // ✅ multiple users can activate
+  activeUsers  ActiveCoupon[] // ? multiple users can activate
   orders       Order[]
   products     Product[]     @relation("CouponProducts")
 }
@@ -98,6 +98,7 @@ model Product {
   currency_image  String?
   currency_name   String?
   smile_api_game  String?    @unique
+  donatbank_product_id String? @unique
   type            ProductType
   order_number    Int        @default(1)
 
@@ -159,20 +160,18 @@ model Feedback {
 }
 
 model Order {
-  id           Int         @id @default(autoincrement())
-  user_id      Int?
-  product_id   Int
-  item_id      Int
-  payment      String
-  identifier   String
-  status       PaymentStatus  @default(Pending)
-  account_id   String?
-  server_id    String?
-  created_at   DateTime       @default(now())
-  updated_at   DateTime       @updatedAt @default(now())
-  response     Json?
-  donatbank_order_id String?     // DonatBank order ID for tracking
-  payment_url  String?         // Payment URL for DonatBank orders
+  id                  Int         @id @default(autoincrement())
+  user_id             Int?
+  product_id          Int
+  item_id             Int
+  payment             String
+  identifier          String
+  status              PaymentStatus  @default(Pending)
+  account_id          String?
+  server_id           String?
+  created_at          DateTime       @default(now())
+  updated_at          DateTime       @updatedAt @default(now())
+  response            Json?
 
   coupon_id    Int?
   coupon       Coupon?        @relation(fields: [coupon_id], references: [id])

@@ -30,7 +30,7 @@ export class DonatBankService {
         status: 'success',
         paymentId: response.data.paymentId,
         paymentUrl: response.data.paymentUrl,
-        message: 'Запрос на пополнение успешно создан.',
+        message: '?????? ?? ?????????? ??????? ??????.',
       };
     } catch (error) {
       if (error.response?.data) {
@@ -49,7 +49,7 @@ export class DonatBankService {
 
       return {
         status: response.data.status || 'success',
-        message: response.data.message || 'Список доступных товаров получен',
+        message: response.data.message || '?????? ????????? ??????? ???????',
         product_list: response.data.product_list || [],
       };
     } catch (error) {
@@ -71,7 +71,7 @@ export class DonatBankService {
 
       return {
         status: response.data.status || 'success',
-        message: response.data.message || 'Информация о товаре получена',
+        message: response.data.message || '?????????? ? ?????? ????????',
         product_info: response.data.product_info || {},
       };
     } catch (error) {
@@ -85,26 +85,21 @@ export class DonatBankService {
     }
   }
 
-  async createOrder(
-    productId: string,
-    packageId: string,
-    quantity: number,
-    fields: Record<string, any>,
-  ) {
+  async createOrder(productId: string, packageId: string, account_id: string) {
     try {
       const response = await this.donatbank.post('/order/create-order', {
         productId,
         packageId,
-        quantity,
-        fields,
+        quantity: 1,
+        fields: {
+          user_id: account_id,
+          zone_id: 'ru',
+        },
       });
 
       return {
-        status: response.data.status || 'success',
-        message: response.data.message || 'Заказ успешно создан',
-        order_id: response.data.order_id || null,
-        payment_url:
-          response.data.payment_url || response.data.paymentUrl || null, // Add payment URL support
+        status: 'success',
+        message: response.data.message,
       };
     } catch (error) {
       if (error.response?.data) {

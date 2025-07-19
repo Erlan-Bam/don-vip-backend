@@ -7,6 +7,7 @@ import { SmileService } from 'src/shared/services/smile.service';
 import { subYears, startOfYear } from 'date-fns';
 import { EmailService } from 'src/shared/services/email.service';
 import { UnimatrixService } from 'src/shared/services/unimatrix.service';
+import { DonatBankService } from 'src/shared/services/donatbank.service';
 import { response } from 'express';
 
 @Injectable()
@@ -17,6 +18,7 @@ export class OrderService {
     private smileService: SmileService,
     private emailService: EmailService,
     private unimatrixService: UnimatrixService,
+    private donatBankService: DonatBankService,
   ) {}
 
   async create(data: CreateOrderDto) {
@@ -25,23 +27,27 @@ export class OrderService {
       select: {
         id: true,
         replenishment: true,
+        type: true,
       },
     });
     if (!product) {
       throw new HttpException('Invalid product id', 400);
     }
+
     const replenishment =
       product.replenishment as unknown as ReplenishmentItem[];
     if (data.item_id >= replenishment.length) {
       throw new HttpException(
-        'ID пакета больше чем количество пакетов в этом продукте',
+        'ID ?????? ?????? ??? ?????????? ??????? ? ???? ????????',
         400,
       );
     }
+
     const coupon = await this.prisma.coupon.findFirst({
       where: { code: data.coupon_code },
       select: { id: true, status: true },
     });
+
     return await this.prisma.order.create({
       data: {
         identifier: data.identifier,
@@ -57,27 +63,28 @@ export class OrderService {
   }
 
   async createDonatBankOrder(data: {
-    donatbank_order_id: string;
-    product_type: string;
-    status: string;
+    identifier: string;
+    product_id: number;
+    user_id?: number;
+    productId: string;
+    packageId: string;
+    quantity: number;
     fields: Record<string, any>;
-    payment_url?: string; // Add payment_url parameter
   }) {
-    // Create a minimal order record for DonatBank orders
-    // We'll use dummy values for required fields that don't apply to DonatBank
     return await this.prisma.order.create({
       data: {
-        identifier: `donatbank_${Date.now()}`, // Unique identifier
-        product_id: 1, // We'll need to create a special DonatBank product or use a placeholder
+        identifier: data.identifier,
+        product_id: data.product_id,
+        user_id: data.user_id,
         item_id: 0, // Not applicable for DonatBank
         payment: 'DonatBank',
         account_id: data.fields.user_id || null,
         server_id: data.fields.zone_id || null,
-        status: data.status as any,
-        donatbank_order_id: data.donatbank_order_id, // Now using the dedicated field
-        payment_url: data.payment_url, // Save payment URL
         response: {
-          ...data.fields,
+          productId: data.productId,
+          packageId: data.packageId,
+          quantity: data.quantity,
+          fields: data.fields,
         },
       },
     });
@@ -103,7 +110,7 @@ export class OrderService {
             ],
           },
         },
-        // 👇 Add numeric ID matching (orderId, itemId, etc.)
+        // ?? Add numeric ID matching (orderId, itemId, etc.)
         ...(Number.isInteger(numericSearch) && numericSearch > 0
           ? [
               { id: numericSearch }, // order.id
@@ -187,9 +194,9 @@ export class OrderService {
         playerId: order.account_id ?? 'N/A',
         serverId: order.server_id ?? 'N/A',
         diamonds: replenishment.amount,
-        response: order.response ?? '—',
-        price: `${replenishment.price} ₽`,
-        method: payment?.method ?? '—',
+        response: order.response ?? '�',
+        price: `${replenishment.price} ?`,
+        method: payment?.method ?? '�',
         product: {
           id: product.id,
           name: product.name,
@@ -382,8 +389,10 @@ export class OrderService {
         server_id: true,
         item_id: true,
         status: true,
+        response: true,
         product: {
           select: {
+            donatbank_product_id: true,
             replenishment: true,
             type: true,
             smile_api_game: true,
@@ -404,11 +413,6 @@ export class OrderService {
     }
 
     let replenishment: ReplenishmentItem[] = [];
-    let response: {
-      type: string;
-      message: string;
-    };
-
     if (typeof order.product.replenishment === 'string') {
       replenishment = JSON.parse(order.product.replenishment);
     } else if (Array.isArray(order.product.replenishment)) {
@@ -418,42 +422,56 @@ export class OrderService {
       return order;
     }
     const item: ReplenishmentItem = replenishment[order.item_id];
-
-    if (order.product.type === 'Bigo') {
-      const result = await this.bigoService.rechargeDiamond({
-        rechargeBigoId: order.account_id,
-        buOrderId: `${order.user_id}${Date.now()}${Math.floor(Math.random() * 100000)}`,
-        currency: 'RUB',
-        value: item.amount,
-        totalCost: item.price,
-      });
-      response = {
-        type: 'bigo',
-        message: result.message,
-      };
-      if (result.message !== 'ok') {
-        await this.smileService.sendBigo(
-          order.account_id,
-          item.amount.toString(),
-        );
-      }
-    } else {
-      const result = await this.smileService.sendOrder(
-        order.product.smile_api_game,
+    let response: {
+      type: string;
+      message: string;
+    };
+    if (order.product.type === 'DonatBank') {
+      const result = await this.donatBankService.createOrder(
+        order.product.donatbank_product_id,
         item.sku,
         order.account_id,
-        order.server_id,
       );
-      if (result.status === 'success') {
+
+      response.message = result.message;
+      response.type = 'donatbank';
+    } else {
+      if (order.product.type === 'Bigo') {
+        const result = await this.bigoService.rechargeDiamond({
+          rechargeBigoId: order.account_id,
+          buOrderId: `${order.user_id}${Date.now()}${Math.floor(Math.random() * 100000)}`,
+          currency: 'RUB',
+          value: item.amount,
+          totalCost: item.price,
+        });
         response = {
-          type: 'smile',
-          message: 'success',
+          type: 'bigo',
+          message: result.message,
         };
+        if (result.message !== 'ok') {
+          await this.smileService.sendBigo(
+            order.account_id,
+            item.amount.toString(),
+          );
+        }
       } else {
-        response = {
-          type: 'smile',
-          message: result.error,
-        };
+        const result = await this.smileService.sendOrder(
+          order.product.smile_api_game,
+          item.sku,
+          order.account_id,
+          order.server_id,
+        );
+        if (result.status === 'success') {
+          response = {
+            type: 'smile',
+            message: 'success',
+          };
+        } else {
+          response = {
+            type: 'smile',
+            message: result.error,
+          };
+        }
       }
     }
 
@@ -549,7 +567,7 @@ export class OrderService {
         playerId: order.account_id,
         diamonds: replenishment.amount,
         response: order.response,
-        price: `${replenishment.price}₽`,
+        price: `${replenishment.price}?`,
         ...(order.server_id !== undefined && { serverId: order.server_id }),
         payment: payment,
         product: {

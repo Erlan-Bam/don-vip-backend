@@ -47,7 +47,7 @@ export class OrderController {
   @ApiOperation({ summary: 'Get all orders (admin only)' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
-  @ApiQuery({ name: 'search', required: false, type: String, example: '7999' }) // 👈 Add this
+  @ApiQuery({ name: 'search', required: false, type: String, example: '7999' }) // ?? Add this
   async getAllForAdmin(
     @Query('page', ParseIntPipe) page = 1,
     @Query('limit', ParseIntPipe) limit = 10,
@@ -107,58 +107,8 @@ export class OrderController {
   @Get('/admin/monthly-sales')
   @ApiBearerAuth('JWT')
   @UseGuards(AuthGuard('jwt'), AdminGuard)
-  @ApiOperation({ summary: 'Ежемесячные продажи за текущий год' })
+  @ApiOperation({ summary: '??????????? ??????? ?? ??????? ???' })
   async getMonthlySales() {
     return this.orderService.getMonthlySalesOverview();
-  }
-
-  @Post('donatbank/create-order')
-  @ApiOperation({ summary: 'Create a new order via DonatBank' })
-  @ApiResponse({
-    status: 201,
-    description: 'Order created successfully',
-  })
-  @ApiResponse({ status: 400, description: 'Validation failed' })
-  @ApiResponse({ status: 500, description: 'DonatBank API error' })
-  @UsePipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: false,
-      transform: true,
-    }),
-  )
-  async createDonatBankOrder(@Body() data: DonatBankCreateOrderDto) {
-    // First, create the order via DonatBank API
-    const donatBankOrder = await this.donatBankService.createOrder(
-      data.productId,
-      data.packageId,
-      data.quantity,
-      data.fields,
-    );
-
-    // If DonatBank order creation is successful, create a local order record
-    if (donatBankOrder.status === 'success' && donatBankOrder.order_id) {
-      try {
-        // Create a local order record to track the DonatBank order
-        const localOrder = await this.orderService.createDonatBankOrder({
-          donatbank_order_id: donatBankOrder.order_id,
-          product_type: 'DonatBank',
-          status: 'Pending',
-          fields: data.fields,
-          payment_url: donatBankOrder.payment_url, // Pass payment_url to local order
-        });
-
-        return {
-          ...donatBankOrder,
-          local_order_id: localOrder.id,
-        };
-      } catch (error) {
-        console.error('Failed to create local order record:', error);
-        // Return DonatBank order even if local order creation fails
-        return donatBankOrder;
-      }
-    }
-
-    return donatBankOrder;
   }
 }
