@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { EmailService } from './services/email.service';
 import { BigoService } from './services/bigo.service';
 import { UnimatrixService } from './services/unimatrix.service';
+import { DonatBankService } from './services/donatbank.service';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { UnimatrixService } from './services/unimatrix.service';
     EmailService,
     BigoService,
     UnimatrixService,
+    DonatBankService,
   ],
   exports: [
     JwtStrategy,
@@ -32,6 +34,7 @@ import { UnimatrixService } from './services/unimatrix.service';
     EmailService,
     BigoService,
     UnimatrixService,
+    DonatBankService,
   ],
 })
 export class SharedModule {}

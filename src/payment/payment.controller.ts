@@ -99,4 +99,15 @@ export class PaymentController {
   async createDonatBankBalance(@Body() data: DonatBankBalanceDto) {
     return this.paymentService.createDonatBankBalanceRequest(data.amount);
   }
+
+  @Get('donatbank/products')
+  @ApiOperation({ summary: 'Get DonatBank product list' })
+  @ApiResponse({
+    status: 200,
+    description: 'Product list retrieved successfully',
+  })
+  @ApiResponse({ status: 500, description: 'DonatBank API error' })
+  async getDonatBankProducts() {
+    return this.paymentService.getDonatBankProducts();
+  }
 }
