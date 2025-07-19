@@ -62,4 +62,24 @@ export class DonatBankService {
       throw new HttpException('Failed to get product list', 500);
     }
   }
+
+  async getProductInfo(productId: string) {
+    try {
+      const response = await this.donatbank.post('/product/info', { id: productId });
+
+      return {
+        status: response.data.status || 'success',
+        message: response.data.message || 'Информация о товаре получена',
+        product_info: response.data.product_info || {},
+      };
+    } catch (error) {
+      if (error.response?.data) {
+        throw new HttpException(
+          error.response.data.message || 'DonatBank API error',
+          error.response.status || 500,
+        );
+      }
+      throw new HttpException('Failed to get product info', 500);
+    }
+  }
 }

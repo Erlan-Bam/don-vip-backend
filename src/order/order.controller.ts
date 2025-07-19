@@ -9,6 +9,8 @@ import {
   ParseIntPipe,
   UseGuards,
   Request,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -23,6 +25,7 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { AdminGuard } from 'src/shared/guards/admin.guards';
 import { DonatBankService } from 'src/shared/services/donatbank.service';
+import { DonatBankProductInfoDto } from './dto/donatbank-product-info.dto';
 
 @ApiTags('Orders')
 @Controller('order')
@@ -118,5 +121,24 @@ export class OrderController {
   @ApiResponse({ status: 500, description: 'DonatBank API error' })
   async getDonatBankProducts() {
     return this.donatBankService.getProductList();
+  }
+
+  @Post('donatbank/product/info')
+  @ApiOperation({ summary: 'Get detailed DonatBank product information' })
+  @ApiResponse({
+    status: 200,
+    description: 'Product information retrieved successfully',
+  })
+  @ApiResponse({ status: 400, description: 'Validation failed' })
+  @ApiResponse({ status: 500, description: 'DonatBank API error' })
+  @UsePipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: false,
+      transform: true,
+    }),
+  )
+  async getDonatBankProductInfo(@Body() data: DonatBankProductInfoDto) {
+    return this.donatBankService.getProductInfo(data.id);
   }
 }
