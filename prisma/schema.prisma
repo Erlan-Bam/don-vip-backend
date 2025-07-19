@@ -34,7 +34,7 @@ enum CouponStatus {
 model Website {
   id               Int       @id @default(autoincrement())
   isTechWorks      Boolean
-  techWorksEndsAt  DateTime? // ?????, ????? “???. ??????” ????????????? ??????????
+  techWorksEndsAt  DateTime?
 }
 model Bank {
   id          Int      @id @default(autoincrement())
@@ -64,7 +64,7 @@ model User {
   feedbacks         Feedback[]
   payments          Payment[]
   usedCoupons       UsedCoupon[]
-  activeCoupons     ActiveCoupon[] // ? multiple active coupons
+  activeCoupons     ActiveCoupon[] 
 }
 
 model Banner {
@@ -83,7 +83,7 @@ model Coupon {
   status       CouponStatus  @default(Active)
 
   usedBy       UsedCoupon[]
-  activeUsers  ActiveCoupon[] // ? multiple users can activate
+  activeUsers  ActiveCoupon[] 
   orders       Order[]
   products     Product[]     @relation("CouponProducts")
 }
@@ -116,7 +116,7 @@ model UsedCoupon {
   user       User      @relation(fields: [user_id], references: [id])
   coupon     Coupon    @relation(fields: [coupon_id], references: [id])
 
-  @@unique([user_id, coupon_id]) // prevent duplicate usage
+  @@unique([user_id, coupon_id]) 
 }
 
 model ActiveCoupon {
@@ -128,7 +128,7 @@ model ActiveCoupon {
   user        User      @relation(fields: [user_id], references: [id])
   coupon      Coupon    @relation(fields: [coupon_id], references: [id])
 
-  @@unique([user_id, coupon_id]) // prevent duplicate activation
+  @@unique([user_id, coupon_id])
 }
 
 model Payment {
