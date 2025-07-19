@@ -100,26 +100,4 @@ export class PaymentController {
   async createDonatBankBalance(@Body() data: DonatBankBalanceDto) {
     return this.paymentService.createDonatBankBalanceRequest(data.amount);
   }
-
-  @Post('donatbank/webhook')
-  @ApiOperation({
-    summary: 'Handle DonatBank webhook for payment notifications',
-  })
-  @ApiResponse({ status: 200, description: 'Webhook processed successfully' })
-  @ApiResponse({ status: 400, description: 'Invalid webhook data' })
-  @ApiResponse({ status: 500, description: 'Webhook processing failed' })
-  @HttpCode(200)
-  @UsePipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: false,
-      transform: true,
-    }),
-  )
-  async donatBankWebhook(@Body() data: DonatBankWebhookDto) {
-    return this.paymentService.handleDonatBankWebhook(
-      data.order_id,
-      data.status,
-    );
-  }
 }
