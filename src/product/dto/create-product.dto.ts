@@ -86,6 +86,14 @@ export class CreateProductDto {
   @IsString()
   smile_api_game?: string;
 
+  @ApiPropertyOptional({
+    example: '63d0ffb5-eadc-4a5c-a5e6-365f9b08d3df',
+    description: 'Идентификатор игры в DonatBank API (если используется)',
+  })
+  @IsOptional()
+  @IsString()
+  donatbank_product_id?: string;
+
   @ApiProperty({
     example: 'Bigo',
     enum: ProductType,

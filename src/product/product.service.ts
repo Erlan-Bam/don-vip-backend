@@ -16,6 +16,7 @@ export class ProductService {
         image: data.image,
         replenishment: JSON.parse(JSON.stringify(data.replenishment)),
         type: data.type,
+        donatbank_product_id: data.donatbank_product_id,
         smile_api_game: data.smile_api_game,
         currency_image: data.currency_image,
         currency_name: data.currency_name,
