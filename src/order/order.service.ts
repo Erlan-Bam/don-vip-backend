@@ -27,23 +27,30 @@ export class OrderService {
       select: {
         id: true,
         replenishment: true,
+        type: true,
       },
     });
     if (!product) {
       throw new HttpException('Invalid product id', 400);
     }
-    const replenishment =
-      product.replenishment as unknown as ReplenishmentItem[];
-    if (data.item_id >= replenishment.length) {
-      throw new HttpException(
-        'ID пакета больше чем количество пакетов в этом продукте',
-        400,
-      );
+
+    // For DonatBank products, we don't need to validate replenishment
+    if (product.type !== 'DonatBank') {
+      const replenishment =
+        product.replenishment as unknown as ReplenishmentItem[];
+      if (data.item_id >= replenishment.length) {
+        throw new HttpException(
+          'ID пакета больше чем количество пакетов в этом продукте',
+          400,
+        );
+      }
     }
+
     const coupon = await this.prisma.coupon.findFirst({
       where: { code: data.coupon_code },
       select: { id: true, status: true },
     });
+
     return await this.prisma.order.create({
       data: {
         identifier: data.identifier,
@@ -54,6 +61,34 @@ export class OrderService {
         account_id: data.account_id,
         server_id: data.server_id,
         coupon_id: coupon && coupon.status === 'Active' ? coupon.id : null,
+      },
+    });
+  }
+
+  async createDonatBankOrder(data: {
+    identifier: string;
+    product_id: number;
+    user_id?: number;
+    productId: string;
+    packageId: string;
+    quantity: number;
+    fields: Record<string, any>;
+  }) {
+    return await this.prisma.order.create({
+      data: {
+        identifier: data.identifier,
+        product_id: data.product_id,
+        user_id: data.user_id,
+        item_id: 0, // Not applicable for DonatBank
+        payment: 'DonatBank',
+        account_id: data.fields.user_id || null,
+        server_id: data.fields.zone_id || null,
+        response: {
+          productId: data.productId,
+          packageId: data.packageId,
+          quantity: data.quantity,
+          fields: data.fields,
+        },
       },
     });
   }
@@ -357,6 +392,7 @@ export class OrderService {
         server_id: true,
         item_id: true,
         status: true,
+        response: true,
         donatbank_order_id: true,
         product: {
           select: {
@@ -386,40 +422,36 @@ export class OrderService {
       [key: string]: any; // Allow additional properties
     };
 
-    // For DonatBank orders, we might not have replenishment data
+    // For DonatBank products - create order in DonatBank system
     if (order.product.type === 'DonatBank') {
-      // Handle DonatBank orders without replenishment parsing
-      if (!order.donatbank_order_id) {
-        throw new Error('DonatBank order ID not found');
-      }
-
       try {
-        // Try to deliver the order via DonatBank API
-        const result = await this.donatBankService.deliverOrder(
-          order.donatbank_order_id,
+        // Get DonatBank order data from response field
+        const donatBankData = order.response as any;
+
+        if (!donatBankData?.productId || !donatBankData?.packageId) {
+          throw new Error('DonatBank product data not found in order');
+        }
+
+        // Create order in DonatBank system
+        const result = await this.donatBankService.createOrder(
+          donatBankData.productId,
+          donatBankData.packageId,
+          donatBankData.quantity || 1,
+          donatBankData.fields || {},
         );
 
-        if (result.status === 'success') {
-          response = {
-            type: 'donatbank',
-            message: 'success',
-            delivery_data: result.delivery_data,
-          };
-        } else {
-          // If delivery fails, get order status for more info
-          const statusResult = await this.donatBankService.getOrderStatus(
-            order.donatbank_order_id,
-          );
-          response = {
-            type: 'donatbank',
-            message: result.message || 'delivery_failed',
-            order_status: statusResult.order_status,
-          };
-        }
+        response = {
+          type: 'donatbank',
+          message: result.status === 'success' ? 'success' : 'error',
+          order_id: result.order_id,
+          payment_url: result.payment_url,
+          donatbank_response: result,
+        };
       } catch (error) {
         response = {
           type: 'donatbank',
-          message: error.message || 'API error',
+          message: 'error',
+          error: error.message || 'API error',
         };
       }
     } else {
