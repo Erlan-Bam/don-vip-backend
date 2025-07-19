@@ -41,22 +41,6 @@ export class OrderController {
     return this.orderService.create(data);
   }
 
-  @Post('donatbank')
-  @ApiOperation({ summary: 'Create DonatBank order' })
-  async createDonatBankOrder(@Body() data: DonatBankCreateOrderDto) {
-    const orderData = {
-      identifier: `donatbank_${Date.now()}`,
-      product_id: 1, // You might want to create a special DonatBank product
-      user_id: undefined, // Will be set from JWT or other context
-      productId: data.productId,
-      packageId: data.packageId,
-      quantity: data.quantity,
-      fields: data.fields,
-    };
-
-    return this.orderService.createDonatBankOrder(orderData);
-  }
-
   @Get('/admin/history')
   @ApiBearerAuth('JWT')
   @UseGuards(AuthGuard('jwt'), AdminGuard)
