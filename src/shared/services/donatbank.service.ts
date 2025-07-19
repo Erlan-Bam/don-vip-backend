@@ -65,7 +65,9 @@ export class DonatBankService {
 
   async getProductInfo(productId: string) {
     try {
-      const response = await this.donatbank.post('/product/info', { id: productId });
+      const response = await this.donatbank.post('/product/info', {
+        id: productId,
+      });
 
       return {
         status: response.data.status || 'success',
@@ -80,6 +82,36 @@ export class DonatBankService {
         );
       }
       throw new HttpException('Failed to get product info', 500);
+    }
+  }
+
+  async createOrder(
+    productId: string,
+    packageId: string,
+    quantity: number,
+    fields: Record<string, any>,
+  ) {
+    try {
+      const response = await this.donatbank.post('/order/create-order', {
+        productId,
+        packageId,
+        quantity,
+        fields,
+      });
+
+      return {
+        status: response.data.status || 'success',
+        message: response.data.message || 'Заказ успешно создан',
+        order_id: response.data.order_id || null,
+      };
+    } catch (error) {
+      if (error.response?.data) {
+        throw new HttpException(
+          error.response.data.message || 'DonatBank API error',
+          error.response.status || 500,
+        );
+      }
+      throw new HttpException('Failed to create order', 500);
     }
   }
 }

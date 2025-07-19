@@ -14,6 +14,8 @@ import {
   Param,
   Delete,
   UploadedFiles,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import {
@@ -29,6 +31,7 @@ import {
   ApiOperation,
   ApiParam,
   ApiQuery,
+  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { CreateProductDto, ReplenishmentItem } from './dto/create-product.dto';
@@ -40,6 +43,8 @@ import { SmileService } from 'src/shared/services/smile.service';
 import { SmileValidateDto } from './dto/smile-validate.dto';
 import { plainToInstance } from 'class-transformer';
 import { BigoValidateDto } from './dto/bigo-validate.dto';
+import { DonatBankService } from 'src/shared/services/donatbank.service';
+import { DonatBankProductInfoDto } from './dto/donatbank-product-info.dto';
 
 @ApiTags('Product')
 @Controller('product')
@@ -50,6 +55,7 @@ export class ProductController {
     private productService: ProductService,
     private smileService: SmileService,
     private configService: ConfigService,
+    private donatBankService: DonatBankService,
   ) {
     const nodeEnv = this.configService.get<string>('NODE_ENV');
     this.baseUrl =
@@ -339,5 +345,35 @@ export class ProductController {
   @ApiParam({ name: 'id', type: Number })
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.productService.remove(id);
+  }
+
+  @Get('donatbank/products')
+  @ApiOperation({ summary: 'Get DonatBank product list' })
+  @ApiResponse({
+    status: 200,
+    description: 'Product list retrieved successfully',
+  })
+  @ApiResponse({ status: 500, description: 'DonatBank API error' })
+  async getDonatBankProducts() {
+    return this.donatBankService.getProductList();
+  }
+
+  @Post('donatbank/product/info')
+  @ApiOperation({ summary: 'Get detailed DonatBank product information' })
+  @ApiResponse({
+    status: 200,
+    description: 'Product information retrieved successfully',
+  })
+  @ApiResponse({ status: 400, description: 'Validation failed' })
+  @ApiResponse({ status: 500, description: 'DonatBank API error' })
+  @UsePipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: false,
+      transform: true,
+    }),
+  )
+  async getDonatBankProductInfo(@Body() data: DonatBankProductInfoDto) {
+    return this.donatBankService.getProductInfo(data.id);
   }
 }

@@ -25,7 +25,7 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { AdminGuard } from 'src/shared/guards/admin.guards';
 import { DonatBankService } from 'src/shared/services/donatbank.service';
-import { DonatBankProductInfoDto } from './dto/donatbank-product-info.dto';
+import { DonatBankCreateOrderDto } from './dto/donatbank-create-order.dto';
 
 @ApiTags('Orders')
 @Controller('order')
@@ -112,22 +112,11 @@ export class OrderController {
     return this.orderService.getMonthlySalesOverview();
   }
 
-  @Get('donatbank/products')
-  @ApiOperation({ summary: 'Get DonatBank product list' })
+  @Post('donatbank/create-order')
+  @ApiOperation({ summary: 'Create a new order via DonatBank' })
   @ApiResponse({
-    status: 200,
-    description: 'Product list retrieved successfully',
-  })
-  @ApiResponse({ status: 500, description: 'DonatBank API error' })
-  async getDonatBankProducts() {
-    return this.donatBankService.getProductList();
-  }
-
-  @Post('donatbank/product/info')
-  @ApiOperation({ summary: 'Get detailed DonatBank product information' })
-  @ApiResponse({
-    status: 200,
-    description: 'Product information retrieved successfully',
+    status: 201,
+    description: 'Order created successfully',
   })
   @ApiResponse({ status: 400, description: 'Validation failed' })
   @ApiResponse({ status: 500, description: 'DonatBank API error' })
@@ -138,7 +127,12 @@ export class OrderController {
       transform: true,
     }),
   )
-  async getDonatBankProductInfo(@Body() data: DonatBankProductInfoDto) {
-    return this.donatBankService.getProductInfo(data.id);
+  async createDonatBankOrder(@Body() data: DonatBankCreateOrderDto) {
+    return this.donatBankService.createOrder(
+      data.productId,
+      data.packageId,
+      data.quantity,
+      data.fields,
+    );
   }
 }
