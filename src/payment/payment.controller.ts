@@ -25,6 +25,7 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { PagsmileNotificationDto } from './dto/pagsmile-notification.dto';
 import { TBankWebhookDto } from './dto/tbank-webhook.dto';
+import { DonatBankBalanceDto } from './dto/donatbank-balance.dto';
 import { Response } from 'express';
 
 @ApiTags('Payment')
@@ -78,5 +79,24 @@ export class PaymentController {
     @Query('limit', ParseIntPipe) limit = 10,
   ) {
     return this.paymentService.getHistory(request.user.id, page, limit);
+  }
+
+  @Post('donatbank/balance')
+  @ApiOperation({ summary: 'Create a balance request via DonatBank' })
+  @ApiResponse({
+    status: 201,
+    description: 'Balance request created successfully',
+  })
+  @ApiResponse({ status: 400, description: 'Validation failed' })
+  @ApiResponse({ status: 500, description: 'DonatBank API error' })
+  @UsePipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: false,
+      transform: true,
+    }),
+  )
+  async createDonatBankBalance(@Body() data: DonatBankBalanceDto) {
+    return this.paymentService.createDonatBankBalanceRequest(data.amount);
   }
 }

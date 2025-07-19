@@ -6,6 +6,7 @@ import { PagsmileCreatePayinDto } from './dto/pagsmile-create-payin.dto';
 import { PagsmileNotificationDto } from './dto/pagsmile-notification.dto';
 import { OrderService } from 'src/order/order.service';
 import { TBankWebhookDto } from './dto/tbank-webhook.dto';
+import { DonatBankBalanceDto } from './dto/donatbank-balance.dto';
 import { Response } from 'express';
 
 @Injectable()
@@ -247,6 +248,41 @@ export class PaymentService {
       limit,
       data: formattedData,
     };
+  }
+
+  async createDonatBankBalanceRequest(amount: number) {
+    const donatbankApiKey = this.configService.get<string>('DONATBANK_API_KEY');
+    if (!donatbankApiKey) {
+      throw new HttpException('DonatBank API key not configured', 500);
+    }
+
+    try {
+      const response = await axios.post(
+        'https://donatbank.com/api/v1/user/balance',
+        { amount },
+        {
+          headers: {
+            'x-api-key': donatbankApiKey,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      return {
+        status: 'success',
+        paymentId: response.data.paymentId,
+        paymentUrl: response.data.paymentUrl,
+        message: 'Запрос на пополнение успешно создан.',
+      };
+    } catch (error) {
+      if (error.response?.data) {
+        throw new HttpException(
+          error.response.data.message || 'DonatBank API error',
+          error.response.status || 500,
+        );
+      }
+      throw new HttpException('Failed to create balance request', 500);
+    }
   }
 
   async verifyPagsmileSignature(
