@@ -56,6 +56,32 @@ export class OrderService {
     });
   }
 
+  async createDonatBankOrder(data: {
+    donatbank_order_id: string;
+    product_type: string;
+    status: string;
+    fields: Record<string, any>;
+  }) {
+    // Create a minimal order record for DonatBank orders
+    // We'll use dummy values for required fields that don't apply to DonatBank
+    return await this.prisma.order.create({
+      data: {
+        identifier: `donatbank_${Date.now()}`, // Unique identifier
+        product_id: 1, // We'll need to create a special DonatBank product or use a placeholder
+        item_id: 0, // Not applicable for DonatBank
+        payment: 'DonatBank',
+        account_id: data.fields.user_id || null,
+        server_id: data.fields.zone_id || null,
+        status: data.status as any,
+        // donatbank_order_id: data.donatbank_order_id, // Will be enabled after migration
+        response: {
+          donatbank_order_id: data.donatbank_order_id, // Store in response field temporarily
+          ...data.fields,
+        },
+      },
+    });
+  }
+
   async getAllForAdmin(page: number, limit: number, search?: string) {
     const skip = (page - 1) * limit;
 

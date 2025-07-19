@@ -15,7 +15,8 @@ export class GlobalPipe extends ValidationPipe {
     if (
       metadata.type === 'body' &&
       (metadata.metatype?.name === 'TBankWebhookDto' ||
-        metadata.metatype?.name === 'PagsmileNotificationDto')
+        metadata.metatype?.name === 'PagsmileNotificationDto' ||
+        metadata.metatype?.name === 'DonatBankWebhookDto')
     ) {
       this.validatorOptions.whitelist = false;
       this.validatorOptions.forbidNonWhitelisted = false;

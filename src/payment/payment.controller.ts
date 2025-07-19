@@ -26,6 +26,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { PagsmileNotificationDto } from './dto/pagsmile-notification.dto';
 import { TBankWebhookDto } from './dto/tbank-webhook.dto';
 import { DonatBankBalanceDto } from './dto/donatbank-balance.dto';
+import { DonatBankWebhookDto } from './dto/donatbank-webhook.dto';
 import { Response } from 'express';
 
 @ApiTags('Payment')
@@ -98,5 +99,27 @@ export class PaymentController {
   )
   async createDonatBankBalance(@Body() data: DonatBankBalanceDto) {
     return this.paymentService.createDonatBankBalanceRequest(data.amount);
+  }
+
+  @Post('donatbank/webhook')
+  @ApiOperation({
+    summary: 'Handle DonatBank webhook for payment notifications',
+  })
+  @ApiResponse({ status: 200, description: 'Webhook processed successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid webhook data' })
+  @ApiResponse({ status: 500, description: 'Webhook processing failed' })
+  @HttpCode(200)
+  @UsePipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: false,
+      transform: true,
+    }),
+  )
+  async donatBankWebhook(@Body() data: DonatBankWebhookDto) {
+    return this.paymentService.handleDonatBankWebhook(
+      data.order_id,
+      data.status,
+    );
   }
 }

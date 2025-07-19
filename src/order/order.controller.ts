@@ -128,11 +128,36 @@ export class OrderController {
     }),
   )
   async createDonatBankOrder(@Body() data: DonatBankCreateOrderDto) {
-    return this.donatBankService.createOrder(
+    // First, create the order via DonatBank API
+    const donatBankOrder = await this.donatBankService.createOrder(
       data.productId,
       data.packageId,
       data.quantity,
       data.fields,
     );
+
+    // If DonatBank order creation is successful, create a local order record
+    if (donatBankOrder.status === 'success' && donatBankOrder.order_id) {
+      try {
+        // Create a local order record to track the DonatBank order
+        const localOrder = await this.orderService.createDonatBankOrder({
+          donatbank_order_id: donatBankOrder.order_id,
+          product_type: 'DonatBank',
+          status: 'Pending',
+          fields: data.fields,
+        });
+
+        return {
+          ...donatBankOrder,
+          local_order_id: localOrder.id,
+        };
+      } catch (error) {
+        console.error('Failed to create local order record:', error);
+        // Return DonatBank order even if local order creation fails
+        return donatBankOrder;
+      }
+    }
+
+    return donatBankOrder;
   }
 }
