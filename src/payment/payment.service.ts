@@ -258,13 +258,10 @@ export class PaymentService {
 
   async handleDonatBankWebhook(orderId: string, status: string) {
     try {
-      // Find the order by DonatBank order ID (temporarily stored in response field)
+      // Find the order by DonatBank order ID
       const order = await this.prisma.order.findFirst({
         where: {
-          response: {
-            path: ['donatbank_order_id'],
-            equals: orderId,
-          },
+          donatbank_order_id: orderId, // Use the dedicated field
         },
         include: { product: true, user: true },
       });

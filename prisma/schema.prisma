@@ -172,6 +172,7 @@ model Order {
   updated_at   DateTime       @updatedAt @default(now())
   response     Json?
   donatbank_order_id String?     // DonatBank order ID for tracking
+  payment_url  String?         // Payment URL for DonatBank orders
 
   coupon_id    Int?
   coupon       Coupon?        @relation(fields: [coupon_id], references: [id])

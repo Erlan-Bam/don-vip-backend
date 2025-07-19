@@ -103,6 +103,8 @@ export class DonatBankService {
         status: response.data.status || 'success',
         message: response.data.message || 'Заказ успешно создан',
         order_id: response.data.order_id || null,
+        payment_url:
+          response.data.payment_url || response.data.paymentUrl || null, // Add payment URL support
       };
     } catch (error) {
       if (error.response?.data) {

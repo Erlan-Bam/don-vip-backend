@@ -61,6 +61,7 @@ export class OrderService {
     product_type: string;
     status: string;
     fields: Record<string, any>;
+    payment_url?: string; // Add payment_url parameter
   }) {
     // Create a minimal order record for DonatBank orders
     // We'll use dummy values for required fields that don't apply to DonatBank
@@ -73,9 +74,9 @@ export class OrderService {
         account_id: data.fields.user_id || null,
         server_id: data.fields.zone_id || null,
         status: data.status as any,
-        // donatbank_order_id: data.donatbank_order_id, // Will be enabled after migration
+        donatbank_order_id: data.donatbank_order_id, // Now using the dedicated field
+        payment_url: data.payment_url, // Save payment URL
         response: {
-          donatbank_order_id: data.donatbank_order_id, // Store in response field temporarily
           ...data.fields,
         },
       },

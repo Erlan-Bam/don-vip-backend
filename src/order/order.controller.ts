@@ -145,6 +145,7 @@ export class OrderController {
           product_type: 'DonatBank',
           status: 'Pending',
           fields: data.fields,
+          payment_url: donatBankOrder.payment_url, // Pass payment_url to local order
         });
 
         return {
