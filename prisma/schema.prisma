@@ -98,6 +98,7 @@ model Product {
   currency_image  String?
   currency_name   String?
   smile_api_game  String?    @unique
+  donatbank_product_id String? @unique
   type            ProductType
   order_number    Int        @default(1)
 
@@ -171,7 +172,6 @@ model Order {
   created_at          DateTime       @default(now())
   updated_at          DateTime       @updatedAt @default(now())
   response            Json?
-  donatbank_order_id  String?    // DonatBank order ID
 
   coupon_id    Int?
   coupon       Coupon?        @relation(fields: [coupon_id], references: [id])

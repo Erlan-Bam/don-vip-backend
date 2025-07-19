@@ -34,16 +34,13 @@ export class OrderService {
       throw new HttpException('Invalid product id', 400);
     }
 
-    // For DonatBank products, we don't need to validate replenishment
-    if (product.type !== 'DonatBank') {
-      const replenishment =
-        product.replenishment as unknown as ReplenishmentItem[];
-      if (data.item_id >= replenishment.length) {
-        throw new HttpException(
-          'ID пакета больше чем количество пакетов в этом продукте',
-          400,
-        );
-      }
+    const replenishment =
+      product.replenishment as unknown as ReplenishmentItem[];
+    if (data.item_id >= replenishment.length) {
+      throw new HttpException(
+        'ID пакета больше чем количество пакетов в этом продукте',
+        400,
+      );
     }
 
     const coupon = await this.prisma.coupon.findFirst({
@@ -393,9 +390,9 @@ export class OrderService {
         item_id: true,
         status: true,
         response: true,
-        donatbank_order_id: true,
         product: {
           select: {
+            donatbank_product_id: true,
             replenishment: true,
             type: true,
             smile_api_game: true,
@@ -416,56 +413,29 @@ export class OrderService {
     }
 
     let replenishment: ReplenishmentItem[] = [];
+    if (typeof order.product.replenishment === 'string') {
+      replenishment = JSON.parse(order.product.replenishment);
+    } else if (Array.isArray(order.product.replenishment)) {
+      replenishment = order.product
+        .replenishment as unknown as ReplenishmentItem[];
+    } else {
+      return order;
+    }
+    const item: ReplenishmentItem = replenishment[order.item_id];
     let response: {
       type: string;
       message: string;
-      [key: string]: any; // Allow additional properties
     };
-
-    // For DonatBank products - create order in DonatBank system
     if (order.product.type === 'DonatBank') {
-      try {
-        // Get DonatBank order data from response field
-        const donatBankData = order.response as any;
+      const result = await this.donatBankService.createOrder(
+        order.product.donatbank_product_id,
+        item.sku,
+        order.account_id,
+      );
 
-        if (!donatBankData?.productId || !donatBankData?.packageId) {
-          throw new Error('DonatBank product data not found in order');
-        }
-
-        // Create order in DonatBank system
-        const result = await this.donatBankService.createOrder(
-          donatBankData.productId,
-          donatBankData.packageId,
-          donatBankData.quantity || 1,
-          donatBankData.fields || {},
-        );
-
-        response = {
-          type: 'donatbank',
-          message: result.status === 'success' ? 'success' : 'error',
-          order_id: result.order_id,
-          payment_url: result.payment_url,
-          donatbank_response: result,
-        };
-      } catch (error) {
-        response = {
-          type: 'donatbank',
-          message: 'error',
-          error: error.message || 'API error',
-        };
-      }
+      response.message = result.message;
+      response.type = 'donatbank';
     } else {
-      // For non-DonatBank orders, parse replenishment data
-      if (typeof order.product.replenishment === 'string') {
-        replenishment = JSON.parse(order.product.replenishment);
-      } else if (Array.isArray(order.product.replenishment)) {
-        replenishment = order.product
-          .replenishment as unknown as ReplenishmentItem[];
-      } else {
-        return order;
-      }
-      const item: ReplenishmentItem = replenishment[order.item_id];
-
       if (order.product.type === 'Bigo') {
         const result = await this.bigoService.rechargeDiamond({
           rechargeBigoId: order.account_id,

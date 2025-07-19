@@ -85,26 +85,21 @@ export class DonatBankService {
     }
   }
 
-  async createOrder(
-    productId: string,
-    packageId: string,
-    quantity: number,
-    fields: Record<string, any>,
-  ) {
+  async createOrder(productId: string, packageId: string, account_id: string) {
     try {
       const response = await this.donatbank.post('/order/create-order', {
         productId,
         packageId,
-        quantity,
-        fields,
+        quantity: 1,
+        fields: {
+          user_id: account_id,
+          zone_id: 'ru',
+        },
       });
 
       return {
-        status: response.data.status || 'success',
-        message: response.data.message || 'Заказ успешно создан',
-        order_id: response.data.order_id || null,
-        payment_url:
-          response.data.payment_url || response.data.paymentUrl || null,
+        status: 'success',
+        message: response.data.message,
       };
     } catch (error) {
       if (error.response?.data) {
@@ -114,51 +109,6 @@ export class DonatBankService {
         );
       }
       throw new HttpException('Failed to create order', 500);
-    }
-  }
-
-  async getOrderStatus(orderId: string) {
-    try {
-      const response = await this.donatbank.post('/order/status', {
-        order_id: orderId,
-      });
-
-      return {
-        status: response.data.status || 'success',
-        message: response.data.message || 'Статус заказа получен',
-        order_status: response.data.order_status || 'PENDING',
-        delivery_info: response.data.delivery_info || null,
-      };
-    } catch (error) {
-      if (error.response?.data) {
-        throw new HttpException(
-          error.response.data.message || 'DonatBank API error',
-          error.response.status || 500,
-        );
-      }
-      throw new HttpException('Failed to get order status', 500);
-    }
-  }
-
-  async deliverOrder(orderId: string) {
-    try {
-      const response = await this.donatbank.post('/order/deliver', {
-        order_id: orderId,
-      });
-
-      return {
-        status: response.data.status || 'success',
-        message: response.data.message || 'Заказ доставлен',
-        delivery_data: response.data.delivery_data || null,
-      };
-    } catch (error) {
-      if (error.response?.data) {
-        throw new HttpException(
-          error.response.data.message || 'DonatBank API error',
-          error.response.status || 500,
-        );
-      }
-      throw new HttpException('Failed to deliver order', 500);
     }
   }
 }
