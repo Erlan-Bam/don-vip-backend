@@ -18,14 +18,19 @@ import {
   ApiQuery,
   ApiBearerAuth,
   ApiParam,
+  ApiResponse,
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { AdminGuard } from 'src/shared/guards/admin.guards';
+import { DonatBankService } from 'src/shared/services/donatbank.service';
 
 @ApiTags('Orders')
 @Controller('order')
 export class OrderController {
-  constructor(private readonly orderService: OrderService) {}
+  constructor(
+    private readonly orderService: OrderService,
+    private readonly donatBankService: DonatBankService,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: 'Create order' })
@@ -102,5 +107,16 @@ export class OrderController {
   @ApiOperation({ summary: 'Ежемесячные продажи за текущий год' })
   async getMonthlySales() {
     return this.orderService.getMonthlySalesOverview();
+  }
+
+  @Get('donatbank/products')
+  @ApiOperation({ summary: 'Get DonatBank product list' })
+  @ApiResponse({
+    status: 200,
+    description: 'Product list retrieved successfully',
+  })
+  @ApiResponse({ status: 500, description: 'DonatBank API error' })
+  async getDonatBankProducts() {
+    return this.donatBankService.getProductList();
   }
 }
