@@ -7,6 +7,7 @@ import { SmileService } from 'src/shared/services/smile.service';
 import { subYears, startOfYear } from 'date-fns';
 import { EmailService } from 'src/shared/services/email.service';
 import { UnimatrixService } from 'src/shared/services/unimatrix.service';
+import { DonatBankService } from 'src/shared/services/donatbank.service';
 import { response } from 'express';
 
 @Injectable()
@@ -17,6 +18,7 @@ export class OrderService {
     private smileService: SmileService,
     private emailService: EmailService,
     private unimatrixService: UnimatrixService,
+    private donatBankService: DonatBankService,
   ) {}
 
   async create(data: CreateOrderDto) {
@@ -52,6 +54,33 @@ export class OrderService {
         account_id: data.account_id,
         server_id: data.server_id,
         coupon_id: coupon && coupon.status === 'Active' ? coupon.id : null,
+      },
+    });
+  }
+
+  async createDonatBankOrder(data: {
+    donatbank_order_id: string;
+    product_type: string;
+    status: string;
+    fields: Record<string, any>;
+    payment_url?: string;
+  }) {
+    // Create a minimal order record for DonatBank orders
+    // We'll need to create a special DonatBank product or use a placeholder
+    return await this.prisma.order.create({
+      data: {
+        identifier: `donatbank_${Date.now()}`, // Unique identifier
+        product_id: 1, // We'll need to create a special DonatBank product or use a placeholder
+        item_id: 0, // Not applicable for DonatBank
+        payment: 'DonatBank',
+        account_id: data.fields.user_id || null,
+        server_id: data.fields.zone_id || null,
+        status: data.status as any,
+        donatbank_order_id: data.donatbank_order_id, // Store DonatBank order ID
+        response: {
+          ...data.fields,
+          payment_url: data.payment_url,
+        },
       },
     });
   }
@@ -355,6 +384,7 @@ export class OrderService {
         server_id: true,
         item_id: true,
         status: true,
+        donatbank_order_id: true,
         product: {
           select: {
             replenishment: true,
@@ -380,53 +410,89 @@ export class OrderService {
     let response: {
       type: string;
       message: string;
+      [key: string]: any; // Allow additional properties
     };
 
-    if (typeof order.product.replenishment === 'string') {
-      replenishment = JSON.parse(order.product.replenishment);
-    } else if (Array.isArray(order.product.replenishment)) {
-      replenishment = order.product
-        .replenishment as unknown as ReplenishmentItem[];
-    } else {
-      return order;
-    }
-    const item: ReplenishmentItem = replenishment[order.item_id];
-
-    if (order.product.type === 'Bigo') {
-      const result = await this.bigoService.rechargeDiamond({
-        rechargeBigoId: order.account_id,
-        buOrderId: `${order.user_id}${Date.now()}${Math.floor(Math.random() * 100000)}`,
-        currency: 'RUB',
-        value: item.amount,
-        totalCost: item.price,
-      });
-      response = {
-        type: 'bigo',
-        message: result.message,
-      };
-      if (result.message !== 'ok') {
-        await this.smileService.sendBigo(
-          order.account_id,
-          item.amount.toString(),
-        );
+    // For DonatBank orders, we might not have replenishment data
+    if (order.product.type === 'DonatBank') {
+      // Handle DonatBank orders without replenishment parsing
+      if (!order.donatbank_order_id) {
+        throw new Error('DonatBank order ID not found');
+      }
+      
+      try {
+        // Try to deliver the order via DonatBank API
+        const result = await this.donatBankService.deliverOrder(order.donatbank_order_id);
+        
+        if (result.status === 'success') {
+          response = {
+            type: 'donatbank',
+            message: 'success',
+            delivery_data: result.delivery_data,
+          };
+        } else {
+          // If delivery fails, get order status for more info
+          const statusResult = await this.donatBankService.getOrderStatus(order.donatbank_order_id);
+          response = {
+            type: 'donatbank',
+            message: result.message || 'delivery_failed',
+            order_status: statusResult.order_status,
+          };
+        }
+      } catch (error) {
+        response = {
+          type: 'donatbank',
+          message: error.message || 'API error',
+        };
       }
     } else {
-      const result = await this.smileService.sendOrder(
-        order.product.smile_api_game,
-        item.sku,
-        order.account_id,
-        order.server_id,
-      );
-      if (result.status === 'success') {
-        response = {
-          type: 'smile',
-          message: 'success',
-        };
+      // For non-DonatBank orders, parse replenishment data
+      if (typeof order.product.replenishment === 'string') {
+        replenishment = JSON.parse(order.product.replenishment);
+      } else if (Array.isArray(order.product.replenishment)) {
+        replenishment = order.product
+          .replenishment as unknown as ReplenishmentItem[];
       } else {
+        return order;
+      }
+      const item: ReplenishmentItem = replenishment[order.item_id];
+
+      if (order.product.type === 'Bigo') {
+        const result = await this.bigoService.rechargeDiamond({
+          rechargeBigoId: order.account_id,
+          buOrderId: `${order.user_id}${Date.now()}${Math.floor(Math.random() * 100000)}`,
+          currency: 'RUB',
+          value: item.amount,
+          totalCost: item.price,
+        });
         response = {
-          type: 'smile',
-          message: result.error,
+          type: 'bigo',
+          message: result.message,
         };
+        if (result.message !== 'ok') {
+          await this.smileService.sendBigo(
+            order.account_id,
+            item.amount.toString(),
+          );
+        }
+      } else {
+        const result = await this.smileService.sendOrder(
+          order.product.smile_api_game,
+          item.sku,
+          order.account_id,
+          order.server_id,
+        );
+        if (result.status === 'success') {
+          response = {
+            type: 'smile',
+            message: 'success',
+          };
+        } else {
+          response = {
+            type: 'smile',
+            message: result.error,
+          };
+        }
       }
     }
 

@@ -159,18 +159,19 @@ model Feedback {
 }
 
 model Order {
-  id           Int         @id @default(autoincrement())
-  user_id      Int?
-  product_id   Int
-  item_id      Int
-  payment      String
-  identifier   String
-  status       PaymentStatus  @default(Pending)
-  account_id   String?
-  server_id    String?
-  created_at   DateTime       @default(now())
-  updated_at   DateTime       @updatedAt @default(now())
-  response     Json?
+  id                  Int         @id @default(autoincrement())
+  user_id             Int?
+  product_id          Int
+  item_id             Int
+  payment             String
+  identifier          String
+  status              PaymentStatus  @default(Pending)
+  account_id          String?
+  server_id           String?
+  created_at          DateTime       @default(now())
+  updated_at          DateTime       @updatedAt @default(now())
+  response            Json?
+  donatbank_order_id  String?    // DonatBank order ID
 
   coupon_id    Int?
   coupon       Coupon?        @relation(fields: [coupon_id], references: [id])
