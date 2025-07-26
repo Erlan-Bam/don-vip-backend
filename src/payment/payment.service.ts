@@ -252,10 +252,6 @@ export class PaymentService {
     };
   }
 
-  async createDonatBankBalanceRequest(amount: number) {
-    return this.donatBankService.createBalanceRequest(amount);
-  }
-
   async verifyPagsmileSignature(
     raw: string,
     signature: string,

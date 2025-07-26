@@ -22,27 +22,6 @@ export class DonatBankService {
     });
   }
 
-  async createBalanceRequest(amount: number) {
-    try {
-      const response = await this.donatbank.post('/user/balance', { amount });
-
-      return {
-        status: 'success',
-        paymentId: response.data.paymentId,
-        paymentUrl: response.data.paymentUrl,
-        message: '?????? ?? ?????????? ??????? ??????.',
-      };
-    } catch (error) {
-      if (error.response?.data) {
-        throw new HttpException(
-          error.response.data.message || 'DonatBank API error',
-          error.response.status || 500,
-        );
-      }
-      throw new HttpException('Failed to create balance request', 500);
-    }
-  }
-
   async getProductList() {
     try {
       const response = await this.donatbank.get('/product/list');

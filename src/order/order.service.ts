@@ -194,9 +194,9 @@ export class OrderService {
         playerId: order.account_id ?? 'N/A',
         serverId: order.server_id ?? 'N/A',
         diamonds: replenishment.amount,
-        response: order.response ?? '—',
+        response: order.response ?? 'ï¿½',
         price: `${replenishment.price} ?`,
-        method: payment?.method ?? '—',
+        method: payment?.method ?? 'ï¿½',
         product: {
           id: product.id,
           name: product.name,
@@ -433,8 +433,10 @@ export class OrderService {
         order.account_id,
       );
 
-      response.message = result.message;
-      response.type = 'donatbank';
+      response = {
+        type: 'donatbank',
+        message: result.message,
+      };
     } else {
       if (order.product.type === 'Bigo') {
         const result = await this.bigoService.rechargeDiamond({
