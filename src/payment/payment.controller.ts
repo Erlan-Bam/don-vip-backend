@@ -81,23 +81,4 @@ export class PaymentController {
   ) {
     return this.paymentService.getHistory(request.user.id, page, limit);
   }
-
-  @Post('donatbank/balance')
-  @ApiOperation({ summary: 'Create a balance request via DonatBank' })
-  @ApiResponse({
-    status: 201,
-    description: 'Balance request created successfully',
-  })
-  @ApiResponse({ status: 400, description: 'Validation failed' })
-  @ApiResponse({ status: 500, description: 'DonatBank API error' })
-  @UsePipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: false,
-      transform: true,
-    }),
-  )
-  async createDonatBankBalance(@Body() data: DonatBankBalanceDto) {
-    return this.paymentService.createDonatBankBalanceRequest(data.amount);
-  }
 }
