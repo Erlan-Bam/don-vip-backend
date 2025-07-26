@@ -96,10 +96,11 @@ export class DonatBankService {
           zone_id: 'ru',
         },
       });
+      console.log('Order creation response:', response.data);
 
       return {
         status: 'success',
-        message: response.data.message,
+        message: 'Заказ успешно создан',
       };
     } catch (error) {
       if (error.response?.data) {
