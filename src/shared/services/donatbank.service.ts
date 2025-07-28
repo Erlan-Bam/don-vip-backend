@@ -91,4 +91,24 @@ export class DonatBankService {
       throw new HttpException('Failed to create order', 500);
     }
   }
+
+  async validate(account_id: string) {
+    try {
+      const response = await this.donatbank.get('/v1/user/check-user', {
+        params: {
+          userId: account_id,
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      if (error.response?.data) {
+        throw new HttpException(
+          error.response.data.message || 'DonatBank API error',
+          error.response.status || 500,
+        );
+      }
+      throw new HttpException('Failed to get product info', 500);
+    }
+  }
 }
