@@ -45,6 +45,7 @@ import { plainToInstance } from 'class-transformer';
 import { BigoValidateDto } from './dto/bigo-validate.dto';
 import { DonatBankService } from 'src/shared/services/donatbank.service';
 import { DonatBankProductInfoDto } from './dto/donatbank-product-info.dto';
+import { DonatBankValidateDto } from './dto/donatbank-validate.dto';
 
 @ApiTags('Product')
 @Controller('product')
@@ -375,5 +376,17 @@ export class ProductController {
   )
   async getDonatBankProductInfo(@Body() data: DonatBankProductInfoDto) {
     return this.donatBankService.getProductInfo(data.id);
+  }
+
+  @Post('donatbank/validate')
+  @ApiOperation({ summary: 'Get validation of DonatBank Product' })
+  @ApiResponse({
+    status: 200,
+    description: 'Product validation retrieved successfully',
+  })
+  @ApiResponse({ status: 400, description: 'Validation failed' })
+  @ApiResponse({ status: 500, description: 'DonatBank API error' })
+  async getDonatBankValidation(@Body() data: DonatBankValidateDto) {
+    return this.donatBankService.validate(data.account_id);
   }
 }

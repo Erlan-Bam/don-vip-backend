@@ -94,11 +94,9 @@ export class DonatBankService {
 
   async validate(account_id: string) {
     try {
-      const response = await this.donatbank.get('/v1/user/check-user', {
-        params: {
-          userId: account_id,
-        },
-      });
+      const response = await this.donatbank.get(
+        `/v1/user/check-user?userId=${account_id}`,
+      );
 
       return response.data;
     } catch (error) {
