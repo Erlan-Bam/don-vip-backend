@@ -37,10 +37,8 @@ export class OrderService {
     const replenishment =
       product.replenishment as unknown as ReplenishmentItem[];
     if (data.item_id >= replenishment.length) {
-      throw new HttpException(
-        'ID ?????? ?????? ??? ?????????? ??????? ? ???? ????????',
-        400,
-      );
+      console.log('did not work because item_id is out of range');
+      throw new HttpException('ID OUT OF RANGE', 400);
     }
 
     const coupon = await this.prisma.coupon.findFirst({
@@ -196,7 +194,7 @@ export class OrderService {
         diamonds: replenishment.amount,
         response: order.response ?? '�',
         price: `${replenishment.price} ?`,
-        method: payment?.method ?? '�',
+        method: payment?.method ?? order.payment,
         product: {
           id: product.id,
           name: product.name,
