@@ -4,11 +4,9 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { BigoService } from '../shared/services/bigo.service';
 import { ReplenishmentItem } from 'src/product/dto/create-product.dto';
 import { SmileService } from 'src/shared/services/smile.service';
-import { subYears, startOfYear } from 'date-fns';
 import { EmailService } from 'src/shared/services/email.service';
 import { UnimatrixService } from 'src/shared/services/unimatrix.service';
 import { DonatBankService } from 'src/shared/services/donatbank.service';
-import { response } from 'express';
 
 @Injectable()
 export class OrderService {
@@ -174,6 +172,14 @@ export class OrderService {
       if (!replenishment) {
         return [];
       }
+      let price = replenishment.price || 0;
+      if (payment.price) {
+        if (payment.method === 'T-BANK') {
+          price = payment.price.toNumber() / 100;
+        } else {
+          price = payment.price.toNumber();
+        }
+      }
 
       return {
         orderId: order.id,
@@ -193,7 +199,7 @@ export class OrderService {
         serverId: order.server_id ?? 'N/A',
         diamonds: replenishment.amount,
         response: order.response ?? '�',
-        price: `${replenishment.price} ?`,
+        price: `${price} ₽`,
         method: payment?.method ?? order.payment,
         product: {
           id: product.id,
