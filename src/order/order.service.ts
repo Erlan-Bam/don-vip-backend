@@ -199,7 +199,7 @@ export class OrderService {
         serverId: order.server_id ?? 'N/A',
         diamonds: replenishment.amount,
         response: order.response ?? '�',
-        price: `${price} ₽`,
+        price: `${price}`,
         method: payment?.method ?? order.payment,
         product: {
           id: product.id,
