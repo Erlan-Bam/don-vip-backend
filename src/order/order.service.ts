@@ -174,7 +174,7 @@ export class OrderService {
       }
       let price = replenishment.price || 0;
       if (payment?.price) {
-        if (payment.method === 'T-BANK') {
+        if (payment.method === 'T-Bank') {
           price = payment.price.toNumber() / 100;
         } else {
           price = payment.price.toNumber();
