@@ -266,7 +266,8 @@ export class ProductController {
   })
   async bigoValidate(@Body() data: BigoValidateDto) {
     const { user_id } = data;
-    return this.smileService.bigoValidate(user_id);
+    return { status: 'success' };
+    // return this.smileService.bigoValidate(user_id);
   }
 
   @Get(':id')
